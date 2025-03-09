@@ -2,13 +2,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/supabase";
 import { Icon } from "@iconify/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import React from "react";
 
 export default function LoginTemplate() {
   const email = React.useId();
   const password = React.useId();
+
+  const navigate = useNavigate({ from: "/" });
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(formData);
+
+    const { error, data } = await supabase.auth.signInWithPassword(payload);
+
+    if (error) throw new Error(error.message);
+
+    navigate({
+      to: "/dashboard",
+      replace: true,
+    });
+  }
 
   return (
     <main className="grid min-h-svh place-content-center gap-y-6 *:max-w-sm">
@@ -23,7 +42,7 @@ export default function LoginTemplate() {
           </Link>
         </p>
       </section>
-      <form className="grid gap-y-3">
+      <form className="grid gap-y-3" onSubmit={handleSubmit}>
         <fieldset className="grid gap-y-1.5">
           <Label htmlFor={email}>Email</Label>
           <Input
