@@ -12,9 +12,11 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RegisterImport } from './routes/register'
-import { Route as DashboardImport } from './routes/dashboard'
-import { Route as BucketsImport } from './routes/buckets'
+import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
+import { Route as AuthedBucketsIndexImport } from './routes/_authed/buckets/index'
+import { Route as AuthedBucketsCreateImport } from './routes/_authed/buckets/create'
 
 // Create/Update Routes
 
@@ -24,15 +26,8 @@ const RegisterRoute = RegisterImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardRoute = DashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const BucketsRoute = BucketsImport.update({
-  id: '/buckets',
-  path: '/buckets',
+const AuthedRouteRoute = AuthedRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -40,6 +35,24 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedDashboardRoute = AuthedDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedBucketsIndexRoute = AuthedBucketsIndexImport.update({
+  id: '/buckets/',
+  path: '/buckets/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedBucketsCreateRoute = AuthedBucketsCreateImport.update({
+  id: '/buckets/create',
+  path: '/buckets/create',
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -53,18 +66,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/buckets': {
-      id: '/buckets'
-      path: '/buckets'
-      fullPath: '/buckets'
-      preLoaderRoute: typeof BucketsImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRoute
     }
     '/register': {
@@ -74,53 +80,107 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardImport
+      parentRoute: typeof AuthedRouteImport
+    }
+    '/_authed/buckets/create': {
+      id: '/_authed/buckets/create'
+      path: '/buckets/create'
+      fullPath: '/buckets/create'
+      preLoaderRoute: typeof AuthedBucketsCreateImport
+      parentRoute: typeof AuthedRouteImport
+    }
+    '/_authed/buckets/': {
+      id: '/_authed/buckets/'
+      path: '/buckets'
+      fullPath: '/buckets'
+      preLoaderRoute: typeof AuthedBucketsIndexImport
+      parentRoute: typeof AuthedRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AuthedRouteRouteChildren {
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedBucketsCreateRoute: typeof AuthedBucketsCreateRoute
+  AuthedBucketsIndexRoute: typeof AuthedBucketsIndexRoute
+}
+
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedBucketsCreateRoute: AuthedBucketsCreateRoute,
+  AuthedBucketsIndexRoute: AuthedBucketsIndexRoute,
+}
+
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/buckets': typeof BucketsRoute
-  '/dashboard': typeof DashboardRoute
+  '': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/buckets/create': typeof AuthedBucketsCreateRoute
+  '/buckets': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/buckets': typeof BucketsRoute
-  '/dashboard': typeof DashboardRoute
+  '': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/buckets/create': typeof AuthedBucketsCreateRoute
+  '/buckets': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/buckets': typeof BucketsRoute
-  '/dashboard': typeof DashboardRoute
+  '/_authed': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/buckets/create': typeof AuthedBucketsCreateRoute
+  '/_authed/buckets/': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/buckets' | '/dashboard' | '/register'
+  fullPaths:
+    | '/'
+    | ''
+    | '/register'
+    | '/dashboard'
+    | '/buckets/create'
+    | '/buckets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/buckets' | '/dashboard' | '/register'
-  id: '__root__' | '/' | '/buckets' | '/dashboard' | '/register'
+  to: '/' | '' | '/register' | '/dashboard' | '/buckets/create' | '/buckets'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/register'
+    | '/_authed/dashboard'
+    | '/_authed/buckets/create'
+    | '/_authed/buckets/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BucketsRoute: typeof BucketsRoute
-  DashboardRoute: typeof DashboardRoute
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
   RegisterRoute: typeof RegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BucketsRoute: BucketsRoute,
-  DashboardRoute: DashboardRoute,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
   RegisterRoute: RegisterRoute,
 }
 
@@ -135,22 +195,35 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/buckets",
-        "/dashboard",
+        "/_authed",
         "/register"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/buckets": {
-      "filePath": "buckets.tsx"
-    },
-    "/dashboard": {
-      "filePath": "dashboard.tsx"
+    "/_authed": {
+      "filePath": "_authed/route.tsx",
+      "children": [
+        "/_authed/dashboard",
+        "/_authed/buckets/create",
+        "/_authed/buckets/"
+      ]
     },
     "/register": {
       "filePath": "register.tsx"
+    },
+    "/_authed/dashboard": {
+      "filePath": "_authed/dashboard.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/buckets/create": {
+      "filePath": "_authed/buckets/create.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/buckets/": {
+      "filePath": "_authed/buckets/index.tsx",
+      "parent": "/_authed"
     }
   }
 }
