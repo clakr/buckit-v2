@@ -8,29 +8,31 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as RegisterImport } from './routes/register'
 import { Route as DashboardImport } from './routes/dashboard'
+import { Route as BucketsImport } from './routes/buckets'
 import { Route as IndexImport } from './routes/index'
-
-// Create Virtual Routes
-
-const RegisterLazyImport = createFileRoute('/register')()
 
 // Create/Update Routes
 
-const RegisterLazyRoute = RegisterLazyImport.update({
+const RegisterRoute = RegisterImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
+} as any)
 
 const DashboardRoute = DashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BucketsRoute = BucketsImport.update({
+  id: '/buckets',
+  path: '/buckets',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -51,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/buckets': {
+      id: '/buckets'
+      path: '/buckets'
+      fullPath: '/buckets'
+      preLoaderRoute: typeof BucketsImport
+      parentRoute: typeof rootRoute
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -62,7 +71,7 @@ declare module '@tanstack/react-router' {
       id: '/register'
       path: '/register'
       fullPath: '/register'
-      preLoaderRoute: typeof RegisterLazyImport
+      preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
   }
@@ -72,42 +81,47 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/buckets': typeof BucketsRoute
   '/dashboard': typeof DashboardRoute
-  '/register': typeof RegisterLazyRoute
+  '/register': typeof RegisterRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/buckets': typeof BucketsRoute
   '/dashboard': typeof DashboardRoute
-  '/register': typeof RegisterLazyRoute
+  '/register': typeof RegisterRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/buckets': typeof BucketsRoute
   '/dashboard': typeof DashboardRoute
-  '/register': typeof RegisterLazyRoute
+  '/register': typeof RegisterRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/register'
+  fullPaths: '/' | '/buckets' | '/dashboard' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/register'
-  id: '__root__' | '/' | '/dashboard' | '/register'
+  to: '/' | '/buckets' | '/dashboard' | '/register'
+  id: '__root__' | '/' | '/buckets' | '/dashboard' | '/register'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BucketsRoute: typeof BucketsRoute
   DashboardRoute: typeof DashboardRoute
-  RegisterLazyRoute: typeof RegisterLazyRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BucketsRoute: BucketsRoute,
   DashboardRoute: DashboardRoute,
-  RegisterLazyRoute: RegisterLazyRoute,
+  RegisterRoute: RegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -121,6 +135,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/buckets",
         "/dashboard",
         "/register"
       ]
@@ -128,11 +143,14 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/buckets": {
+      "filePath": "buckets.tsx"
+    },
     "/dashboard": {
       "filePath": "dashboard.tsx"
     },
     "/register": {
-      "filePath": "register.lazy.tsx"
+      "filePath": "register.tsx"
     }
   }
 }

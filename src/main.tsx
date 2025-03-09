@@ -1,12 +1,22 @@
 import "@/global.css";
 import { routeTree } from "@/routeTree.gen";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
+
+export const queryClient = new QueryClient();
 
 // Set up a Router instance
 const router = createRouter({
   routeTree,
+  context: {
+    queryClient,
+  },
   defaultPreload: "intent",
+  defaultPreloadStaleTime: 0,
+  scrollRestoration: true,
+  defaultPendingComponent: () => <div>loading...</div>,
+  defaultErrorComponent: ({ error }) => <div>{error.message}</div>,
 });
 
 // Register things for typesafety
@@ -20,5 +30,9 @@ const rootElement = document.getElementById("app")!;
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(<RouterProvider router={router} />);
+  root.render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
 }

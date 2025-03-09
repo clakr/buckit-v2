@@ -17,14 +17,16 @@ export default function LoginTemplate() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const payload = Object.fromEntries(formData);
 
-    const { error, data } = await supabase.auth.signInWithPassword(payload);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.get("email")?.toString() ?? "",
+      password: formData.get("password")?.toString() ?? "",
+    });
 
     if (error) throw new Error(error.message);
 
     navigate({
-      to: "/dashboard",
+      to: "/buckets",
       replace: true,
     });
   }
