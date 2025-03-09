@@ -1,5 +1,5 @@
-import "./global.css";
-import { routeTree } from "./routeTree.gen";
+import "@/global.css";
+import { routeTree } from "@/routeTree.gen";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 

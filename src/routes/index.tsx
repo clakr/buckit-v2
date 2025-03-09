@@ -1,13 +1,6 @@
+import LoginTemplate from "@/modules/authentication/templates/login-template";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: HomeComponent,
+  component: LoginTemplate,
 });
-
-function HomeComponent() {
-  return (
-    <div className="p-2">
-      <h3>Welcome Home!</h3>
-    </div>
-  );
-}
