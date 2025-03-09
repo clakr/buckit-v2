@@ -8,14 +8,22 @@
     "dev": "vite --port=3001",
     "build": "vite build",
     "serve": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "lint": "eslint .",
+    "format": "prettier . --write",
+    "precommit": "eslint . && prettier . --write"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.0.12",
     "@tanstack/router-plugin": "1.114.1",
+    "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "@vitejs/plugin-react": "4.3.2",
+    "eslint": "9.22.0",
+    "eslint-plugin-react": "7.37.4",
+    "prettier": "3.5.3",
+    "prettier-plugin-tailwindcss": "0.6.11",
     "tailwindcss": "4.0.12",
     "vite": "6.0.3"
   },
