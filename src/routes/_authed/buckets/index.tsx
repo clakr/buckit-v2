@@ -6,4 +6,9 @@ export const Route = createFileRoute("/_authed/buckets/")({
   component: BucketsTemplate,
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(bucketsQueryOptions),
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      bucketId: (search.bucketId as string) ?? "",
+    };
+  },
 });

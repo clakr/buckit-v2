@@ -51,6 +51,9 @@ export default function CreateBucketTemplate() {
 
       navigate({
         to: "/buckets",
+        search: {
+          bucketId: "",
+        },
       });
     },
   });
