@@ -9,7 +9,7 @@ import {
 import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
 import { Tables } from "@/supabase/database.types";
 import { Icon } from "@iconify/react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 type Props = { bucketId: Tables<"buckets">["id"] };
@@ -69,6 +69,12 @@ export default function BucketsActionsDropdownMenu({ bucketId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <Link to="/buckets/$bucketId" params={{ bucketId }}>
+              <Icon icon="bx:pencil" />
+              Edit Bucket
+            </Link>
+          </DropdownMenuItem>
           <DialogTrigger
             onClick={() => setDialogContent("archive-bucket")}
             asChild

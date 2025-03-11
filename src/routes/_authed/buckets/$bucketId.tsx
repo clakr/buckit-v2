@@ -3,29 +3,36 @@ import Main from "@/components/shared/main";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateBucketMutation } from "@/modules/buckets/hooks";
-import { createBucketSchema } from "@/modules/buckets/schemas";
+import { useUpdateBucketMutation } from "@/modules/buckets/hooks";
+import { bucketQueryOptions } from "@/modules/buckets/query-options";
+import { updateBucketSchema } from "@/modules/buckets/schemas";
 import { useForm } from "@tanstack/react-form";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authed/buckets/create")({
-  component: CreateBucketTemplate,
+export const Route = createFileRoute("/_authed/buckets/$bucketId")({
+  component: BucketTemplate,
+  loader: ({ context: { queryClient }, params: { bucketId } }) =>
+    queryClient.ensureQueryData(bucketQueryOptions(bucketId)),
 });
 
-export default function CreateBucketTemplate() {
+function BucketTemplate() {
   const navigate = Route.useNavigate();
+  const { bucketId } = Route.useParams();
 
-  const { mutateAsync, isPending } = useCreateBucketMutation();
+  const { data: bucket } = useSuspenseQuery(bucketQueryOptions(bucketId));
+
+  const { mutateAsync, isPending } = useUpdateBucketMutation();
 
   const form = useForm({
     defaultValues: {
-      name: "",
-      description: "",
-      current_amount: "",
+      name: bucket?.name ?? "",
+      description: bucket?.description ?? "",
+      current_amount: bucket?.current_amount ?? "",
     },
     validators: {
       onSubmit: ({ value }) => {
-        const { success, error } = createBucketSchema.safeParse(value);
+        const { success, error } = updateBucketSchema.safeParse(value);
 
         if (!success) {
           return {
@@ -35,9 +42,12 @@ export default function CreateBucketTemplate() {
       },
     },
     onSubmit: async ({ value }) => {
-      const payload = createBucketSchema.parse(value);
+      const payload = updateBucketSchema.parse(value);
 
-      await mutateAsync(payload);
+      await mutateAsync({
+        id: bucketId,
+        ...payload,
+      });
 
       navigate({
         to: "/buckets",
@@ -49,13 +59,12 @@ export default function CreateBucketTemplate() {
   });
 
   return (
-    <Main className="grid gap-y-4">
-      <h1 className="text-3xl font-bold">Create Bucket</h1>
+    <Main>
       <form
         className="grid gap-y-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
           form.handleSubmit();
         }}
       >
@@ -152,7 +161,7 @@ export default function CreateBucketTemplate() {
           className="justify-self-end"
           isLoading={isPending}
         >
-          Create
+          Update
         </LoadingButton>
       </form>
     </Main>
