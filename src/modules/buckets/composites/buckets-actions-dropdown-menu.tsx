@@ -60,11 +60,7 @@ export default function BucketsActionsDropdownMenu({ bucketId }: Props) {
     <Dialog onOpenChange={handleDialogOpenChange}>
       <DropdownMenu onOpenChange={handleDropdownOpenChange}>
         <DropdownMenuTrigger asChild>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute top-4 right-4"
-          >
+          <Button size="icon" variant="ghost" className="-me-2 -mt-2">
             <Icon icon="bx:dots-vertical-rounded" className="size-5" />
           </Button>
         </DropdownMenuTrigger>

@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { formatToCurrency } from "@/lib/utils";
 import BucketsActionsDropdownMenu from "@/modules/buckets/composites/buckets-actions-dropdown-menu";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -35,15 +36,16 @@ export default function BucketsTemplate() {
       </section>
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
         {buckets.map((bucket) => (
-          <Card key={bucket.id} className="relative">
-            <BucketsActionsDropdownMenu bucketId={bucket.id} />
-
-            <CardHeader>
-              <CardTitle>{bucket.name}</CardTitle>
-              <CardDescription>{bucket.description}</CardDescription>
+          <Card key={bucket.id} className="justify-between">
+            <CardHeader className="grid grid-cols-[1fr_max-content]">
+              <div>
+                <CardTitle>{bucket.name}</CardTitle>
+                <CardDescription>{bucket.description}</CardDescription>
+              </div>
+              <BucketsActionsDropdownMenu bucketId={bucket.id} />
             </CardHeader>
-            <CardFooter className="self-end">
-              {bucket.current_amount}
+            <CardFooter className="self-end font-bold">
+              {formatToCurrency(bucket.current_amount)}
             </CardFooter>
           </Card>
         ))}
