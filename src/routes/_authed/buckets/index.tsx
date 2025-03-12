@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -10,28 +11,71 @@ import BucketsActionsDropdownMenu from "@/modules/buckets/composites/buckets-act
 import CreateBucketDialog from "@/modules/buckets/composites/create-bucket-dialog";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import EmptyBucketsSection from "@/modules/buckets/sections/empty-buckets-section";
-import LoadingBucketsSection from "@/modules/buckets/sections/loading-buckets-section";
 import IndexTemplate from "@/modules/buckets/templates/index-template";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Icon } from "@iconify/react";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authed/buckets/")({
-  component: BucketsRoute,
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(bucketsQueryOptions),
   validateSearch: (search: Record<string, unknown>) => ({
     bucketId: (search.bucketId as string) ?? "",
   }),
-  pendingComponent() {
-    return (
-      <IndexTemplate>
-        <LoadingBucketsSection />
-      </IndexTemplate>
-    );
-  },
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(bucketsQueryOptions),
+  pendingComponent: BucketsLoadingComponent,
+  errorComponent: BucketsErrorComponent,
+  component: BucketsComponent,
 });
 
-export default function BucketsRoute() {
+function BucketsLoadingComponent() {
+  return (
+    <IndexTemplate>
+      <section className="grid min-h-[25svh] place-content-center place-items-center gap-y-4 text-center">
+        <Icon
+          icon="bx:loader-alt"
+          className="text-muted-foreground size-12 animate-spin"
+        />
+        <div>
+          <h2 className="text-xl font-medium">Loading buckets...</h2>
+          <p className="text-muted-foreground text-sm">
+            Please wait while we fetch your buckets.
+          </p>
+        </div>
+      </section>
+    </IndexTemplate>
+  );
+}
+
+function BucketsErrorComponent({ reset }: ErrorComponentProps) {
+  const queryErrorResetBoundary = useQueryErrorResetBoundary();
+
+  useEffect(() => {
+    queryErrorResetBoundary.reset();
+  }, [queryErrorResetBoundary]);
+
+  return (
+    <IndexTemplate>
+      <section className="grid min-h-[25svh] place-content-center place-items-center gap-y-4 text-center">
+        <Icon icon="bx:info-circle" className="text-destructive size-12" />
+        <div>
+          <h2 className="text-xl font-medium">Failed to load buckets</h2>
+          <p className="text-muted-foreground text-sm">
+            There was en error loading your buckets. Please try again.
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => reset()}>
+          Try again
+        </Button>
+      </section>
+    </IndexTemplate>
+  );
+}
+
+function BucketsComponent() {
   const { data: buckets } = useSuspenseQuery(bucketsQueryOptions);
 
   const isBucketsEmpty = buckets.length === 0;
