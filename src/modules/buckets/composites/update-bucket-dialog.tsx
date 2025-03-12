@@ -1,5 +1,10 @@
 import LoadingButton from "@/components/shared/composites/loading-button";
-import Main from "@/components/shared/main";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,17 +13,10 @@ import { bucketQueryOptions } from "@/modules/buckets/query-options";
 import { updateBucketSchema } from "@/modules/buckets/schemas";
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { getRouteApi } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authed/buckets/$bucketId")({
-  component: BucketTemplate,
-  loader: ({ context: { queryClient }, params: { bucketId } }) =>
-    queryClient.ensureQueryData(bucketQueryOptions(bucketId)),
-});
-
-function BucketTemplate() {
-  const navigate = Route.useNavigate();
-  const { bucketId } = Route.useParams();
+export default function UpdateBucketDialog() {
+  const { bucketId } = getRouteApi("/_authed/buckets/").useSearch();
 
   const { data: bucket } = useSuspenseQuery(bucketQueryOptions(bucketId));
 
@@ -48,18 +46,17 @@ function BucketTemplate() {
         id: bucketId,
         ...payload,
       });
-
-      navigate({
-        to: "/buckets",
-        search: {
-          bucketId: "",
-        },
-      });
     },
   });
 
   return (
-    <Main>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Update Bucket</DialogTitle>
+        <DialogDescription>
+          Please enter the details to update this bucket.
+        </DialogDescription>
+      </DialogHeader>
       <form
         className="grid gap-y-3"
         onSubmit={(e) => {
@@ -164,6 +161,6 @@ function BucketTemplate() {
           Update
         </LoadingButton>
       </form>
-    </Main>
+    </DialogContent>
   );
 }

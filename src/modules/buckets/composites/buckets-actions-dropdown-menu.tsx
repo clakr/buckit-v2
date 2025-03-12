@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
+import UpdateBucketDialog from "@/modules/buckets/composites/update-bucket-dialog";
 import { Tables } from "@/supabase/database.types";
 import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -14,7 +15,7 @@ import { useState } from "react";
 
 type Props = { bucketId: Tables<"buckets">["id"] };
 
-type DialogContent = "archive-bucket";
+type DialogContent = "archive-bucket" | "update-bucket";
 
 export default function BucketsActionsDropdownMenu({ bucketId }: Props) {
   const navigate = useNavigate({
@@ -28,6 +29,8 @@ export default function BucketsActionsDropdownMenu({ bucketId }: Props) {
   function DialogContent() {
     if (dialogContent === "archive-bucket") {
       return <ArchiveBucketDialog />;
+    } else if (dialogContent === "update-bucket") {
+      return <UpdateBucketDialog />;
     }
 
     return null;
@@ -65,12 +68,15 @@ export default function BucketsActionsDropdownMenu({ bucketId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem asChild>
-            <Link to="/buckets/$bucketId" params={{ bucketId }}>
+          <DialogTrigger
+            onClick={() => setDialogContent("update-bucket")}
+            asChild
+          >
+            <DropdownMenuItem>
               <Icon icon="bx:pencil" />
-              Edit Bucket
-            </Link>
-          </DropdownMenuItem>
+              Update Bucket
+            </DropdownMenuItem>
+          </DialogTrigger>
           <DialogTrigger
             onClick={() => setDialogContent("archive-bucket")}
             asChild

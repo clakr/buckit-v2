@@ -50,7 +50,7 @@ export default function CreateBucketDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>Create Bucket Dialog</Button>
+        <Button>Create Bucket</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
