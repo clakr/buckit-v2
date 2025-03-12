@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { formatToCurrency } from "@/lib/utils";
 import BucketsActionsDropdownMenu from "@/modules/buckets/composites/buckets-actions-dropdown-menu";
+import CreateBucketDialog from "@/modules/buckets/composites/create-bucket-dialog";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -30,9 +31,7 @@ export default function BucketsTemplate() {
     <Main className="grid gap-y-4">
       <section className="flex items-end justify-between">
         <h1 className="text-3xl font-bold">Buckets</h1>
-        <Button className="justify-self-end" asChild>
-          <Link to="/buckets/create">Create Bucket</Link>
-        </Button>
+        <CreateBucketDialog />
       </section>
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
         {buckets.map((bucket) => (

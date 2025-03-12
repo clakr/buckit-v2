@@ -16,7 +16,6 @@ import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsIndexImport } from './routes/_authed/buckets/index'
-import { Route as AuthedBucketsCreateImport } from './routes/_authed/buckets/create'
 import { Route as AuthedBucketsBucketIdImport } from './routes/_authed/buckets/$bucketId'
 
 // Create/Update Routes
@@ -47,12 +46,6 @@ const AuthedDashboardRoute = AuthedDashboardImport.update({
 const AuthedBucketsIndexRoute = AuthedBucketsIndexImport.update({
   id: '/buckets/',
   path: '/buckets/',
-  getParentRoute: () => AuthedRouteRoute,
-} as any)
-
-const AuthedBucketsCreateRoute = AuthedBucketsCreateImport.update({
-  id: '/buckets/create',
-  path: '/buckets/create',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
@@ -101,13 +94,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedBucketsBucketIdImport
       parentRoute: typeof AuthedRouteImport
     }
-    '/_authed/buckets/create': {
-      id: '/_authed/buckets/create'
-      path: '/buckets/create'
-      fullPath: '/buckets/create'
-      preLoaderRoute: typeof AuthedBucketsCreateImport
-      parentRoute: typeof AuthedRouteImport
-    }
     '/_authed/buckets/': {
       id: '/_authed/buckets/'
       path: '/buckets'
@@ -123,14 +109,12 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedBucketsBucketIdRoute: typeof AuthedBucketsBucketIdRoute
-  AuthedBucketsCreateRoute: typeof AuthedBucketsCreateRoute
   AuthedBucketsIndexRoute: typeof AuthedBucketsIndexRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedBucketsBucketIdRoute: AuthedBucketsBucketIdRoute,
-  AuthedBucketsCreateRoute: AuthedBucketsCreateRoute,
   AuthedBucketsIndexRoute: AuthedBucketsIndexRoute,
 }
 
@@ -144,7 +128,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/buckets/$bucketId': typeof AuthedBucketsBucketIdRoute
-  '/buckets/create': typeof AuthedBucketsCreateRoute
   '/buckets': typeof AuthedBucketsIndexRoute
 }
 
@@ -154,7 +137,6 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/buckets/$bucketId': typeof AuthedBucketsBucketIdRoute
-  '/buckets/create': typeof AuthedBucketsCreateRoute
   '/buckets': typeof AuthedBucketsIndexRoute
 }
 
@@ -165,7 +147,6 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/buckets/$bucketId': typeof AuthedBucketsBucketIdRoute
-  '/_authed/buckets/create': typeof AuthedBucketsCreateRoute
   '/_authed/buckets/': typeof AuthedBucketsIndexRoute
 }
 
@@ -177,17 +158,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/dashboard'
     | '/buckets/$bucketId'
-    | '/buckets/create'
     | '/buckets'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/register'
-    | '/dashboard'
-    | '/buckets/$bucketId'
-    | '/buckets/create'
-    | '/buckets'
+  to: '/' | '' | '/register' | '/dashboard' | '/buckets/$bucketId' | '/buckets'
   id:
     | '__root__'
     | '/'
@@ -195,7 +168,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authed/dashboard'
     | '/_authed/buckets/$bucketId'
-    | '/_authed/buckets/create'
     | '/_authed/buckets/'
   fileRoutesById: FileRoutesById
 }
@@ -235,7 +207,6 @@ export const routeTree = rootRoute
       "children": [
         "/_authed/dashboard",
         "/_authed/buckets/$bucketId",
-        "/_authed/buckets/create",
         "/_authed/buckets/"
       ]
     },
@@ -248,10 +219,6 @@ export const routeTree = rootRoute
     },
     "/_authed/buckets/$bucketId": {
       "filePath": "_authed/buckets/$bucketId.tsx",
-      "parent": "/_authed"
-    },
-    "/_authed/buckets/create": {
-      "filePath": "_authed/buckets/create.tsx",
       "parent": "/_authed"
     },
     "/_authed/buckets/": {
