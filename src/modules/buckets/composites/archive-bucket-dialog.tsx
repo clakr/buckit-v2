@@ -10,13 +10,22 @@ import { useArchiveBucketMutation } from "@/modules/buckets/hooks";
 import { getRouteApi } from "@tanstack/react-router";
 
 export default function ArchiveBucketDialog() {
-  const { bucketId } = getRouteApi("/_authed/buckets/").useSearch();
+  const routeApi = getRouteApi("/_authed/buckets/");
+
+  const navigate = routeApi.useNavigate();
+  const { bucketId } = routeApi.useSearch();
 
   const { mutateAsync, isPending } = useArchiveBucketMutation();
 
   async function handleArchive() {
     await mutateAsync({
       id: bucketId,
+    });
+
+    navigate({
+      search: {
+        bucketId: "",
+      },
     });
   }
 

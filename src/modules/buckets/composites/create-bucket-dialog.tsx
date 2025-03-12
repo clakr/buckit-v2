@@ -1,24 +1,23 @@
 import LoadingButton from "@/components/shared/composites/loading-button";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateBucketMutation } from "@/modules/buckets/hooks";
 import { createBucketSchema } from "@/modules/buckets/schemas";
+import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { useForm } from "@tanstack/react-form";
-import React from "react";
 
 export default function CreateBucketDialog() {
+  const { isOpen, toggleDialog } = useCreateBucketDialogStore();
+
   const { mutateAsync, isPending } = useCreateBucketMutation();
-  const [isOpen, setIsOpen] = React.useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -42,16 +41,14 @@ export default function CreateBucketDialog() {
 
       await mutateAsync(payload);
 
-      setIsOpen(false);
+      toggleDialog();
+
       form.reset();
     },
   });
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>Create Bucket</Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={toggleDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create a New Bucket</DialogTitle>

@@ -6,8 +6,6 @@ import { queryOptions } from "@tanstack/react-query";
 export const bucketsQueryOptions = queryOptions({
   queryKey: ["buckets"],
   queryFn: async () => {
-    await new Promise((r) => setTimeout(r, 3000));
-
     const { error, data } = await supabase
       .from("buckets")
       .select()
@@ -23,8 +21,6 @@ export function bucketQueryOptions(bucketId: Tables<"buckets">["id"]) {
   return queryOptions({
     queryKey: ["buckets", bucketId],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 3000));
-
       const { error, data } = await supabase
         .from("buckets")
         .select()
