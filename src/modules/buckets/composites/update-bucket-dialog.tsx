@@ -1,6 +1,5 @@
 import LoadingButton from "@/components/shared/composites/loading-button";
 import {
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -11,12 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useUpdateBucketMutation } from "@/modules/buckets/hooks";
 import { bucketQueryOptions } from "@/modules/buckets/query-options";
 import { updateBucketSchema } from "@/modules/buckets/schemas";
+import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { getRouteApi } from "@tanstack/react-router";
+import { useShallow } from "zustand/react/shallow";
 
 export default function UpdateBucketDialog() {
-  const { bucketId } = getRouteApi("/_authed/buckets/").useSearch();
+  const { bucketId } = useBucketDropdownMenuStore(
+    useShallow((state) => ({ bucketId: state.bucketId })),
+  );
 
   const { data: bucket } = useSuspenseQuery(bucketQueryOptions(bucketId));
 
@@ -50,7 +52,7 @@ export default function UpdateBucketDialog() {
   });
 
   return (
-    <DialogContent>
+    <>
       <DialogHeader>
         <DialogTitle>Update Bucket</DialogTitle>
         <DialogDescription>
@@ -161,6 +163,6 @@ export default function UpdateBucketDialog() {
           Update
         </LoadingButton>
       </form>
-    </DialogContent>
+    </>
   );
 }

@@ -1,19 +1,18 @@
 import LoadingButton from "@/components/shared/composites/loading-button";
 import {
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useArchiveBucketMutation } from "@/modules/buckets/hooks";
-import { getRouteApi } from "@tanstack/react-router";
+import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
+import { useShallow } from "zustand/react/shallow";
 
 export default function ArchiveBucketDialog() {
-  const routeApi = getRouteApi("/_authed/buckets/");
-
-  const navigate = routeApi.useNavigate();
-  const { bucketId } = routeApi.useSearch();
+  const { bucketId } = useBucketDropdownMenuStore(
+    useShallow((state) => ({ bucketId: state.bucketId })),
+  );
 
   const { mutateAsync, isPending } = useArchiveBucketMutation();
 
@@ -22,15 +21,14 @@ export default function ArchiveBucketDialog() {
       id: bucketId,
     });
 
-    navigate({
-      search: {
-        bucketId: "",
-      },
-    });
+    const closeButtonElement = document.querySelector<HTMLButtonElement>(
+      "button[data-button=close]",
+    );
+    closeButtonElement?.click();
   }
 
   return (
-    <DialogContent>
+    <>
       <DialogHeader>
         <DialogTitle>Archive Bucket?</DialogTitle>
         <DialogDescription>
@@ -47,6 +45,6 @@ export default function ArchiveBucketDialog() {
           Archive
         </LoadingButton>
       </DialogFooter>
-    </DialogContent>
+    </>
   );
 }

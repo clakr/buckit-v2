@@ -32,9 +32,6 @@ export default function LoginTemplate() {
 
     navigate({
       to: "/buckets",
-      search: {
-        bucketId: "",
-      },
       replace: true,
     });
   }
