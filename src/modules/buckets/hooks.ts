@@ -1,12 +1,19 @@
 import { queryClient } from "@/main";
-import { bucketsQueryOptions } from "@/modules/buckets/query-options";
+import {
+  bucketQueryOptions,
+  bucketsQueryOptions,
+} from "@/modules/buckets/query-options";
 import { supabase } from "@/supabase";
-import { TablesInsert, TablesUpdate } from "@/supabase/database.types";
+import {
+  BucketInsert,
+  BucketTransactionInsert,
+  BucketUpdate,
+} from "@/supabase/types";
 import { useMutation } from "@tanstack/react-query";
 
 export function useCreateBucketMutation() {
   return useMutation({
-    mutationFn: async (payload: TablesInsert<"buckets">) => {
+    mutationFn: async (payload: BucketInsert) => {
       const { error, data } = await supabase.from("buckets").insert([payload]);
 
       if (error) throw new Error(error.message);
@@ -22,9 +29,7 @@ export function useCreateBucketMutation() {
 
 export function useArchiveBucketMutation() {
   return useMutation({
-    mutationFn: async (payload: {
-      id: NonNullable<TablesUpdate<"buckets">["id"]>;
-    }) => {
+    mutationFn: async (payload: { id: NonNullable<BucketUpdate["id"]> }) => {
       const { error, data } = await supabase
         .from("buckets")
         .update({
@@ -37,18 +42,18 @@ export function useArchiveBucketMutation() {
 
       return data;
     },
-    onSuccess: () =>
+    onSuccess: (_, variables) =>
       queryClient.invalidateQueries({
-        queryKey: bucketsQueryOptions.queryKey,
+        queryKey: bucketQueryOptions(variables.id).queryKey,
       }),
   });
 }
 
 export function useUpdateBucketMutation() {
   return useMutation({
-    mutationFn: async (payload: TablesUpdate<"buckets">) => {
-      if (!payload.id) throw new Error("Bucket ID not provided");
-
+    mutationFn: async (
+      payload: BucketInsert & { id: NonNullable<BucketInsert["id"]> },
+    ) => {
       const { error, data } = await supabase
         .from("buckets")
         .update(payload)
@@ -58,9 +63,24 @@ export function useUpdateBucketMutation() {
 
       return data;
     },
-    onSuccess: () =>
+    onSuccess: (_, variables) =>
       queryClient.invalidateQueries({
-        queryKey: bucketsQueryOptions.queryKey,
+        queryKey: bucketQueryOptions(variables.id).queryKey,
       }),
+  });
+}
+
+export function useCreateBucketTransactionMutation() {
+  return useMutation({
+    mutationFn: async (payload: BucketTransactionInsert) => {
+      const { error, data } = await supabase
+        .from("bucket_transactions")
+        .insert(payload)
+        .select();
+
+      if (error) throw new Error(error.message);
+
+      return data;
+    },
   });
 }

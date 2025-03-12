@@ -6,34 +6,32 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { useUpdateBucketMutation } from "@/modules/buckets/hooks";
-import { bucketQueryOptions } from "@/modules/buckets/query-options";
-import { updateBucketSchema } from "@/modules/buckets/schemas";
+import { useCreateBucketTransactionMutation } from "@/modules/buckets/hooks";
+import { createBucketTransactionSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useForm } from "@tanstack/react-form";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
 
-export default function UpdateBucketDialog() {
+export function CreateBucketTransactionDialog() {
   const { bucketId } = useBucketDropdownMenuStore(
     useShallow((state) => ({ bucketId: state.bucketId })),
   );
 
-  const { data: bucket } = useSuspenseQuery(bucketQueryOptions(bucketId));
-
-  const { mutateAsync, isPending } = useUpdateBucketMutation();
+  const { mutateAsync, isPending } = useCreateBucketTransactionMutation();
 
   const form = useForm({
     defaultValues: {
-      name: bucket?.name ?? "",
-      description: bucket?.description ?? "",
-      current_amount: bucket?.current_amount ?? "",
+      bucket_id: bucketId,
+      amount: "",
+      description: "",
+      type: "",
     },
     validators: {
       onSubmit: ({ value }) => {
-        const { success, error } = updateBucketSchema.safeParse(value);
-
+        const { success, error } =
+          createBucketTransactionSchema.safeParse(value);
         if (!success) {
           return {
             fields: error.flatten().fieldErrors,
@@ -42,47 +40,39 @@ export default function UpdateBucketDialog() {
       },
     },
     onSubmit: async ({ value }) => {
-      const payload = updateBucketSchema.parse(value);
+      const payload = createBucketTransactionSchema.parse(value);
 
-      await mutateAsync({
-        id: bucketId,
-        ...payload,
-      });
+      await mutateAsync(payload);
 
       form.reset();
-
-      const closeButtonElement = document.querySelector<HTMLButtonElement>(
-        "button[data-button=close]",
-      );
-      closeButtonElement?.click();
     },
   });
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Update Bucket</DialogTitle>
+        <DialogTitle>Create Bucket Transaction</DialogTitle>
         <DialogDescription>
-          Please enter the details to update this bucket.
+          Please enter the details to create a transaction for this bucket.
         </DialogDescription>
       </DialogHeader>
       <form
         className="grid gap-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
           form.handleSubmit();
         }}
       >
         <form.Field
-          name="name"
+          name="amount"
           children={(field) => (
             <fieldset className="group grid grid-cols-2 gap-y-1.5">
               <Label
                 htmlFor={field.name}
                 className="group-has-[em]:text-destructive"
               >
-                Name
+                Amount
               </Label>
               {field.state.meta.errors.length > 0 ? (
                 <em
@@ -94,7 +84,7 @@ export default function UpdateBucketDialog() {
               ) : null}
               <Input
                 id={field.name}
-                type="text"
+                type="number"
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -112,7 +102,6 @@ export default function UpdateBucketDialog() {
                 className="group-has-[em]:text-destructive items-end gap-x-1"
               >
                 Description
-                <small>(optional)</small>
               </Label>
               {field.state.meta.errors.length > 0 ? (
                 <em
@@ -134,14 +123,14 @@ export default function UpdateBucketDialog() {
           )}
         />
         <form.Field
-          name="current_amount"
+          name="type"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
+            <fieldset className="group grid grid-cols-2 gap-y-3">
               <Label
                 htmlFor={field.name}
                 className="group-has-[em]:text-destructive"
               >
-                Current Amount
+                Type
               </Label>
               {field.state.meta.errors.length > 0 ? (
                 <em
@@ -151,14 +140,21 @@ export default function UpdateBucketDialog() {
                   {field.state.meta.errors.join(", ")}
                 </em>
               ) : null}
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
+              <RadioGroup
+                className="group-has-[em]:text-destructive col-span-full gap-y-2"
+                defaultValue={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
+                onValueChange={(value) => field.handleChange(value)}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="inbound" id="inbound" />
+                  <Label htmlFor="inbound">Inbound</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="outbound" id="outbound" />
+                  <Label htmlFor="outbound">Outbound</Label>
+                </div>
+              </RadioGroup>
             </fieldset>
           )}
         />
@@ -167,7 +163,7 @@ export default function UpdateBucketDialog() {
           className="justify-self-end"
           isLoading={isPending}
         >
-          Update
+          Create
         </LoadingButton>
       </form>
     </>

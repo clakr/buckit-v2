@@ -9,7 +9,10 @@ export const useCreateBucketDialogStore = create<{
   toggleDialog: () => set((state) => ({ isOpen: !state.isOpen })),
 }));
 
-type DialogContentState = "update-bucket" | "archive-bucket";
+type DialogContentState =
+  | "create-transaction"
+  | "update-bucket"
+  | "archive-bucket";
 export const useBucketDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;

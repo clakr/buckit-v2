@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createBucketSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
+    .nonempty("Name is required")
     .max(255, "Name must be less than 255 characters"),
   description: z
     .string()
@@ -15,3 +15,18 @@ export const createBucketSchema = z.object({
 });
 
 export const updateBucketSchema = createBucketSchema;
+
+export const createBucketTransactionSchema = z.object({
+  bucket_id: z
+    .string()
+    .uuid("Invalid bucket ID")
+    .nonempty("Bucket ID is required"),
+  amount: z.coerce
+    .number()
+    .min(0.01, "Amount must be greater than 0")
+    .max(1000000000, "Amount must be less than 1,000,000,000"),
+  description: z.string().nonempty("Description is required"),
+  type: z.enum(["inbound", "outbound"], {
+    message: "Transaction type must be inbound or outbound",
+  }),
+});

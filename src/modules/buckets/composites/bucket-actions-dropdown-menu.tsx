@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
+import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
 import UpdateBucketDialog from "@/modules/buckets/composites/update-bucket-dialog";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { Bucket } from "@/supabase/types";
@@ -31,6 +32,8 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
       return <UpdateBucketDialog />;
     } else if (dialogContentState === "archive-bucket") {
       return <ArchiveBucketDialog />;
+    } else if (dialogContentState === "create-transaction") {
+      return <CreateBucketTransactionDialog />;
     }
     return null;
   }
@@ -44,6 +47,15 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DialogTrigger
+            onClick={() => handleTrigger("create-transaction")}
+            asChild
+          >
+            <DropdownMenuItem>
+              <Icon icon="bx:plus" />
+              Create Transaction
+            </DropdownMenuItem>
+          </DialogTrigger>
           <DialogTrigger onClick={() => handleTrigger("update-bucket")} asChild>
             <DropdownMenuItem>
               <Icon icon="bx:pencil" />
