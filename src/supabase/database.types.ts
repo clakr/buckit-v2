@@ -39,6 +39,7 @@ export type Database = {
           amount: number
           bucket_id: string
           created_at: string
+          current_balance: number
           description: string
           id: string
           type: Database["public"]["Enums"]["transaction_type"]
@@ -48,6 +49,7 @@ export type Database = {
           amount: number
           bucket_id: string
           created_at?: string
+          current_balance: number
           description: string
           id?: string
           type: Database["public"]["Enums"]["transaction_type"]
@@ -57,6 +59,7 @@ export type Database = {
           amount?: number
           bucket_id?: string
           created_at?: string
+          current_balance?: number
           description?: string
           id?: string
           type?: Database["public"]["Enums"]["transaction_type"]
@@ -110,7 +113,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_bucket_current_amount: {
+        Args: {
+          bucket_id: string
+          amount: number
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Returns: number
+      }
     }
     Enums: {
       transaction_type: "inbound" | "outbound"

@@ -29,4 +29,5 @@ export const createBucketTransactionSchema = z.object({
   type: z.enum(["inbound", "outbound"], {
     message: "Transaction type must be inbound or outbound",
   }),
+  current_balance: z.number().default(0),
 });

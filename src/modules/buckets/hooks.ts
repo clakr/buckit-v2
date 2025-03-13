@@ -73,9 +73,22 @@ export function useUpdateBucketMutation() {
 export function useCreateBucketTransactionMutation() {
   return useMutation({
     mutationFn: async (payload: BucketTransactionInsert) => {
-      const { error, data } = await supabase
+      const { error: updateCurrentAmountError, data: updateCurrentAmountData } =
+        await supabase.rpc("update_bucket_current_amount", {
+          bucket_id: payload.bucket_id,
+          amount: payload.amount,
+          transaction_type: payload.type,
+        });
+
+      if (updateCurrentAmountError)
+        throw new Error(updateCurrentAmountError.message);
+
+      const { data, error } = await supabase
         .from("bucket_transactions")
-        .insert(payload)
+        .insert({
+          ...payload,
+          current_balance: updateCurrentAmountData,
+        })
         .select();
 
       if (error) throw new Error(error.message);
