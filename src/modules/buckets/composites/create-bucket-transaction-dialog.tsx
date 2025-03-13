@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { closeDialog } from "@/lib/utils";
 import { useCreateBucketTransactionMutation } from "@/modules/buckets/hooks";
 import { createBucketTransactionSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
@@ -45,6 +46,8 @@ export function CreateBucketTransactionDialog() {
       await mutateAsync(payload);
 
       form.reset();
+
+      closeDialog();
     },
   });
 

@@ -1,6 +1,6 @@
 import { queryClient } from "@/main";
 import { supabase } from "@/supabase";
-import { Tables } from "@/supabase/database.types";
+import { Bucket } from "@/supabase/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const bucketsQueryOptions = queryOptions({
@@ -17,9 +17,9 @@ export const bucketsQueryOptions = queryOptions({
   },
 });
 
-export function bucketQueryOptions(bucketId: Tables<"buckets">["id"]) {
+export function bucketQueryOptions(bucketId: Bucket["id"]) {
   return queryOptions({
-    queryKey: ["buckets", bucketId],
+    queryKey: [...bucketsQueryOptions.queryKey, bucketId],
     queryFn: async () => {
       const { error, data } = await supabase
         .from("buckets")
@@ -33,10 +33,25 @@ export function bucketQueryOptions(bucketId: Tables<"buckets">["id"]) {
     initialData: () => {
       const bucketsQueryData = queryClient.getQueryData([
         "buckets",
-      ]) as Tables<"buckets">[];
+      ]) as Bucket[];
       if (!bucketsQueryData) return undefined;
 
       return bucketsQueryData.find((bucket) => bucketId === bucket.id);
+    },
+  });
+}
+
+export function bucketTransactionsQueryOptions(bucketId: Bucket["id"]) {
+  return queryOptions({
+    queryKey: [...bucketQueryOptions(bucketId).queryKey, "transactions"],
+    queryFn: async () => {
+      const { error, data } = await supabase
+        .from("bucket_transactions")
+        .select("*");
+
+      if (error) throw new Error(error.message);
+
+      return data;
     },
   });
 }

@@ -5,6 +5,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { closeDialog } from "@/lib/utils";
 import { useArchiveBucketMutation } from "@/modules/buckets/hooks";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useShallow } from "zustand/react/shallow";
@@ -21,10 +22,7 @@ export default function ArchiveBucketDialog() {
       id: bucketId,
     });
 
-    const closeButtonElement = document.querySelector<HTMLButtonElement>(
-      "button[data-button=close]",
-    );
-    closeButtonElement?.click();
+    closeDialog();
   }
 
   return (

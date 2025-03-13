@@ -11,3 +11,10 @@ export function formatToCurrency(value: number) {
     currency: "PHP",
   }).format(value);
 }
+
+export function closeDialog() {
+  const closeButtonElement = document.querySelector<HTMLButtonElement>(
+    "button[data-button=close]",
+  );
+  closeButtonElement?.click();
+}

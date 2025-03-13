@@ -11,6 +11,7 @@ export const useCreateBucketDialogStore = create<{
 
 type DialogContentState =
   | "create-transaction"
+  | "view-transactions"
   | "update-bucket"
   | "archive-bucket";
 export const useBucketDropdownMenuStore = create<{
