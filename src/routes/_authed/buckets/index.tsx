@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { BucketCard } from "@/modules/buckets/composites/bucket-card";
 import CreateBucketDialog from "@/modules/buckets/composites/create-bucket-dialog";
-import { bucketsQueryOptions } from "@/modules/buckets/query-options";
+import {
+  bucketsQueryOptions,
+  bucketsTransactionsQueryOptions,
+} from "@/modules/buckets/query-options";
 import EmptyBucketsSection from "@/modules/buckets/sections/empty-buckets-section";
 import IndexTemplate from "@/modules/buckets/templates/index-template";
 import { Icon } from "@iconify/react";
@@ -13,8 +16,11 @@ import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authed/buckets/")({
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(bucketsQueryOptions),
+  loader: async ({ context: { queryClient } }) => {
+    queryClient.prefetchQuery(bucketsTransactionsQueryOptions);
+
+    await queryClient.ensureQueryData(bucketsQueryOptions);
+  },
   pendingComponent: BucketsLoadingComponent,
   errorComponent: BucketsErrorComponent,
   component: BucketsComponent,

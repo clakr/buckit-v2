@@ -5,7 +5,14 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Set up a Router instance
 const router = createRouter({

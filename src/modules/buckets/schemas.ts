@@ -14,7 +14,9 @@ export const createBucketSchema = z.object({
     .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
 });
 
-export const updateBucketSchema = createBucketSchema;
+export const updateBucketSchema = createBucketSchema.omit({
+  current_amount: true,
+});
 
 export const createBucketTransactionSchema = z.object({
   bucket_id: z

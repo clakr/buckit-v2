@@ -29,7 +29,6 @@ export default function UpdateBucketDialog() {
     defaultValues: {
       name: bucket?.name ?? "",
       description: bucket?.description ?? "",
-      current_amount: bucket?.current_amount ?? "",
     },
     validators: {
       onSubmit: ({ value }) => {
@@ -126,35 +125,6 @@ export default function UpdateBucketDialog() {
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 rows={5}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </fieldset>
-          )}
-        />
-        <form.Field
-          name="current_amount"
-          children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive"
-              >
-                Current Amount
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
                 className="group-has-[em]:border-destructive col-span-full"
               />
             </fieldset>

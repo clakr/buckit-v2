@@ -1,8 +1,4 @@
 import { queryClient } from "@/main";
-import {
-  bucketQueryOptions,
-  bucketsQueryOptions,
-} from "@/modules/buckets/query-options";
 import { supabase } from "@/supabase";
 import {
   BucketInsert,
@@ -20,10 +16,9 @@ export function useCreateBucketMutation() {
 
       return data;
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: bucketsQueryOptions.queryKey,
-      }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    },
   });
 }
 
@@ -42,10 +37,9 @@ export function useArchiveBucketMutation() {
 
       return data;
     },
-    onSuccess: (_, variables) =>
-      queryClient.invalidateQueries({
-        queryKey: bucketQueryOptions(variables.id).queryKey,
-      }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    },
   });
 }
 
@@ -63,10 +57,9 @@ export function useUpdateBucketMutation() {
 
       return data;
     },
-    onSuccess: (_, variables) =>
-      queryClient.invalidateQueries({
-        queryKey: bucketQueryOptions(variables.id).queryKey,
-      }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    },
   });
 }
 
@@ -94,6 +87,14 @@ export function useCreateBucketTransactionMutation() {
       if (error) throw new Error(error.message);
 
       return data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["buckets"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["transactions", { type: "bucket" }],
+      });
     },
   });
 }
