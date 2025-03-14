@@ -6,10 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
-import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
-import ViewBucketTransactionsDialog from "@/modules/buckets/composites/view-bucket-transactions-dialog";
+import ViewGoalTransactionsDialog from "@/modules/buckets/composites/view-bucket-transactions-dialog";
 import ArchiveGoalDialog from "@/modules/goals/composites/archive-goal-dialog";
+import { CreateGoalTransactionDialog } from "@/modules/goals/composites/create-goal-transaction-dialog";
 import UpdateGoalDialog from "@/modules/goals/composites/update-goal-dialog";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { Goal } from "@/supabase/types";
@@ -35,9 +34,9 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
     } else if (dialogContentState === "archive-goal") {
       return <ArchiveGoalDialog />;
     } else if (dialogContentState === "create-transaction") {
-      return <CreateBucketTransactionDialog />;
+      return <CreateGoalTransactionDialog />;
     } else if (dialogContentState === "view-transactions") {
-      return <ViewBucketTransactionsDialog />;
+      return <ViewGoalTransactionsDialog />;
     }
     return null;
   }

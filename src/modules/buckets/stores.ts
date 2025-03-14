@@ -10,10 +10,10 @@ export const useCreateBucketDialogStore = create<{
 }));
 
 type DialogContentState =
-  | "create-transaction"
-  | "view-transactions"
+  | "archive-bucket"
   | "update-bucket"
-  | "archive-bucket";
+  | "create-transaction"
+  | "view-transactions";
 export const useBucketDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;
@@ -21,7 +21,7 @@ export const useBucketDropdownMenuStore = create<{
   bucketId: Bucket["id"];
   setBucketId: (bucketId: Bucket["id"]) => void;
 }>((set) => ({
-  dialogContentState: "update-bucket",
+  dialogContentState: "archive-bucket",
   setDialogContentState: (dialogContentState) =>
     set(() => ({ dialogContentState })),
 

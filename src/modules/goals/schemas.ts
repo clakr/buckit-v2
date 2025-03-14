@@ -59,3 +59,40 @@ export const updateGoalSchema = goalSchema.pick({
   description: true,
   target_amount: true,
 });
+
+const transactionTypeSchema = z.union([
+  z.literal("inbound"),
+  z.literal("outbound"),
+]);
+
+export const goalTransactionSchema = z.object({
+  id: z.string().default(""),
+  goal_id: z.string(),
+  created_at: z.string().default(new Date().toLocaleString()),
+
+  amount: z
+    .string()
+    .nonempty("Amount is required")
+    .transform((value) => Number(value))
+    .pipe(
+      z
+        .number()
+        .min(0.01, "Amount must be at least 0.01")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    ),
+  description: z
+    .string()
+    .nonempty("Description is required")
+    .max(1000, "Description must be less than 1000 characters"),
+  type: transactionTypeSchema,
+
+  current_balance: z.number().default(0),
+});
+
+export const createGoalTransactionSchema = goalTransactionSchema.pick({
+  goal_id: true,
+  amount: true,
+  description: true,
+  type: true,
+  current_balance: true,
+});

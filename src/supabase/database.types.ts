@@ -102,6 +102,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      goal_transactions: {
+        Row: {
+          amount: number;
+          created_at: string;
+          current_balance: number;
+          description: string;
+          goal_id: string;
+          id: string;
+          type: Database["public"]["Enums"]["transaction_type"];
+        };
+        Insert: {
+          amount: number;
+          created_at?: string;
+          current_balance: number;
+          description: string;
+          goal_id: string;
+          id?: string;
+          type: Database["public"]["Enums"]["transaction_type"];
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          current_balance?: number;
+          description?: string;
+          goal_id?: string;
+          id?: string;
+          type?: Database["public"]["Enums"]["transaction_type"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "goal_transactions_goal_id_fkey";
+            columns: ["goal_id"];
+            isOneToOne: false;
+            referencedRelation: "goals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       goals: {
         Row: {
           created_at: string;
@@ -143,6 +181,14 @@ export type Database = {
       update_bucket_current_amount: {
         Args: {
           bucket_id: string;
+          amount: number;
+          transaction_type: Database["public"]["Enums"]["transaction_type"];
+        };
+        Returns: number;
+      };
+      update_goal_current_amount: {
+        Args: {
+          goal_id: string;
           amount: number;
           transaction_type: Database["public"]["Enums"]["transaction_type"];
         };

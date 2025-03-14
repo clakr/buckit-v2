@@ -92,9 +92,6 @@ export function useCreateBucketTransactionMutation() {
       queryClient.invalidateQueries({
         queryKey: ["buckets"],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["transactions", { type: "bucket" }],
-      });
     },
   });
 }

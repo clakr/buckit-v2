@@ -10,10 +10,10 @@ export const useCreateGoalDialogStore = create<{
 }));
 
 type DialogContentState =
-  | "create-transaction"
-  | "view-transactions"
+  | "archive-goal"
   | "update-goal"
-  | "archive-goal";
+  | "create-transaction"
+  | "view-transactions";
 export const useGoalDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;
@@ -21,7 +21,7 @@ export const useGoalDropdownMenuStore = create<{
   goalId: Goal["id"];
   setGoalId: (goalId: Goal["id"]) => void;
 }>((set) => ({
-  dialogContentState: "update-goal",
+  dialogContentState: "archive-goal",
   setDialogContentState: (dialogContentState) =>
     set(() => ({ dialogContentState })),
 
