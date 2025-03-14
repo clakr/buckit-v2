@@ -1,12 +1,15 @@
 import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
+import { queryClient } from "@/main";
+import { GoalCard } from "@/modules/goals/composites/goal-card";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
+import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { IndexTemplate } from "@/modules/goals/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed/goals")({
-  loader: async ({ context: { queryClient } }) => {
+  loader: async () => {
     await queryClient.ensureQueryData(goalsQueryOptions);
   },
   pendingComponent: GoalsLoadingComponent,
@@ -46,6 +49,10 @@ function GoalsErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function GoalsComponent() {
+  const toggleCreateGoalDialog = useCreateGoalDialogStore(
+    (state) => state.toggleDialog,
+  );
+
   const { data: goals } = useSuspenseQuery(goalsQueryOptions);
 
   if (goals.length === 0) {
@@ -58,7 +65,7 @@ function GoalsComponent() {
               Get started by creating your first goal.
             </p>
           </div>
-          <Button disabled>Create Goal</Button>
+          <Button onClick={toggleCreateGoalDialog}>Create Goal</Button>
         </StateSection>
       </IndexTemplate>
     );
@@ -68,7 +75,7 @@ function GoalsComponent() {
     <IndexTemplate>
       <section className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
         {goals.map((goal) => (
-          <pre>{goal}</pre>
+          <GoalCard key={goal.id} goal={goal} />
         ))}
       </section>
     </IndexTemplate>

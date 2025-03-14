@@ -18,3 +18,9 @@ export function closeDialog() {
   );
   closeButtonElement?.click();
 }
+
+export function formatToPercentage(value: number) {
+  return new Intl.NumberFormat(navigator.language, {
+    style: "percent",
+  }).format(value);
+}

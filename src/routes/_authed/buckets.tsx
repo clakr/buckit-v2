@@ -1,5 +1,6 @@
 import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
+import { queryClient } from "@/main";
 import { BucketCard } from "@/modules/buckets/composites/bucket-card";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
@@ -8,7 +9,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed/buckets")({
-  loader: async ({ context: { queryClient } }) => {
+  loader: async () => {
     await queryClient.ensureQueryData(bucketsQueryOptions);
   },
   pendingComponent: BucketsLoadingComponent,
