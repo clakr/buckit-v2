@@ -1,3 +1,4 @@
+import { transactionTypeSchema } from "@/lib/schemas";
 import { z } from "zod";
 
 export const goalSchema = z.object({
@@ -59,11 +60,6 @@ export const updateGoalSchema = goalSchema.pick({
   description: true,
   target_amount: true,
 });
-
-const transactionTypeSchema = z.union([
-  z.literal("inbound"),
-  z.literal("outbound"),
-]);
 
 export const goalTransactionSchema = z.object({
   id: z.string().default(""),

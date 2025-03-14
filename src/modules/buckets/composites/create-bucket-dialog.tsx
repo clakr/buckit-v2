@@ -1,4 +1,3 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   Dialog,
   DialogContent,
@@ -7,24 +6,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useAppForm } from "@/main";
 import { useCreateBucketMutation } from "@/modules/buckets/hooks";
 import { createBucketSchema } from "@/modules/buckets/schemas";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
-import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 
 export function CreateBucketDialog() {
   const { isOpen, toggleDialog } = useCreateBucketDialogStore();
 
-  const { mutateAsync, isPending } = useCreateBucketMutation();
+  const mutation = useCreateBucketMutation();
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: "",
       description: "",
       current_amount: "",
-    },
+    } as z.input<typeof createBucketSchema>,
     validators: {
       onSubmit: ({ value }) => {
         const { success, error } = createBucketSchema.safeParse(value);
@@ -39,7 +38,7 @@ export function CreateBucketDialog() {
     onSubmit: async ({ value }) => {
       const payload = createBucketSchema.parse(value);
 
-      await mutateAsync(payload);
+      await mutation.mutateAsync(payload);
 
       toggleDialog();
 
@@ -64,24 +63,10 @@ export function CreateBucketDialog() {
             form.handleSubmit();
           }}
         >
-          <form.Field
+          <form.AppField
             name="name"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive"
-                >
-                  Name
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Name">
                 <Input
                   id={field.name}
                   type="text"
@@ -90,28 +75,13 @@ export function CreateBucketDialog() {
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="group-has-[em]:border-destructive col-span-full"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <form.Field
+          <form.AppField
             name="description"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive items-end gap-x-1"
-                >
-                  Description
-                  <small>(optional)</small>
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Description">
                 <Textarea
                   id={field.name}
                   value={field.state.value}
@@ -120,27 +90,13 @@ export function CreateBucketDialog() {
                   rows={5}
                   className="group-has-[em]:border-destructive col-span-full"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <form.Field
+          <form.AppField
             name="current_amount"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive"
-                >
-                  Current Amount
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Current Amount">
                 <Input
                   id={field.name}
                   type="number"
@@ -149,16 +105,14 @@ export function CreateBucketDialog() {
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="group-has-[em]:border-destructive col-span-full"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <LoadingButton
-            type="submit"
-            className="justify-self-end"
-            isLoading={isPending}
-          >
-            Create
-          </LoadingButton>
+          <form.AppForm>
+            <form.SubmitButton className="justify-self-end">
+              Create
+            </form.SubmitButton>
+          </form.AppForm>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,4 +1,3 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   Dialog,
   DialogContent,
@@ -7,20 +6,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useAppForm } from "@/main";
 import { useCreateGoalMutation } from "@/modules/goals/hooks";
 import { createGoalSchema, goalSchema } from "@/modules/goals/schemas";
 import { useCreateGoalDialogStore } from "@/modules/goals/stores";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 export function CreateGoalDialog() {
   const { isOpen, toggleDialog } = useCreateGoalDialogStore();
 
-  const { mutateAsync, isPending } = useCreateGoalMutation();
+  const mutation = useCreateGoalMutation();
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: "",
       description: "",
@@ -41,7 +39,7 @@ export function CreateGoalDialog() {
     onSubmit: async ({ value }) => {
       const payload = createGoalSchema.parse(value);
 
-      await mutateAsync(payload);
+      await mutation.mutateAsync(payload);
 
       toggleDialog();
 
@@ -66,24 +64,10 @@ export function CreateGoalDialog() {
             form.handleSubmit();
           }}
         >
-          <form.Field
+          <form.AppField
             name="name"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive"
-                >
-                  Name
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Name">
                 <Input
                   id={field.name}
                   type="text"
@@ -92,28 +76,13 @@ export function CreateGoalDialog() {
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="group-has-[em]:border-destructive col-span-full"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <form.Field
+          <form.AppField
             name="description"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive items-end gap-x-1"
-                >
-                  Description
-                  <small>(optional)</small>
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Description">
                 <Textarea
                   id={field.name}
                   value={field.state.value}
@@ -122,27 +91,13 @@ export function CreateGoalDialog() {
                   rows={5}
                   className="group-has-[em]:border-destructive col-span-full"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <form.Field
+          <form.AppField
             name="current_amount"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive"
-                >
-                  Current Amount
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Current Amount">
                 <Input
                   id={field.name}
                   type="number"
@@ -152,27 +107,13 @@ export function CreateGoalDialog() {
                   className="group-has-[em]:border-destructive col-span-full"
                   step="0.01"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <form.Field
+          <form.AppField
             name="target_amount"
             children={(field) => (
-              <fieldset className="group grid grid-cols-2 gap-y-1.5">
-                <Label
-                  htmlFor={field.name}
-                  className="group-has-[em]:text-destructive"
-                >
-                  Target Amount
-                </Label>
-                {field.state.meta.errors.length > 0 ? (
-                  <em
-                    role="alert"
-                    className="text-destructive text-end text-sm/none"
-                  >
-                    {field.state.meta.errors.join(", ")}
-                  </em>
-                ) : null}
+              <field.Fieldset label="Target Amount">
                 <Input
                   id={field.name}
                   type="number"
@@ -182,16 +123,14 @@ export function CreateGoalDialog() {
                   className="group-has-[em]:border-destructive col-span-full"
                   step="0.01"
                 />
-              </fieldset>
+              </field.Fieldset>
             )}
           />
-          <LoadingButton
-            type="submit"
-            className="justify-self-end"
-            isLoading={isPending}
-          >
-            Create
-          </LoadingButton>
+          <form.AppForm>
+            <form.SubmitButton className="justify-self-end">
+              Create
+            </form.SubmitButton>
+          </form.AppForm>
         </form>
       </DialogContent>
     </Dialog>

@@ -20,7 +20,7 @@ export function GoalCard({ goal }: Props) {
     <Card key={goal.id} className="justify-between">
       <CardHeader className="grid grid-cols-[1fr_max-content]">
         <div>
-          <CardTitle>{goal.name}</CardTitle>
+          <CardTitle className="uppercase">{goal.name}</CardTitle>
           <CardDescription>{goal.description}</CardDescription>
         </div>
         <GoalActionsDropdownMenu goalId={goal.id} />

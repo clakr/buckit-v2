@@ -1,4 +1,3 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
 import { StateSection } from "@/components/shared/sections/state-section";
 import {
   DialogDescription,
@@ -6,16 +5,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { closeDialog } from "@/lib/utils";
+import { useAppForm } from "@/main";
 import { useUpdateBucketMutation } from "@/modules/buckets/hooks";
 import { bucketQueryOptions } from "@/modules/buckets/query-options";
 import { updateBucketSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
-import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
+import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
 export function UpdateBucketDialog() {
@@ -24,20 +23,20 @@ export function UpdateBucketDialog() {
   );
 
   const {
-    isPending: isQueryPending,
+    isPending,
     isError,
     error,
     data: bucket,
   } = useQuery(bucketQueryOptions(bucketId));
 
-  const { mutateAsync, isPending: isMutationPending } =
-    useUpdateBucketMutation();
+  const mutation = useUpdateBucketMutation();
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
-      name: bucket?.name ?? "",
-      description: bucket?.description ?? "",
-    },
+      id: bucket?.id,
+      name: bucket?.name,
+      description: bucket?.description,
+    } as z.input<typeof updateBucketSchema>,
     validators: {
       onSubmit: ({ value }) => {
         const { success, error } = updateBucketSchema.safeParse(value);
@@ -52,10 +51,7 @@ export function UpdateBucketDialog() {
     onSubmit: async ({ value }) => {
       const payload = updateBucketSchema.parse(value);
 
-      await mutateAsync({
-        id: bucketId,
-        ...payload,
-      });
+      await mutation.mutateAsync(payload);
 
       form.reset();
 
@@ -63,7 +59,7 @@ export function UpdateBucketDialog() {
     },
   });
 
-  if (isQueryPending) {
+  if (isPending) {
     return (
       <DialogContainer>
         <StateSection state="loading">
@@ -104,24 +100,10 @@ export function UpdateBucketDialog() {
           form.handleSubmit();
         }}
       >
-        <form.Field
+        <form.AppField
           name="name"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive"
-              >
-                Name
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
+            <field.Fieldset label="Name">
               <Input
                 id={field.name}
                 type="text"
@@ -130,28 +112,13 @@ export function UpdateBucketDialog() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="group-has-[em]:border-destructive col-span-full"
               />
-            </fieldset>
+            </field.Fieldset>
           )}
         />
-        <form.Field
+        <form.AppField
           name="description"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive items-end gap-x-1"
-              >
-                Description
-                <small>(optional)</small>
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
+            <field.Fieldset label="Description">
               <Textarea
                 id={field.name}
                 value={field.state.value}
@@ -160,16 +127,14 @@ export function UpdateBucketDialog() {
                 rows={5}
                 className="group-has-[em]:border-destructive col-span-full"
               />
-            </fieldset>
+            </field.Fieldset>
           )}
         />
-        <LoadingButton
-          type="submit"
-          className="justify-self-end"
-          isLoading={isMutationPending}
-        >
-          Update
-        </LoadingButton>
+        <form.AppForm>
+          <form.SubmitButton className="justify-self-end">
+            Update
+          </form.SubmitButton>
+        </form.AppForm>
       </form>
     </DialogContainer>
   );

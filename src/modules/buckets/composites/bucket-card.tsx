@@ -16,7 +16,7 @@ export function BucketCard({ bucket }: Props) {
     <Card key={bucket.id} className="justify-between">
       <CardHeader className="grid grid-cols-[1fr_max-content]">
         <div>
-          <CardTitle>{bucket.name}</CardTitle>
+          <CardTitle className="uppercase">{bucket.name}</CardTitle>
           <CardDescription>{bucket.description}</CardDescription>
         </div>
         <BucketActionsDropdownMenu bucketId={bucket.id} />

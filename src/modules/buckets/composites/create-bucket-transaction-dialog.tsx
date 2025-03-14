@@ -1,4 +1,3 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   DialogDescription,
   DialogHeader,
@@ -9,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { closeDialog } from "@/lib/utils";
+import { useAppForm } from "@/main";
 import { useCreateBucketTransactionMutation } from "@/modules/buckets/hooks";
 import { createBucketTransactionSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
-import { useForm } from "@tanstack/react-form";
+import { TransactionType } from "@/supabase/types";
+import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
 export function CreateBucketTransactionDialog() {
@@ -20,15 +21,15 @@ export function CreateBucketTransactionDialog() {
     useShallow((state) => ({ bucketId: state.bucketId })),
   );
 
-  const { mutateAsync, isPending } = useCreateBucketTransactionMutation();
+  const mutation = useCreateBucketTransactionMutation();
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       bucket_id: bucketId,
       amount: "",
       description: "",
-      type: "",
-    },
+      type: "inbound",
+    } as z.input<typeof createBucketTransactionSchema>,
     validators: {
       onSubmit: ({ value }) => {
         const { success, error } =
@@ -43,7 +44,7 @@ export function CreateBucketTransactionDialog() {
     onSubmit: async ({ value }) => {
       const payload = createBucketTransactionSchema.parse(value);
 
-      await mutateAsync(payload);
+      await mutation.mutateAsync(payload);
 
       form.reset();
 
@@ -67,24 +68,10 @@ export function CreateBucketTransactionDialog() {
           form.handleSubmit();
         }}
       >
-        <form.Field
+        <form.AppField
           name="amount"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive"
-              >
-                Amount
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
+            <field.Fieldset label="Amount">
               <Input
                 id={field.name}
                 type="number"
@@ -93,27 +80,13 @@ export function CreateBucketTransactionDialog() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="group-has-[em]:border-destructive col-span-full"
               />
-            </fieldset>
+            </field.Fieldset>
           )}
         />
-        <form.Field
+        <form.AppField
           name="description"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-1.5">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive items-end gap-x-1"
-              >
-                Description
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
+            <field.Fieldset label="Description">
               <Textarea
                 id={field.name}
                 value={field.state.value}
@@ -122,32 +95,20 @@ export function CreateBucketTransactionDialog() {
                 rows={5}
                 className="group-has-[em]:border-destructive col-span-full"
               />
-            </fieldset>
+            </field.Fieldset>
           )}
         />
-        <form.Field
+        <form.AppField
           name="type"
           children={(field) => (
-            <fieldset className="group grid grid-cols-2 gap-y-3">
-              <Label
-                htmlFor={field.name}
-                className="group-has-[em]:text-destructive"
-              >
-                Type
-              </Label>
-              {field.state.meta.errors.length > 0 ? (
-                <em
-                  role="alert"
-                  className="text-destructive text-end text-sm/none"
-                >
-                  {field.state.meta.errors.join(", ")}
-                </em>
-              ) : null}
+            <field.Fieldset label="Type">
               <RadioGroup
-                className="group-has-[em]:text-destructive col-span-full gap-y-2"
+                className="group-has-[em]:text-destructive col-span-full mt-1 gap-y-2"
                 defaultValue={field.state.value}
                 onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
+                onValueChange={(value) =>
+                  field.handleChange(value as TransactionType)
+                }
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="inbound" id="inbound" />
@@ -158,16 +119,14 @@ export function CreateBucketTransactionDialog() {
                   <Label htmlFor="outbound">Outbound</Label>
                 </div>
               </RadioGroup>
-            </fieldset>
+            </field.Fieldset>
           )}
         />
-        <LoadingButton
-          type="submit"
-          className="justify-self-end"
-          isLoading={isPending}
-        >
-          Create
-        </LoadingButton>
+        <form.AppForm>
+          <form.SubmitButton className="justify-self-end">
+            Create
+          </form.SubmitButton>
+        </form.AppForm>
       </form>
     </>
   );
