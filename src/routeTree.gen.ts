@@ -15,7 +15,7 @@ import { Route as RegisterImport } from './routes/register'
 import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
-import { Route as AuthedBucketsIndexImport } from './routes/_authed/buckets/index'
+import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
 
 // Create/Update Routes
 
@@ -42,9 +42,9 @@ const AuthedDashboardRoute = AuthedDashboardImport.update({
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
-const AuthedBucketsIndexRoute = AuthedBucketsIndexImport.update({
-  id: '/buckets/',
-  path: '/buckets/',
+const AuthedBucketsRoute = AuthedBucketsImport.update({
+  id: '/buckets',
+  path: '/buckets',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
@@ -73,18 +73,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
+    '/_authed/buckets': {
+      id: '/_authed/buckets'
+      path: '/buckets'
+      fullPath: '/buckets'
+      preLoaderRoute: typeof AuthedBucketsImport
+      parentRoute: typeof AuthedRouteImport
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardImport
-      parentRoute: typeof AuthedRouteImport
-    }
-    '/_authed/buckets/': {
-      id: '/_authed/buckets/'
-      path: '/buckets'
-      fullPath: '/buckets'
-      preLoaderRoute: typeof AuthedBucketsIndexImport
       parentRoute: typeof AuthedRouteImport
     }
   }
@@ -93,13 +93,13 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthedRouteRouteChildren {
+  AuthedBucketsRoute: typeof AuthedBucketsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
-  AuthedBucketsIndexRoute: typeof AuthedBucketsIndexRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedBucketsRoute: AuthedBucketsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
-  AuthedBucketsIndexRoute: AuthedBucketsIndexRoute,
 }
 
 const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
@@ -110,16 +110,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/buckets': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/buckets': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -127,22 +127,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteRouteWithChildren
   '/register': typeof RegisterRoute
+  '/_authed/buckets': typeof AuthedBucketsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
-  '/_authed/buckets/': typeof AuthedBucketsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/register' | '/dashboard' | '/buckets'
+  fullPaths: '/' | '' | '/register' | '/buckets' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/register' | '/dashboard' | '/buckets'
+  to: '/' | '' | '/register' | '/buckets' | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authed'
     | '/register'
+    | '/_authed/buckets'
     | '/_authed/dashboard'
-    | '/_authed/buckets/'
   fileRoutesById: FileRoutesById
 }
 
@@ -179,19 +179,19 @@ export const routeTree = rootRoute
     "/_authed": {
       "filePath": "_authed/route.tsx",
       "children": [
-        "/_authed/dashboard",
-        "/_authed/buckets/"
+        "/_authed/buckets",
+        "/_authed/dashboard"
       ]
     },
     "/register": {
       "filePath": "register.tsx"
     },
-    "/_authed/dashboard": {
-      "filePath": "_authed/dashboard.tsx",
+    "/_authed/buckets": {
+      "filePath": "_authed/buckets.tsx",
       "parent": "/_authed"
     },
-    "/_authed/buckets/": {
-      "filePath": "_authed/buckets/index.tsx",
+    "/_authed/dashboard": {
+      "filePath": "_authed/dashboard.tsx",
       "parent": "/_authed"
     }
   }

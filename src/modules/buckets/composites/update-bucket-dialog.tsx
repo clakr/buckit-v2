@@ -1,4 +1,5 @@
 import LoadingButton from "@/components/shared/composites/loading-button";
+import { StateSection } from "@/components/shared/sections/state-section";
 import {
   DialogDescription,
   DialogHeader,
@@ -13,7 +14,8 @@ import { bucketQueryOptions } from "@/modules/buckets/query-options";
 import { updateBucketSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useForm } from "@tanstack/react-form";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { PropsWithChildren } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 export default function UpdateBucketDialog() {
@@ -21,9 +23,15 @@ export default function UpdateBucketDialog() {
     useShallow((state) => ({ bucketId: state.bucketId })),
   );
 
-  const { data: bucket } = useSuspenseQuery(bucketQueryOptions(bucketId));
+  const {
+    isPending: isQueryPending,
+    isError,
+    error,
+    data: bucket,
+  } = useQuery(bucketQueryOptions(bucketId));
 
-  const { mutateAsync, isPending } = useUpdateBucketMutation();
+  const { mutateAsync, isPending: isMutationPending } =
+    useUpdateBucketMutation();
 
   const form = useForm({
     defaultValues: {
@@ -55,14 +63,39 @@ export default function UpdateBucketDialog() {
     },
   });
 
+  if (isQueryPending) {
+    return (
+      <DialogContainer>
+        <StateSection state="loading">
+          <div>
+            <h2 className="text-xl font-medium">Loading bucket...</h2>
+            <p className="text-muted-foreground max-w-[30ch] text-sm text-balance">
+              Please wait while we fetch this bucket.
+            </p>
+          </div>
+        </StateSection>
+      </DialogContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <DialogContainer>
+        <StateSection state="error">
+          <div>
+            <h2 className="text-xl font-medium">Failed to load bucket</h2>
+            <p className="text-muted-foreground max-w-[30ch] text-sm text-balance">
+              There was en error loading this bucket. Please try again.
+            </p>
+            <p>{error.message}</p>
+          </div>
+        </StateSection>
+      </DialogContainer>
+    );
+  }
+
   return (
-    <>
-      <DialogHeader>
-        <DialogTitle>Update Bucket</DialogTitle>
-        <DialogDescription>
-          Please enter the details to update this bucket.
-        </DialogDescription>
-      </DialogHeader>
+    <DialogContainer>
       <form
         className="grid gap-y-3"
         onSubmit={(e) => {
@@ -133,11 +166,25 @@ export default function UpdateBucketDialog() {
         <LoadingButton
           type="submit"
           className="justify-self-end"
-          isLoading={isPending}
+          isLoading={isMutationPending}
         >
           Update
         </LoadingButton>
       </form>
+    </DialogContainer>
+  );
+}
+
+function DialogContainer({ children }: PropsWithChildren) {
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>Update Bucket</DialogTitle>
+        <DialogDescription>
+          Please enter the details to update this bucket.
+        </DialogDescription>
+      </DialogHeader>
+      {children}
     </>
   );
 }

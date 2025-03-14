@@ -1,5 +1,6 @@
 import Main from "@/components/shared/main";
 import { Button } from "@/components/ui/button";
+import CreateBucketDialog from "@/modules/buckets/composites/create-bucket-dialog";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { PropsWithChildren } from "react";
 
@@ -21,6 +22,8 @@ export default function IndexTemplate({ children }: PropsWithChildren) {
       </section>
 
       {children}
+
+      <CreateBucketDialog />
     </Main>
   );
 }
