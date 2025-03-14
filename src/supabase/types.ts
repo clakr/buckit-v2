@@ -17,3 +17,4 @@ export type BucketTransaction = Tables<"bucket_transactions">;
 
 export type Goal = Tables<"goals">;
 export type GoalInsert = TablesInsert<"goals">;
+export type GoalUpdate = TablesUpdate<"goals">;

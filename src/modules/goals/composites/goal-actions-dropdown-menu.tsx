@@ -9,6 +9,7 @@ import {
 import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
 import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
 import ViewBucketTransactionsDialog from "@/modules/buckets/composites/view-bucket-transactions-dialog";
+import ArchiveGoalDialog from "@/modules/goals/composites/archive-goal-dialog";
 import UpdateGoalDialog from "@/modules/goals/composites/update-goal-dialog";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { Goal } from "@/supabase/types";
@@ -32,7 +33,7 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
     if (dialogContentState === "update-goal") {
       return <UpdateGoalDialog />;
     } else if (dialogContentState === "archive-goal") {
-      return <ArchiveBucketDialog />;
+      return <ArchiveGoalDialog />;
     } else if (dialogContentState === "create-transaction") {
       return <CreateBucketTransactionDialog />;
     } else if (dialogContentState === "view-transactions") {
