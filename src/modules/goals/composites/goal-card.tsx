@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatToCurrency, formatToPercentage } from "@/lib/utils";
+import { GoalActionsDropdownMenu } from "@/modules/goals/composites/goal-actions-dropdown-menu";
 import { Goal } from "@/supabase/types";
 
 type Props = { goal: Goal };
@@ -22,6 +23,7 @@ export function GoalCard({ goal }: Props) {
           <CardTitle>{goal.name}</CardTitle>
           <CardDescription>{goal.description}</CardDescription>
         </div>
+        <GoalActionsDropdownMenu goalId={goal.id} />
       </CardHeader>
       <CardFooter className="grid grid-cols-2 gap-y-1 text-sm">
         <span className="text-muted-foreground col-span-full text-end">

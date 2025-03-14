@@ -1,4 +1,6 @@
+import { queryClient } from "@/main";
 import { supabase } from "@/supabase";
+import { Goal } from "@/supabase/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const goalsQueryOptions = queryOptions({
@@ -14,3 +16,25 @@ export const goalsQueryOptions = queryOptions({
     return data;
   },
 });
+
+export function goalQueryOptions(goalId: Goal["id"]) {
+  return queryOptions({
+    queryKey: ["goals", goalId],
+    queryFn: async () => {
+      const { error, data } = await supabase
+        .from("goals")
+        .select()
+        .eq("id", goalId);
+
+      if (error) throw new Error(error.message);
+
+      return data.at(0);
+    },
+    initialData: () => {
+      const goalsQueryData = queryClient.getQueryData(["goals"]) as Goal[];
+      if (!goalsQueryData) return undefined;
+
+      return goalsQueryData.find((goal) => goalId === goal.id);
+    },
+  });
+}

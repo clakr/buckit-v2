@@ -52,3 +52,10 @@ export const createGoalSchema = goalSchema
       path: ["target_amount"], // Apply error to target_amount field
     },
   );
+
+export const updateGoalSchema = goalSchema.pick({
+  id: true,
+  name: true,
+  description: true,
+  target_amount: true,
+});

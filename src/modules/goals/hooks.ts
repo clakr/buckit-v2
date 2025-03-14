@@ -17,3 +17,23 @@ export function useCreateGoalMutation() {
     },
   });
 }
+
+export function useUpdateGoalMutation() {
+  return useMutation({
+    mutationFn: async (
+      payload: GoalInsert & { id: NonNullable<GoalInsert["id"]> },
+    ) => {
+      const { error, data } = await supabase
+        .from("goals")
+        .update(payload)
+        .eq("id", payload.id);
+
+      if (error) throw new Error(error.message);
+
+      return data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
+    },
+  });
+}
