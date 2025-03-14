@@ -47,7 +47,7 @@ export function bucketTransactionsQueryOptions(bucketId: Bucket["id"]) {
     queryFn: async () => {
       const { error, data } = await supabase
         .from("bucket_transactions")
-        .select("*")
+        .select()
         .eq("bucket_id", bucketId)
         .order("created_at", {
           ascending: false,

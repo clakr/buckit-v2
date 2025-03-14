@@ -38,3 +38,22 @@ export function goalQueryOptions(goalId: Goal["id"]) {
     },
   });
 }
+
+export function goalTransactionsQueryOptions(goalId: Goal["id"]) {
+  return queryOptions({
+    queryKey: ["goals", goalId, "transactions"],
+    queryFn: async () => {
+      const { error, data } = await supabase
+        .from("goal_transactions")
+        .select()
+        .eq("goal_id", goalId)
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (error) throw new Error(error.message);
+
+      return data;
+    },
+  });
+}

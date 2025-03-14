@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { formatToCurrency, formatToPercentage } from "@/lib/utils";
+import { cn, formatToCurrency, formatToPercentage } from "@/lib/utils";
 import { GoalActionsDropdownMenu } from "@/modules/goals/composites/goal-actions-dropdown-menu";
 import { Goal } from "@/supabase/types";
 
@@ -26,7 +26,12 @@ export function GoalCard({ goal }: Props) {
         <GoalActionsDropdownMenu goalId={goal.id} />
       </CardHeader>
       <CardFooter className="grid grid-cols-2 gap-y-1 text-sm">
-        <span className="text-muted-foreground col-span-full text-end">
+        <span
+          className={cn(
+            "text-muted-foreground col-span-full text-end",
+            progress < 0 && "text-destructive font-bold",
+          )}
+        >
           {formatToPercentage(percentage)}
         </span>
         <Progress value={progress} className="col-span-full" />
