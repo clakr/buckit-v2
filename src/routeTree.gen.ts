@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RegisterImport } from './routes/register'
 import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthedGoalsImport } from './routes/_authed/goals'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
 
@@ -34,6 +35,12 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedGoalsRoute = AuthedGoalsImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 
 const AuthedDashboardRoute = AuthedDashboardImport.update({
@@ -87,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardImport
       parentRoute: typeof AuthedRouteImport
     }
+    '/_authed/goals': {
+      id: '/_authed/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthedGoalsImport
+      parentRoute: typeof AuthedRouteImport
+    }
   }
 }
 
@@ -95,11 +109,13 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteRouteChildren {
   AuthedBucketsRoute: typeof AuthedBucketsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedGoalsRoute: typeof AuthedGoalsRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedBucketsRoute: AuthedBucketsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedGoalsRoute: AuthedGoalsRoute,
 }
 
 const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
@@ -112,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/goals': typeof AuthedGoalsRoute
 }
 
 export interface FileRoutesByTo {
@@ -120,6 +137,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/goals': typeof AuthedGoalsRoute
 }
 
 export interface FileRoutesById {
@@ -129,13 +147,14 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authed/buckets': typeof AuthedBucketsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/goals': typeof AuthedGoalsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/register' | '/buckets' | '/dashboard'
+  fullPaths: '/' | '' | '/register' | '/buckets' | '/dashboard' | '/goals'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/register' | '/buckets' | '/dashboard'
+  to: '/' | '' | '/register' | '/buckets' | '/dashboard' | '/goals'
   id:
     | '__root__'
     | '/'
@@ -143,6 +162,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authed/buckets'
     | '/_authed/dashboard'
+    | '/_authed/goals'
   fileRoutesById: FileRoutesById
 }
 
@@ -180,7 +200,8 @@ export const routeTree = rootRoute
       "filePath": "_authed/route.tsx",
       "children": [
         "/_authed/buckets",
-        "/_authed/dashboard"
+        "/_authed/dashboard",
+        "/_authed/goals"
       ]
     },
     "/register": {
@@ -192,6 +213,10 @@ export const routeTree = rootRoute
     },
     "/_authed/dashboard": {
       "filePath": "_authed/dashboard.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/goals": {
+      "filePath": "_authed/goals.tsx",
       "parent": "/_authed"
     }
   }

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export default function Main({
+export function Main({
   className,
   children,
   ...props

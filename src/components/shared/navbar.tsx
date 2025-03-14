@@ -27,6 +27,9 @@ export default function Navbar() {
           <Button variant="link" className="px-0" asChild>
             <Link to="/buckets">Buckets</Link>
           </Button>
+          <Button variant="link" className="px-0" asChild>
+            <Link to="/goals">Goals</Link>
+          </Button>
         </section>
         <section>
           <Button variant="ghost" onClick={handleLogout}>

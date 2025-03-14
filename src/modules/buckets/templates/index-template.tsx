@@ -1,4 +1,4 @@
-import Main from "@/components/shared/main";
+import { Main } from "@/components/shared/main";
 import { Button } from "@/components/ui/button";
 import CreateBucketDialog from "@/modules/buckets/composites/create-bucket-dialog";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
