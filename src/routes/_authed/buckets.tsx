@@ -4,7 +4,7 @@ import { queryClient } from "@/main";
 import { BucketCard } from "@/modules/buckets/composites/bucket-card";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
-import IndexTemplate from "@/modules/buckets/templates/index-template";
+import { IndexTemplate } from "@/modules/buckets/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 

@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { createBucketSchema } from "@/modules/buckets/schemas";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { useForm } from "@tanstack/react-form";
 
-export default function CreateBucketDialog() {
+export function CreateBucketDialog() {
   const { isOpen, toggleDialog } = useCreateBucketDialogStore();
 
   const { mutateAsync, isPending } = useCreateBucketMutation();

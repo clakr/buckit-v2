@@ -3,7 +3,7 @@ import { supabase } from "@/supabase";
 import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
-export default function Navbar() {
+export function Navbar() {
   const navigate = useNavigate();
 
   async function handleLogout() {

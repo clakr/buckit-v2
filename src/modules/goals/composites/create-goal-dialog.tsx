@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
-export default function CreateGoalDialog() {
+export function CreateGoalDialog() {
   const { isOpen, toggleDialog } = useCreateGoalDialogStore();
 
   const { mutateAsync, isPending } = useCreateGoalMutation();

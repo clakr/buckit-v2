@@ -6,10 +6,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ArchiveBucketDialog from "@/modules/buckets/composites/archive-bucket-dialog";
+import { ArchiveBucketDialog } from "@/modules/buckets/composites/archive-bucket-dialog";
 import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
-import UpdateBucketDialog from "@/modules/buckets/composites/update-bucket-dialog";
-import ViewBucketTransactionsDialog from "@/modules/buckets/composites/view-bucket-transactions-dialog";
+import { UpdateBucketDialog } from "@/modules/buckets/composites/update-bucket-dialog";
+import { ViewBucketTransactionsDialog } from "@/modules/buckets/composites/view-bucket-transactions-dialog";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { Bucket } from "@/supabase/types";
 import { Icon } from "@iconify/react";

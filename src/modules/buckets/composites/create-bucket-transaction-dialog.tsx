@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   DialogDescription,
   DialogHeader,

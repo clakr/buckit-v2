@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import { StateSection } from "@/components/shared/sections/state-section";
 import {
   DialogDescription,
@@ -19,7 +19,7 @@ import { PropsWithChildren } from "react";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
-export default function UpdateGoalDialog() {
+export function UpdateGoalDialog() {
   const { goalId } = useGoalDropdownMenuStore(
     useShallow((state) => ({ goalId: state.goalId })),
   );

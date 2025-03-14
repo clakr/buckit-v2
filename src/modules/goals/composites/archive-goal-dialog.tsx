@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   DialogDescription,
   DialogHeader,
@@ -10,7 +10,7 @@ import { useArchiveGoalMutation } from "@/modules/goals/hooks";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ArchiveGoalDialog() {
+export function ArchiveGoalDialog() {
   const { goalId } = useGoalDropdownMenuStore(
     useShallow((state) => ({ goalId: state.goalId })),
   );

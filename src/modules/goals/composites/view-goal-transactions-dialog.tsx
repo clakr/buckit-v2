@@ -20,7 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ViewGoalTransactionsDialog() {
+export function ViewGoalTransactionsDialog() {
   const { goalId } = useGoalDropdownMenuStore(
     useShallow((state) => ({ goalId: state.goalId })),
   );

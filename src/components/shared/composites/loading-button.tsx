@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 
-export default function LoadingButton({
+export function LoadingButton({
   children,
   isLoading,
   ...props

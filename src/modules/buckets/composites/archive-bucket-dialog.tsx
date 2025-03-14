@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import {
   DialogDescription,
   DialogHeader,
@@ -10,7 +10,7 @@ import { useArchiveBucketMutation } from "@/modules/buckets/hooks";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ArchiveBucketDialog() {
+export function ArchiveBucketDialog() {
   const { bucketId } = useBucketDropdownMenuStore(
     useShallow((state) => ({ bucketId: state.bucketId })),
   );

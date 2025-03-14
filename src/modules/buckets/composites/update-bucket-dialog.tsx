@@ -1,4 +1,4 @@
-import LoadingButton from "@/components/shared/composites/loading-button";
+import { LoadingButton } from "@/components/shared/composites/loading-button";
 import { StateSection } from "@/components/shared/sections/state-section";
 import {
   DialogDescription,
@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-export default function UpdateBucketDialog() {
+export function UpdateBucketDialog() {
   const { bucketId } = useBucketDropdownMenuStore(
     useShallow((state) => ({ bucketId: state.bucketId })),
   );

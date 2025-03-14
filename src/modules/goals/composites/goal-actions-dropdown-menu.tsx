@@ -6,10 +6,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ArchiveGoalDialog from "@/modules/goals/composites/archive-goal-dialog";
+import { ArchiveGoalDialog } from "@/modules/goals/composites/archive-goal-dialog";
 import { CreateGoalTransactionDialog } from "@/modules/goals/composites/create-goal-transaction-dialog";
-import UpdateGoalDialog from "@/modules/goals/composites/update-goal-dialog";
-import ViewGoalTransactionsDialog from "@/modules/goals/composites/view-goal-transactions-dialog";
+import { UpdateGoalDialog } from "@/modules/goals/composites/update-goal-dialog";
+import { ViewGoalTransactionsDialog } from "@/modules/goals/composites/view-goal-transactions-dialog";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { Goal } from "@/supabase/types";
 import { Icon } from "@iconify/react";

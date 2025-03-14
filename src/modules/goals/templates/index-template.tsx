@@ -1,6 +1,6 @@
 import { Main } from "@/components/shared/main";
 import { Button } from "@/components/ui/button";
-import CreateGoalDialog from "@/modules/goals/composites/create-goal-dialog";
+import { CreateGoalDialog } from "@/modules/goals/composites/create-goal-dialog";
 import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { PropsWithChildren } from "react";
 

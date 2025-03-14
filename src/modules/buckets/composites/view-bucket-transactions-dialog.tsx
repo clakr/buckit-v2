@@ -20,7 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ViewBucketTransactionsDialog() {
+export function ViewBucketTransactionsDialog() {
   const { bucketId } = useBucketDropdownMenuStore(
     useShallow((state) => ({ bucketId: state.bucketId })),
   );
