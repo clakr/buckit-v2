@@ -2,17 +2,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { authStore } from "@/modules/authentication/stores";
 import { supabase } from "@/supabase";
 import { Icon } from "@iconify/react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, useNavigate } from "@tanstack/react-router";
 import React from "react";
 
 export const Route = createFileRoute("/")({
   component: LoginTemplate,
+  beforeLoad: async () => {
+    await authStore.getState().fetchUser();
+
+    const user = authStore.getState().user;
+    if (user) {
+      throw redirect({
+        to: "/dashboard",
+      });
+    }
+  },
 });
 
-export default function LoginTemplate() {
+function LoginTemplate() {
   const email = React.useId();
   const password = React.useId();
 

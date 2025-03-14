@@ -1,4 +1,4 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
+import { Button } from "@/components/ui/button";
 import {
   DialogDescription,
   DialogHeader,
@@ -15,10 +15,10 @@ export function ArchiveGoalDialog() {
     useShallow((state) => ({ goalId: state.goalId })),
   );
 
-  const { mutateAsync, isPending } = useArchiveGoalMutation();
+  const mutation = useArchiveGoalMutation();
 
   async function handleArchive() {
-    await mutateAsync({
+    await mutation.mutateAsync({
       id: goalId,
     });
 
@@ -35,13 +35,9 @@ export function ArchiveGoalDialog() {
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <LoadingButton
-          type="button"
-          isLoading={isPending}
-          onClick={handleArchive}
-        >
+        <Button type="button" onClick={handleArchive}>
           Archive
-        </LoadingButton>
+        </Button>
       </DialogFooter>
     </>
   );

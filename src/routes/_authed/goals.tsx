@@ -80,6 +80,4 @@ function GoalsComponent() {
       </section>
     </IndexTemplate>
   );
-
-  return <IndexTemplate>{JSON.stringify(goals, null, 2)}</IndexTemplate>;
 }

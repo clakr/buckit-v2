@@ -1,4 +1,4 @@
-import { LoadingButton } from "@/components/shared/composites/loading-button";
+import { Button } from "@/components/ui/button";
 import {
   DialogDescription,
   DialogHeader,
@@ -15,10 +15,10 @@ export function ArchiveBucketDialog() {
     useShallow((state) => ({ bucketId: state.bucketId })),
   );
 
-  const { mutateAsync, isPending } = useArchiveBucketMutation();
+  const mutation = useArchiveBucketMutation();
 
   async function handleArchive() {
-    await mutateAsync({
+    await mutation.mutateAsync({
       id: bucketId,
     });
 
@@ -35,13 +35,9 @@ export function ArchiveBucketDialog() {
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <LoadingButton
-          type="button"
-          isLoading={isPending}
-          onClick={handleArchive}
-        >
+        <Button type="button" onClick={handleArchive}>
           Archive
-        </LoadingButton>
+        </Button>
       </DialogFooter>
     </>
   );
