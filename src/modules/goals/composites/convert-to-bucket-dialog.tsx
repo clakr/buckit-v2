@@ -4,12 +4,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { updateGoalSchema } from "@/lib/schemas";
+import { convertToBucketSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
-import { useUpdateGoalMutation } from "@/modules/goals/hooks";
+import { useConvertToBucketMutation } from "@/modules/goals/hooks";
 import { goalQueryOptions } from "@/modules/goals/query-options";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +15,7 @@ import { PropsWithChildren } from "react";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
-export function UpdateGoalDialog() {
+export function ConvertToBucketDialog() {
   const { goalId } = useGoalDropdownMenuStore(
     useShallow((state) => ({ goalId: state.goalId })),
   );
@@ -26,21 +24,21 @@ export function UpdateGoalDialog() {
     isPending,
     isError,
     error,
-    data: goal,
+    data: bucket,
   } = useQuery(goalQueryOptions(goalId));
 
-  const mutation = useUpdateGoalMutation();
+  const mutation = useConvertToBucketMutation();
 
   const form = useAppForm({
     defaultValues: {
-      id: goal?.id,
-      name: goal?.name,
-      description: goal?.description,
-      target_amount: goal?.target_amount.toString(),
-    } as z.input<typeof updateGoalSchema>,
+      goalId,
+      name: bucket?.name,
+      description: bucket?.description,
+      current_amount: bucket?.current_amount.toString(),
+    } as z.input<typeof convertToBucketSchema>,
     validators: {
       onSubmit: ({ value }) => {
-        const { success, error } = updateGoalSchema.safeParse(value);
+        const { success, error } = convertToBucketSchema.safeParse(value);
 
         if (!success) {
           return {
@@ -50,7 +48,7 @@ export function UpdateGoalDialog() {
       },
     },
     onSubmit: async ({ value }) => {
-      const payload = updateGoalSchema.parse(value);
+      const payload = convertToBucketSchema.parse(value);
 
       await mutation.mutateAsync(payload);
 
@@ -95,61 +93,15 @@ export function UpdateGoalDialog() {
     <DialogContainer>
       <form
         className="grid gap-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
           form.handleSubmit();
         }}
       >
-        <form.AppField
-          name="name"
-          children={(field) => (
-            <field.Fieldset label="Name">
-              <Input
-                id={field.name}
-                type="text"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="description"
-          children={(field) => (
-            <field.Fieldset label="Description">
-              <Textarea
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                rows={5}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="target_amount"
-          children={(field) => (
-            <field.Fieldset label="Target Amount">
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-                step="0.01"
-              />
-            </field.Fieldset>
-          )}
-        />
         <form.AppForm>
           <form.SubmitButton className="justify-self-end">
-            Update
+            Convert
           </form.SubmitButton>
         </form.AppForm>
       </form>
@@ -161,9 +113,10 @@ function DialogContainer({ children }: PropsWithChildren) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Update Goal</DialogTitle>
+        <DialogTitle>Convert Goal to Bucket</DialogTitle>
         <DialogDescription>
-          Please enter the details to update this goal.
+          This will convert the goal to a bucket. You cannot restore all the
+          transactions that have been made in this goal.
         </DialogDescription>
       </DialogHeader>
       {children}

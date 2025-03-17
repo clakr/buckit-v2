@@ -13,7 +13,8 @@ type DialogContentState =
   | "archive-goal"
   | "update-goal"
   | "create-transaction"
-  | "view-transactions";
+  | "view-transactions"
+  | "convert-to-bucket";
 export const useGoalDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;

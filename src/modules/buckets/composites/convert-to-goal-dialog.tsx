@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { convertToGoalSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
 import { useConvertToGoalMutation } from "@/modules/buckets/hooks";
 import { bucketQueryOptions } from "@/modules/buckets/query-options";
-import { convertToGoalSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
@@ -183,7 +183,8 @@ function DialogContainer({ children }: PropsWithChildren) {
       <DialogHeader>
         <DialogTitle>Convert Bucket To Goal</DialogTitle>
         <DialogDescription>
-          Please enter the details to convert this bucket to a goal.
+          This will convert the bucket to a goal. You cannot restore all the
+          transactions that have been made in this bucket.
         </DialogDescription>
       </DialogHeader>
       {children}

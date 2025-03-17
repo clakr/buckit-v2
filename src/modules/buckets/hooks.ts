@@ -123,6 +123,9 @@ export function useConvertToGoalMutation() {
       await queryClient.invalidateQueries({
         queryKey: ["buckets"],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["goals"],
+      });
     },
   });
 }

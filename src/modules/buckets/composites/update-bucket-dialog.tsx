@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { updateBucketSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
 import { useUpdateBucketMutation } from "@/modules/buckets/hooks";
 import { bucketQueryOptions } from "@/modules/buckets/query-options";
-import { updateBucketSchema } from "@/modules/buckets/schemas";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";

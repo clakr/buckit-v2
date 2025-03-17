@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createGoalSchema, goalSchema } from "@/lib/schemas";
 import { useAppForm } from "@/main";
 import { useCreateGoalMutation } from "@/modules/goals/hooks";
-import { createGoalSchema, goalSchema } from "@/modules/goals/schemas";
 import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { z } from "zod";
 

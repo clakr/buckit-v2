@@ -62,7 +62,7 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           >
             <DropdownMenuItem>
               <Icon icon="bx:plus" />
-              Create
+              Create Transaction
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogTrigger
@@ -71,7 +71,7 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           >
             <DropdownMenuItem>
               <Icon icon="bitcoin-icons:transactions-filled" />
-              View
+              View Transactions
             </DropdownMenuItem>
           </DialogTrigger>
           <DropdownMenuSeparator />
@@ -80,7 +80,7 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           <DialogTrigger onClick={() => handleTrigger("update-bucket")} asChild>
             <DropdownMenuItem>
               <Icon icon="bx:pencil" />
-              Update
+              Update Bucket
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogTrigger
@@ -89,7 +89,7 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           >
             <DropdownMenuItem>
               <Icon icon="bx:trash" />
-              Archive
+              Archive Bucket
             </DropdownMenuItem>
           </DialogTrigger>
           <DropdownMenuSeparator />

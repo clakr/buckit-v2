@@ -1,6 +1,8 @@
 import { queryClient } from "@/main";
 import { supabase } from "@/supabase";
 import {
+  BucketInsert,
+  Goal,
   GoalInsert,
   GoalTransactionInsert,
   GoalUpdate,
@@ -91,6 +93,38 @@ export function useCreateGoalTransactionMutation() {
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ["goals"],
+      });
+    },
+  });
+}
+
+export function useConvertToBucketMutation() {
+  return useMutation({
+    mutationFn: async ({
+      goalId,
+      ...bucketPayload
+    }: BucketInsert & { goalId: Goal["id"] }) => {
+      const { error: goalError } = await supabase
+        .from("goals")
+        .update({
+          is_active: false,
+        })
+        .eq("id", goalId);
+
+      if (goalError) throw new Error(goalError.message);
+
+      const { error: bucketError } = await supabase
+        .from("buckets")
+        .insert([bucketPayload]);
+
+      if (bucketError) throw new Error(bucketError.message);
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["goals"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["buckets"],
       });
     },
   });

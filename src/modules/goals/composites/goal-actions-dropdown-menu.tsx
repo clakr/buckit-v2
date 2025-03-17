@@ -4,9 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArchiveGoalDialog } from "@/modules/goals/composites/archive-goal-dialog";
+import { ConvertToBucketDialog } from "@/modules/goals/composites/convert-to-bucket-dialog";
 import { CreateGoalTransactionDialog } from "@/modules/goals/composites/create-goal-transaction-dialog";
 import { UpdateGoalDialog } from "@/modules/goals/composites/update-goal-dialog";
 import { ViewGoalTransactionsDialog } from "@/modules/goals/composites/view-goal-transactions-dialog";
@@ -37,6 +40,8 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
       return <CreateGoalTransactionDialog />;
     } else if (dialogContentState === "view-transactions") {
       return <ViewGoalTransactionsDialog />;
+    } else if (dialogContentState === "convert-to-bucket") {
+      return <ConvertToBucketDialog />;
     }
     return null;
   }
@@ -50,6 +55,7 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuLabel>Transactions</DropdownMenuLabel>
           <DialogTrigger
             onClick={() => handleTrigger("create-transaction")}
             asChild
@@ -68,6 +74,9 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
               View Transactions
             </DropdownMenuItem>
           </DialogTrigger>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel>Goal</DropdownMenuLabel>
           <DialogTrigger onClick={() => handleTrigger("update-goal")} asChild>
             <DropdownMenuItem>
               <Icon icon="bx:pencil" />
@@ -78,6 +87,18 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
             <DropdownMenuItem>
               <Icon icon="bx:trash" />
               Archive Goal
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel>Others</DropdownMenuLabel>
+          <DialogTrigger
+            onClick={() => handleTrigger("convert-to-bucket")}
+            asChild
+          >
+            <DropdownMenuItem>
+              <Icon icon="lucide:piggy-bank" />
+              Convert To Bucket
             </DropdownMenuItem>
           </DialogTrigger>
         </DropdownMenuContent>

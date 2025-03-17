@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createBucketSchema } from "@/lib/schemas";
 import { useAppForm } from "@/main";
 import { useCreateBucketMutation } from "@/modules/buckets/hooks";
-import { createBucketSchema } from "@/modules/buckets/schemas";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { z } from "zod";
 
