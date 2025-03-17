@@ -2,6 +2,7 @@ import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/main";
 import { BucketCard } from "@/modules/buckets/composites/bucket-card";
+import { CreateBucketDialog } from "@/modules/buckets/composites/create-bucket-dialog";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { IndexTemplate } from "@/modules/buckets/templates/index-template";
@@ -67,6 +68,8 @@ function BucketsComponent() {
           </div>
           <Button onClick={toggleCreateBucketDialog}>Create Bucket</Button>
         </StateSection>
+
+        <CreateBucketDialog />
       </IndexTemplate>
     );
   }
@@ -78,6 +81,8 @@ function BucketsComponent() {
           <BucketCard bucket={bucket} key={bucket.id} />
         ))}
       </section>
+
+      <CreateBucketDialog />
     </IndexTemplate>
   );
 }

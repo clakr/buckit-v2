@@ -1,9 +1,11 @@
 import { queryClient } from "@/main";
 import { supabase } from "@/supabase";
 import {
+  Bucket,
   BucketInsert,
   BucketTransactionInsert,
   BucketUpdate,
+  GoalInsert,
 } from "@/supabase/types";
 import { useMutation } from "@tanstack/react-query";
 
@@ -90,6 +92,35 @@ export function useCreateBucketTransactionMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({
+        queryKey: ["buckets"],
+      });
+    },
+  });
+}
+
+export function useConvertToGoalMutation() {
+  return useMutation({
+    mutationFn: async ({
+      bucketId,
+      ...goalPayload
+    }: GoalInsert & { bucketId: Bucket["id"] }) => {
+      const { error: bucketError } = await supabase
+        .from("buckets")
+        .update({
+          is_active: false,
+        })
+        .eq("id", bucketId);
+
+      if (bucketError) throw new Error(bucketError.message);
+
+      const { error: goalError } = await supabase
+        .from("goals")
+        .insert([goalPayload]);
+
+      if (goalError) throw new Error(goalError.message);
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["buckets"],
       });
     },

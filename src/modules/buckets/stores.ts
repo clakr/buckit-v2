@@ -13,7 +13,8 @@ type DialogContentState =
   | "archive-bucket"
   | "update-bucket"
   | "create-transaction"
-  | "view-transactions";
+  | "view-transactions"
+  | "convert-to-goal";
 export const useBucketDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;

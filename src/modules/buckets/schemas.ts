@@ -1,4 +1,5 @@
 import { transactionTypeSchema } from "@/lib/schemas";
+import { goalSchema } from "@/modules/goals/schemas";
 import { z } from "zod";
 
 export const bucketSchema = z.object({
@@ -71,3 +72,22 @@ export const createBucketTransactionSchema = bucketTransactionSchema.pick({
   type: true,
   current_balance: true,
 });
+
+export const convertToGoalSchema = goalSchema
+  .pick({
+    name: true,
+    description: true,
+    current_amount: true,
+    target_amount: true,
+  })
+  .extend({
+    bucketId: bucketSchema.shape.id,
+  })
+  .refine(
+    (data) =>
+      data.target_amount === null || data.target_amount > data.current_amount,
+    {
+      message: "Target amount must be greater than current amount",
+      path: ["target_amount"],
+    },
+  );

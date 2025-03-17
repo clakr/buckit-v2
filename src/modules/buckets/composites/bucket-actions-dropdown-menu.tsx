@@ -4,9 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArchiveBucketDialog } from "@/modules/buckets/composites/archive-bucket-dialog";
+import { ConvertToGoalDialog } from "@/modules/buckets/composites/convert-to-goal-dialog";
 import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
 import { UpdateBucketDialog } from "@/modules/buckets/composites/update-bucket-dialog";
 import { ViewBucketTransactionsDialog } from "@/modules/buckets/composites/view-bucket-transactions-dialog";
@@ -37,6 +40,8 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
       return <CreateBucketTransactionDialog />;
     } else if (dialogContentState === "view-transactions") {
       return <ViewBucketTransactionsDialog />;
+    } else if (dialogContentState === "convert-to-goal") {
+      return <ConvertToGoalDialog />;
     }
     return null;
   }
@@ -50,13 +55,14 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuLabel>Transactions</DropdownMenuLabel>
           <DialogTrigger
             onClick={() => handleTrigger("create-transaction")}
             asChild
           >
             <DropdownMenuItem>
               <Icon icon="bx:plus" />
-              Create Transaction
+              Create
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogTrigger
@@ -65,13 +71,16 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           >
             <DropdownMenuItem>
               <Icon icon="bitcoin-icons:transactions-filled" />
-              View Transactions
+              View
             </DropdownMenuItem>
           </DialogTrigger>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel>Bucket</DropdownMenuLabel>
           <DialogTrigger onClick={() => handleTrigger("update-bucket")} asChild>
             <DropdownMenuItem>
               <Icon icon="bx:pencil" />
-              Update Bucket
+              Update
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogTrigger
@@ -80,7 +89,19 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
           >
             <DropdownMenuItem>
               <Icon icon="bx:trash" />
-              Archive Bucket
+              Archive
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel>Others</DropdownMenuLabel>
+          <DialogTrigger
+            onClick={() => handleTrigger("convert-to-goal")}
+            asChild
+          >
+            <DropdownMenuItem>
+              <Icon icon="lucide:goal" />
+              Convert To Goal
             </DropdownMenuItem>
           </DialogTrigger>
         </DropdownMenuContent>
