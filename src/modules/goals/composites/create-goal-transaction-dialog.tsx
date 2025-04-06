@@ -3,16 +3,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
 import { createGoalTransactionSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
 import { useCreateGoalTransactionMutation } from "@/modules/goals/hooks";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
-import { TransactionType } from "@/supabase/types";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
@@ -31,15 +26,7 @@ export function CreateGoalTransactionDialog() {
       type: "inbound",
     } as z.input<typeof createGoalTransactionSchema>,
     validators: {
-      onSubmit: ({ value }) => {
-        const { success, error } = createGoalTransactionSchema.safeParse(value);
-
-        if (!success) {
-          return {
-            fields: error.flatten().fieldErrors,
-          };
-        }
-      },
+      onSubmit: createGoalTransactionSchema,
     },
     onSubmit: async ({ value }) => {
       const payload = createGoalTransactionSchema.parse(value);
@@ -68,60 +55,23 @@ export function CreateGoalTransactionDialog() {
           form.handleSubmit();
         }}
       >
-        <form.AppField
-          name="amount"
-          children={(field) => (
-            <field.Fieldset label="Amount">
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
+        <form.AppField name="amount">
+          {(field) => <field.InputField label="Amount" type="number" />}
+        </form.AppField>
+        <form.AppField name="description">
+          {(field) => <field.TextareaField label="Description" />}
+        </form.AppField>
+        <form.AppField name="type">
+          {(field) => (
+            <field.RadioGroupField
+              label="Type"
+              options={[
+                { value: "inbound", label: "Inbound" },
+                { value: "outbound", label: "Outbound" },
+              ]}
+            />
           )}
-        />
-        <form.AppField
-          name="description"
-          children={(field) => (
-            <field.Fieldset label="Description">
-              <Textarea
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                rows={5}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="type"
-          children={(field) => (
-            <field.Fieldset label="Type">
-              <RadioGroup
-                className="group-has-[em]:text-destructive col-span-full mt-1 gap-y-2"
-                defaultValue={field.state.value}
-                onBlur={field.handleBlur}
-                onValueChange={(value) =>
-                  field.handleChange(value as TransactionType)
-                }
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="inbound" id="inbound" />
-                  <Label htmlFor="inbound">Inbound</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="outbound" id="outbound" />
-                  <Label htmlFor="outbound">Outbound</Label>
-                </div>
-              </RadioGroup>
-            </field.Fieldset>
-          )}
-        />
+        </form.AppField>
         <form.AppForm>
           <form.SubmitButton className="justify-self-end">
             Create

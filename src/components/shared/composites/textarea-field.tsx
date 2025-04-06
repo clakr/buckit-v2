@@ -30,6 +30,7 @@ export default function TextareaField({ label, description, ...props }: Props) {
         </em>
       ) : null}
       <Textarea
+        {...props}
         name={field.name}
         id={field.name}
         value={field.state.value}

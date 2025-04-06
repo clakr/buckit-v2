@@ -37,15 +37,7 @@ export function ConvertToBucketDialog() {
       current_amount: bucket?.current_amount.toString(),
     } as z.input<typeof convertToBucketSchema>,
     validators: {
-      onSubmit: ({ value }) => {
-        const { success, error } = convertToBucketSchema.safeParse(value);
-
-        if (!success) {
-          return {
-            fields: error.flatten().fieldErrors,
-          };
-        }
-      },
+      onSubmit: convertToBucketSchema,
     },
     onSubmit: async ({ value }) => {
       const payload = convertToBucketSchema.parse(value);
