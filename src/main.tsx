@@ -1,4 +1,3 @@
-import { Fieldset } from "@/components/shared/composites/fieldset";
 import "@/global.css";
 import { routeTree } from "@/routeTree.gen";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
@@ -15,7 +14,6 @@ export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {
-    Fieldset,
     InputField: lazy(
       () => import("@/components/shared/composites/input-field"),
     ),

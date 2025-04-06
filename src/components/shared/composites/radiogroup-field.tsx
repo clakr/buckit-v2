@@ -1,3 +1,4 @@
+import { Fieldset } from "@/components/shared/composites/fieldset";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useFieldContext } from "@/main";
@@ -27,22 +28,7 @@ export default function RadioGroupField({
   const field = useFieldContext<string>();
 
   return (
-    <fieldset className="group grid grid-cols-2 gap-y-1.5">
-      <div className="grid gap-y-0.5">
-        <Label htmlFor={field.name} className="group-has-[em]:text-destructive">
-          {label}
-        </Label>
-        {description ? (
-          <p className="text-muted-foreground group-has-[em]:text-destructive text-xs">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      {typeof field.state.meta.errors[0] === "object" ? (
-        <em role="alert" className="text-destructive self-end text-end text-sm">
-          {field.state.meta.errors[0].message}
-        </em>
-      ) : null}
+    <Fieldset label={label} description={description}>
       <RadioGroup
         {...props}
         name={field.name}
@@ -65,6 +51,6 @@ export default function RadioGroupField({
           </div>
         ))}
       </RadioGroup>
-    </fieldset>
+    </Fieldset>
   );
 }
