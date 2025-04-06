@@ -56,15 +56,27 @@ export function CreateGoalTransactionDialog() {
         }}
       >
         <form.AppField name="amount">
-          {(field) => <field.InputField label="Amount" type="number" />}
+          {(field) => (
+            <field.InputField
+              label="Amount"
+              type="number"
+              description="The amount to add or subtract"
+            />
+          )}
         </form.AppField>
         <form.AppField name="description">
-          {(field) => <field.TextareaField label="Description" />}
+          {(field) => (
+            <field.TextareaField
+              label="Description"
+              description="A description of the transaction"
+            />
+          )}
         </form.AppField>
         <form.AppField name="type">
           {(field) => (
             <field.RadioGroupField
               label="Type"
+              description="Whether to add or subtract from the goal"
               options={[
                 { value: "inbound", label: "Inbound" },
                 { value: "outbound", label: "Outbound" },

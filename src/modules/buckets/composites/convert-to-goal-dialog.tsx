@@ -93,16 +93,39 @@ export function ConvertToGoalDialog() {
         }}
       >
         <form.AppField name="name">
-          {(field) => <field.InputField label="Name" type="text" />}
+          {(field) => (
+            <field.InputField
+              label="Name"
+              type="text"
+              description="The name of the goal"
+            />
+          )}
         </form.AppField>
         <form.AppField name="description">
-          {(field) => <field.TextareaField label="Description" />}
+          {(field) => (
+            <field.TextareaField
+              label="Description"
+              description="A description of the goal"
+            />
+          )}
         </form.AppField>
         <form.AppField name="current_amount">
-          {(field) => <field.InputField label="Current Amount" type="number" />}
+          {(field) => (
+            <field.InputField
+              label="Current Amount"
+              type="number"
+              description="The current amount saved"
+            />
+          )}
         </form.AppField>
         <form.AppField name="target_amount">
-          {(field) => <field.InputField label="Target Amount" type="number" />}
+          {(field) => (
+            <field.InputField
+              label="Target Amount"
+              type="number"
+              description="The target amount to save"
+            />
+          )}
         </form.AppField>
         <form.AppForm>
           <form.SubmitButton className="justify-self-end">
