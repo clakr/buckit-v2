@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { authStore } from "@/modules/authentication/stores";
+import { useAuthStore } from "@/modules/authentication/stores";
 import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
@@ -7,9 +7,7 @@ export function Navbar() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    const { error } = await authStore.getState().logout();
-
-    if (error) throw new Error(error.message);
+    await useAuthStore.getState().logout();
 
     navigate({
       to: "/",

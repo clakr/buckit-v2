@@ -1,60 +1,73 @@
+import { LoginSchema } from "@/lib/schemas";
 import { supabase } from "@/supabase";
-import { AuthError, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
+import { z } from "zod";
 import { createStore } from "zustand";
+import { persist } from "zustand/middleware";
 
-type AuthStoreState = { user: User | null };
+type AuthState = {
+  user: User | null;
+  login: (value: z.input<typeof LoginSchema>) => Promise<void>;
+  logout: () => Promise<void>;
+  fetchUser(): Promise<void>;
+  register: (value: unknown) => Promise<void>;
 
-type AuthStoreActions = {
-  fetchUser: () => Promise<
-    | {
-        error: AuthError;
-      }
-    | {
-        error: null;
-      }
-  >;
-  logout: () => Promise<
-    | {
-        error: AuthError;
-      }
-    | {
-        error: null;
-      }
-  >;
+  reset: () => void;
 };
 
-type AuthStore = AuthStoreState & AuthStoreActions;
+export const useAuthStore = createStore<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      login: async (value) => {
+        try {
+          const { error } = await supabase.auth.signInWithPassword(value);
 
-export const authStore = createStore<AuthStore>()((set) => ({
-  user: null,
-  fetchUser: async () => {
-    console.log("fetching...");
-    const { error, data } = await supabase.auth.getUser();
+          if (error) throw new Error(error.message);
 
-    if (error) {
-      return {
-        error,
-      };
-    }
+          await get().fetchUser();
+        } catch (error) {
+          console.error(error);
 
-    set({ user: data.user });
-    return {
-      error: null,
-    };
-  },
-  logout: async () => {
-    const { error } = await supabase.auth.signOut();
+          get().reset();
+        }
+      },
+      logout: async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
 
-    if (error) {
-      return {
-        error,
-      };
-    }
+          if (error) throw new Error(error.message);
 
-    set({ user: null });
+          get().reset();
+        } catch (error) {
+          console.error(error);
 
-    return {
-      error: null,
-    };
-  },
-}));
+          set((state) => ({
+            user: state.user,
+          }));
+        }
+      },
+      fetchUser: async () => {
+        try {
+          const { error, data } = await supabase.auth.getUser();
+
+          if (error) throw new Error(error.message);
+
+          set({ user: data.user });
+        } catch (error) {
+          console.error(error);
+
+          get().reset();
+        }
+      },
+      register: async () => {},
+
+      reset: () => {
+        set({ user: null });
+      },
+    }),
+    {
+      name: "auth",
+    },
+  ),
+);

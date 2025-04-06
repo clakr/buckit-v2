@@ -1,19 +1,24 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useFormContext } from "@/main";
 import { Icon } from "@iconify/react";
 
-export function SubmitButton({
-  children,
-  ...props
-}: Parameters<typeof Button>["0"]) {
+type Props = Parameters<typeof Button>[0];
+
+export default function SubmitButton({ children, className, ...props }: Props) {
   const form = useFormContext();
 
   return (
-    <form.Subscribe selector={(state) => state.isSubmitting}>
-      {(isSubmitting) => (
-        <Button {...props} disabled={isSubmitting}>
+    <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+      {([canSubmit, isSubmitting]) => (
+        <Button
+          {...props}
+          type="submit"
+          disabled={!canSubmit}
+          className={cn("", className)}
+        >
           {isSubmitting ? (
-            <Icon icon="bx:loader-alt" className="animate-spin" />
+            <Icon icon="bx:loader" className="animate-spin" />
           ) : null}
           {children}
         </Button>

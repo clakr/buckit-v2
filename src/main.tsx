@@ -1,11 +1,11 @@
 import { Fieldset } from "@/components/shared/composites/fieldset";
-import { SubmitButton } from "@/components/shared/composites/submit-button";
 import "@/global.css";
 import { routeTree } from "@/routeTree.gen";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { lazy } from "react";
 import ReactDOM from "react-dom/client";
 
 export const { fieldContext, formContext, useFieldContext, useFormContext } =
@@ -16,9 +16,14 @@ export const { useAppForm } = createFormHook({
   formContext,
   fieldComponents: {
     Fieldset,
+    InputField: lazy(
+      () => import("@/components/shared/composites/input-field"),
+    ),
   },
   formComponents: {
-    SubmitButton,
+    SubmitButton: lazy(
+      () => import("@/components/shared/composites/submit-button"),
+    ),
   },
 });
 

@@ -1,15 +1,13 @@
 import { Navbar } from "@/components/shared/navbar";
-import { authStore } from "@/modules/authentication/stores";
+import { useAuthStore } from "@/modules/authentication/stores";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed")({
   component: RouteComponent,
   beforeLoad: async () => {
-    const user = authStore.getState().user;
-    if (user) return;
+    const user = useAuthStore.getState().user;
 
-    const { error } = await authStore.getState().fetchUser();
-    if (error) {
+    if (!user) {
       throw redirect({
         to: "/",
       });
