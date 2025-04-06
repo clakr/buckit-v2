@@ -104,7 +104,7 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DialogContent>
+      <DialogContent className="grid max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)]">
         <DialogContentState />
       </DialogContent>
     </Dialog>
