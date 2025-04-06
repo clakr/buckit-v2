@@ -1,15 +1,29 @@
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useFieldContext } from "@/main";
 import type { ReactNode } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 
-type Props = ComponentProps<"input"> & {
+type Option = {
+  value: string;
   label: ReactNode;
-  description?: ReactNode;
 };
 
-export default function InputField({ label, description, ...props }: Props) {
+type Props = Omit<
+  ComponentProps<typeof RadioGroup>,
+  "value" | "defaultValue"
+> & {
+  label: ReactNode;
+  description?: ReactNode;
+  options: Option[];
+};
+
+export default function RadioGroupField({
+  label,
+  description,
+  options,
+  ...props
+}: Props) {
   const field = useFieldContext<string>();
 
   return (
@@ -29,15 +43,28 @@ export default function InputField({ label, description, ...props }: Props) {
           {field.state.meta.errors[0].message}
         </em>
       ) : null}
-      <Input
+      <RadioGroup
         {...props}
         name={field.name}
-        id={field.name}
         value={field.state.value}
-        onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
-        className="group-has-[em]:border-destructive col-span-full"
-      />
+        onValueChange={field.handleChange}
+        className="col-span-full gap-y-2"
+      >
+        {options.map((option) => (
+          <div
+            key={option.value}
+            className="flex items-center gap-x-2 first:mt-2"
+          >
+            <RadioGroupItem
+              value={option.value}
+              id={`${field.name}-${option.value}`}
+            />
+            <Label htmlFor={`${field.name}-${option.value}`}>
+              {option.label}
+            </Label>
+          </div>
+        ))}
+      </RadioGroup>
     </fieldset>
   );
 }

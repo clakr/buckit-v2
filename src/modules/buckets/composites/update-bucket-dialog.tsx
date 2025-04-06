@@ -4,8 +4,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { updateBucketSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
@@ -38,15 +36,7 @@ export function UpdateBucketDialog() {
       description: bucket?.description,
     } as z.input<typeof updateBucketSchema>,
     validators: {
-      onSubmit: ({ value }) => {
-        const { success, error } = updateBucketSchema.safeParse(value);
-
-        if (!success) {
-          return {
-            fields: error.flatten().fieldErrors,
-          };
-        }
-      },
+      onSubmit: updateBucketSchema,
     },
     onSubmit: async ({ value }) => {
       const payload = updateBucketSchema.parse(value);
@@ -100,36 +90,12 @@ export function UpdateBucketDialog() {
           form.handleSubmit();
         }}
       >
-        <form.AppField
-          name="name"
-          children={(field) => (
-            <field.Fieldset label="Name">
-              <Input
-                id={field.name}
-                type="text"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="description"
-          children={(field) => (
-            <field.Fieldset label="Description">
-              <Textarea
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                rows={5}
-                className="group-has-[em]:border-destructive col-span-full"
-              />
-            </field.Fieldset>
-          )}
-        />
+        <form.AppField name="name">
+          {(field) => <field.InputField label="Name" type="text" />}
+        </form.AppField>
+        <form.AppField name="description">
+          {(field) => <field.TextareaField label="Description" />}
+        </form.AppField>
         <form.AppForm>
           <form.SubmitButton className="justify-self-end">
             Update

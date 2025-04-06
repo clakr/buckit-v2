@@ -19,6 +19,12 @@ export const { useAppForm } = createFormHook({
     InputField: lazy(
       () => import("@/components/shared/composites/input-field"),
     ),
+    TextareaField: lazy(
+      () => import("@/components/shared/composites/textarea-field"),
+    ),
+    RadioGroupField: lazy(
+      () => import("@/components/shared/composites/radiogroup-field"),
+    ),
   },
   formComponents: {
     SubmitButton: lazy(

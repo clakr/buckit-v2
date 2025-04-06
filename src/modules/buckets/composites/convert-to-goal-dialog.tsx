@@ -4,8 +4,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { convertToGoalSchema } from "@/lib/schemas";
 import { closeDialog } from "@/lib/utils";
 import { useAppForm } from "@/main";
@@ -40,15 +38,7 @@ export function ConvertToGoalDialog() {
       target_amount: "",
     } as z.input<typeof convertToGoalSchema>,
     validators: {
-      onSubmit: ({ value }) => {
-        const { success, error } = convertToGoalSchema.safeParse(value);
-
-        if (!success) {
-          return {
-            fields: error.flatten().fieldErrors,
-          };
-        }
-      },
+      onSubmit: convertToGoalSchema,
     },
     onSubmit: async ({ value }) => {
       const payload = convertToGoalSchema.parse(value);
@@ -102,71 +92,18 @@ export function ConvertToGoalDialog() {
           form.handleSubmit();
         }}
       >
-        <form.AppField
-          name="name"
-          children={(field) => (
-            <field.Fieldset label="Name">
-              <Input
-                id={field.name}
-                type="text"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-                disabled
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="description"
-          children={(field) => (
-            <field.Fieldset label="Description">
-              <Textarea
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                rows={5}
-                className="group-has-[em]:border-destructive col-span-full"
-                disabled
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="current_amount"
-          children={(field) => (
-            <field.Fieldset label="Current Amount">
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-                step="0.01"
-                disabled
-              />
-            </field.Fieldset>
-          )}
-        />
-        <form.AppField
-          name="target_amount"
-          children={(field) => (
-            <field.Fieldset label="Target Amount">
-              <Input
-                id={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="group-has-[em]:border-destructive col-span-full"
-                step="0.01"
-              />
-            </field.Fieldset>
-          )}
-        />
+        <form.AppField name="name">
+          {(field) => <field.InputField label="Name" type="text" />}
+        </form.AppField>
+        <form.AppField name="description">
+          {(field) => <field.TextareaField label="Description" />}
+        </form.AppField>
+        <form.AppField name="current_amount">
+          {(field) => <field.InputField label="Current Amount" type="number" />}
+        </form.AppField>
+        <form.AppField name="target_amount">
+          {(field) => <field.InputField label="Target Amount" type="number" />}
+        </form.AppField>
         <form.AppForm>
           <form.SubmitButton className="justify-self-end">
             Convert
