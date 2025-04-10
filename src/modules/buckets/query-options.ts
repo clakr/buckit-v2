@@ -24,11 +24,12 @@ export function bucketQueryOptions(bucketId: Bucket["id"]) {
       const { error, data } = await supabase
         .from("buckets")
         .select()
-        .eq("id", bucketId);
+        .eq("id", bucketId)
+        .single();
 
       if (error) throw new Error(error.message);
 
-      return data.at(0);
+      return data;
     },
     initialData: () => {
       const bucketsQueryData = queryClient.getQueryData([

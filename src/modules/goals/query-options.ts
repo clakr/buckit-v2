@@ -24,11 +24,12 @@ export function goalQueryOptions(goalId: Goal["id"]) {
       const { error, data } = await supabase
         .from("goals")
         .select()
-        .eq("id", goalId);
+        .eq("id", goalId)
+        .single();
 
       if (error) throw new Error(error.message);
 
-      return data.at(0);
+      return data;
     },
     initialData: () => {
       const goalsQueryData = queryClient.getQueryData(["goals"]) as Goal[];

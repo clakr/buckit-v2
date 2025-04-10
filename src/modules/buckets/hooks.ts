@@ -17,11 +17,12 @@ export function useCreateBucketMutation() {
       const { error, data } = await supabase
         .from("buckets")
         .insert([payload])
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
-      return data.at(0);
+      return data;
     },
     onSettled: (payload) => {
       if (!payload) return undefined;
@@ -44,7 +45,8 @@ export function useArchiveBucketMutation() {
           is_active: false,
         })
         .eq("id", payload.id)
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
@@ -69,11 +71,12 @@ export function useUpdateBucketMutation() {
         .from("buckets")
         .update(payload)
         .eq("id", payload.id)
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
-      return data.at(0);
+      return data;
     },
     onSettled: (payload) => {
       if (!payload) return undefined;
@@ -94,7 +97,7 @@ export function useUpdateBucketMutation() {
 export function useCreateBucketTransactionMutation() {
   return useMutation({
     mutationFn: async (payload: BucketTransactionInsert) => {
-      const { error: updateCurrentAmountError, data: updateCurrentAmountData } =
+      const { error: updateCurrentAmountError, data: updatedCurrentAmount } =
         await supabase.rpc("update_bucket_current_amount", {
           bucket_id: payload.bucket_id,
           amount: payload.amount,
@@ -104,19 +107,20 @@ export function useCreateBucketTransactionMutation() {
       if (updateCurrentAmountError)
         throw new Error(updateCurrentAmountError.message);
 
-      const { data, error } = await supabase
+      const { error, data: transaction } = await supabase
         .from("bucket_transactions")
         .insert({
           ...payload,
-          current_balance: updateCurrentAmountData,
+          current_balance: updatedCurrentAmount,
         })
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
       return {
-        updatedBucketCurrentAmount: updateCurrentAmountData,
-        transaction: data[0],
+        updatedCurrentAmount,
+        transaction,
       };
     },
     onSettled: (payload) => {
@@ -140,7 +144,7 @@ export function useCreateBucketTransactionMutation() {
 
         return prev.with(updatedBucketIndex, {
           ...prev[updatedBucketIndex],
-          current_amount: payload.updatedBucketCurrentAmount,
+          current_amount: payload.updatedCurrentAmount,
         });
       });
     },
@@ -165,11 +169,12 @@ export function useConvertToGoalMutation() {
       const { error: goalError, data } = await supabase
         .from("goals")
         .insert([goalPayload])
-        .select();
+        .select()
+        .single();
 
       if (goalError) throw new Error(goalError.message);
 
-      return data.at(0);
+      return data;
     },
     onSettled: async (payload, _, variable) => {
       if (!payload) return undefined;

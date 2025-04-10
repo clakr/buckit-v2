@@ -1,9 +1,11 @@
 import { queryClient } from "@/main";
 import { supabase } from "@/supabase";
 import {
+  Bucket,
   BucketInsert,
   Goal,
   GoalInsert,
+  GoalTransaction,
   GoalTransactionInsert,
   GoalUpdate,
 } from "@/supabase/types";
@@ -12,14 +14,24 @@ import { useMutation } from "@tanstack/react-query";
 export function useCreateGoalMutation() {
   return useMutation({
     mutationFn: async (payload: GoalInsert) => {
-      const { error, data } = await supabase.from("goals").insert([payload]);
+      const { error, data } = await supabase
+        .from("goals")
+        .insert([payload])
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
       return data;
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["goals"] });
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        return [...prev, payload];
+      });
     },
   });
 }
@@ -33,14 +45,19 @@ export function useArchiveGoalMutation() {
           is_active: false,
         })
         .eq("id", payload.id)
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
       return data;
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["goals"] });
+    onSettled: (_, __, variable) => {
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((goal) => goal.id !== variable.id);
+      });
     },
   });
 }
@@ -53,14 +70,26 @@ export function useUpdateGoalMutation() {
       const { error, data } = await supabase
         .from("goals")
         .update(payload)
-        .eq("id", payload.id);
+        .eq("id", payload.id)
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
       return data;
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["goals"] });
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedGoalIndex = prev.findIndex(
+          (goal) => payload.id === goal.id,
+        );
+
+        return prev.with(updatedGoalIndex, payload);
+      });
     },
   });
 }
@@ -68,7 +97,7 @@ export function useUpdateGoalMutation() {
 export function useCreateGoalTransactionMutation() {
   return useMutation({
     mutationFn: async (payload: GoalTransactionInsert) => {
-      const { error: updateCurrentAmountError, data: updateCurrentAmountData } =
+      const { error: updateCurrentAmountError, data: updatedCurrentAmount } =
         await supabase.rpc("update_goal_current_amount", {
           goal_id: payload.goal_id,
           amount: payload.amount,
@@ -78,21 +107,45 @@ export function useCreateGoalTransactionMutation() {
       if (updateCurrentAmountError)
         throw new Error(updateCurrentAmountError.message);
 
-      const { data, error } = await supabase
+      const { error, data: transaction } = await supabase
         .from("goal_transactions")
         .insert({
           ...payload,
-          current_balance: updateCurrentAmountData,
+          current_balance: updatedCurrentAmount,
         })
-        .select();
+        .select()
+        .single();
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return {
+        updatedCurrentAmount,
+        transaction,
+      };
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["goals"],
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<GoalTransaction[]>(
+        ["goals", payload.transaction.goal_id, "transactions"],
+        (prev) => {
+          if (!prev) return undefined;
+
+          return [...prev, payload.transaction];
+        },
+      );
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedGoalIndex = prev.findIndex(
+          (goal) => payload.transaction.goal_id === goal.id,
+        );
+
+        return prev.with(updatedGoalIndex, {
+          ...prev[updatedGoalIndex],
+          current_amount: payload.updatedCurrentAmount,
+        });
       });
     },
   });
@@ -113,18 +166,29 @@ export function useConvertToBucketMutation() {
 
       if (goalError) throw new Error(goalError.message);
 
-      const { error: bucketError } = await supabase
+      const { error: bucketError, data } = await supabase
         .from("buckets")
-        .insert([bucketPayload]);
+        .insert([bucketPayload])
+        .select()
+        .single();
 
       if (bucketError) throw new Error(bucketError.message);
+
+      return data;
     },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["goals"],
+    onSettled: async (payload, _, variable) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((goal) => variable.goalId !== goal.id);
       });
-      await queryClient.invalidateQueries({
-        queryKey: ["buckets"],
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        return [...prev, payload];
       });
     },
   });
