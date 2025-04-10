@@ -47,7 +47,7 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
   defaultStructuralSharing: true,
-  defaultPendingComponent: () => DefaultPendingSection,
+  defaultPendingComponent: () => <DefaultPendingSection />,
   defaultErrorComponent: ({ error }) => <div>{error.message}</div>,
 });
 

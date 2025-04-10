@@ -3,8 +3,10 @@ import { supabase } from "@/supabase";
 import {
   Bucket,
   BucketInsert,
+  BucketTransaction,
   BucketTransactionInsert,
   BucketUpdate,
+  Goal,
   GoalInsert,
 } from "@/supabase/types";
 import { useMutation } from "@tanstack/react-query";
@@ -12,14 +14,23 @@ import { useMutation } from "@tanstack/react-query";
 export function useCreateBucketMutation() {
   return useMutation({
     mutationFn: async (payload: BucketInsert) => {
-      const { error, data } = await supabase.from("buckets").insert([payload]);
+      const { error, data } = await supabase
+        .from("buckets")
+        .insert([payload])
+        .select();
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return data.at(0);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        return [...prev, payload];
+      });
     },
   });
 }
@@ -39,8 +50,12 @@ export function useArchiveBucketMutation() {
 
       return data;
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    onSettled: (_, __, variable) => {
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((bucket) => bucket.id !== variable.id);
+      });
     },
   });
 }
@@ -53,14 +68,25 @@ export function useUpdateBucketMutation() {
       const { error, data } = await supabase
         .from("buckets")
         .update(payload)
-        .eq("id", payload.id);
+        .eq("id", payload.id)
+        .select();
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return data.at(0);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedBucketIndex = prev.findIndex(
+          (bucket) => payload.id === bucket.id,
+        );
+
+        return prev.with(updatedBucketIndex, payload);
+      });
     },
   });
 }
@@ -88,11 +114,34 @@ export function useCreateBucketTransactionMutation() {
 
       if (error) throw new Error(error.message);
 
-      return data;
+      return {
+        updatedBucketCurrentAmount: updateCurrentAmountData,
+        transaction: data[0],
+      };
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["buckets"],
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<BucketTransaction[]>(
+        ["buckets", payload.transaction.bucket_id, "transactions"],
+        (prev) => {
+          if (!prev) return undefined;
+
+          return [...prev, payload.transaction];
+        },
+      );
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedBucketIndex = prev.findIndex(
+          (bucket) => payload.transaction.bucket_id === bucket.id,
+        );
+
+        return prev.with(updatedBucketIndex, {
+          ...prev[updatedBucketIndex],
+          current_amount: payload.updatedBucketCurrentAmount,
+        });
       });
     },
   });
@@ -113,18 +162,28 @@ export function useConvertToGoalMutation() {
 
       if (bucketError) throw new Error(bucketError.message);
 
-      const { error: goalError } = await supabase
+      const { error: goalError, data } = await supabase
         .from("goals")
-        .insert([goalPayload]);
+        .insert([goalPayload])
+        .select();
 
       if (goalError) throw new Error(goalError.message);
+
+      return data.at(0);
     },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["buckets"],
+    onSettled: async (payload, _, variable) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((bucket) => variable.bucketId !== bucket.id);
       });
-      await queryClient.invalidateQueries({
-        queryKey: ["goals"],
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        return [...prev, payload];
       });
     },
   });
