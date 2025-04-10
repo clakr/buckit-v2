@@ -1,5 +1,4 @@
 import { Fieldset } from "@/components/shared/composites/fieldset";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useFieldContext } from "@/main";
 import type { ReactNode } from "@tanstack/react-router";

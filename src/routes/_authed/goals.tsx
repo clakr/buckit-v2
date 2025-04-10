@@ -9,8 +9,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed/goals")({
-  loader: async () => {
-    await queryClient.ensureQueryData(goalsQueryOptions);
+  loader: () => {
+    queryClient.ensureQueryData(goalsQueryOptions);
   },
   pendingComponent: GoalsLoadingComponent,
   errorComponent: GoalsErrorComponent,

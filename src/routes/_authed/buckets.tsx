@@ -10,8 +10,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed/buckets")({
-  loader: async () => {
-    await queryClient.ensureQueryData(bucketsQueryOptions);
+  loader: () => {
+    queryClient.ensureQueryData(bucketsQueryOptions);
   },
   pendingComponent: BucketsLoadingComponent,
   errorComponent: BucketsErrorComponent,
