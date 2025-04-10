@@ -1,3 +1,4 @@
+import { DefaultPendingSection } from "@/components/shared/sections/default-pending-section";
 import "@/global.css";
 import { routeTree } from "@/routeTree.gen";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
@@ -45,7 +46,8 @@ const router = createRouter({
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
-  defaultPendingComponent: () => <div>loading...</div>,
+  defaultStructuralSharing: true,
+  defaultPendingComponent: () => DefaultPendingSection,
   defaultErrorComponent: ({ error }) => <div>{error.message}</div>,
 });
 

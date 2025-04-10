@@ -5,7 +5,7 @@ import { formatToCurrency } from "@/lib/utils";
 import { queryClient } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
