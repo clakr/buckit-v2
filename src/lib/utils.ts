@@ -24,3 +24,11 @@ export function formatToPercentage(value: number) {
     style: "percent",
   }).format(value);
 }
+
+export function formatToDate(date: string) {
+  return new Intl.DateTimeFormat(navigator.language, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(date));
+}

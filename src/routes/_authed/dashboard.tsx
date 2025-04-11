@@ -4,6 +4,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatToCurrency } from "@/lib/utils";
 import { queryClient } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
+import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
+import { TransactionsTabsContent } from "@/modules/dashboard/sections/transactions-tabs-content";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { Icon } from "@iconify/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -14,6 +16,7 @@ export const Route = createFileRoute("/_authed/dashboard")({
   loader: () => {
     queryClient.ensureQueryData(bucketsQueryOptions);
     queryClient.ensureQueryData(goalsQueryOptions);
+    queryClient.ensureQueryData(transactionsQueryOptions);
   },
 });
 
@@ -44,9 +47,7 @@ export function DashboardTemplate() {
           <TabsTrigger value="goals" disabled>
             Goals
           </TabsTrigger>
-          <TabsTrigger value="transactions" disabled>
-            Transactions
-          </TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
           <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
@@ -103,7 +104,7 @@ export function DashboardTemplate() {
         </TabsContent>
         <TabsContent value="buckets">this is buckets</TabsContent>
         <TabsContent value="goals">this is goals</TabsContent>
-        <TabsContent value="transactions">this is transactions</TabsContent>
+        <TransactionsTabsContent />
       </Tabs>
     </Main>
   );
