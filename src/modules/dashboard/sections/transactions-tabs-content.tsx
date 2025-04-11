@@ -17,23 +17,15 @@ import {
 import { TabsContent } from "@/components/ui/tabs";
 import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
+import {
+  getTransactionParentName,
+  getTransactionType,
+} from "@/modules/dashboard/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function TransactionsTabsContent() {
   const { data: transactions } = useSuspenseQuery(transactionsQueryOptions);
-
-  function getTransactionType(transaction: (typeof transactions)[number]) {
-    return "buckets" in transaction ? "Bucket" : "Goal";
-  }
-
-  function getTransactionParentName(
-    transaction: (typeof transactions)[number],
-  ) {
-    return "buckets" in transaction
-      ? transaction.buckets.name
-      : transaction.goals.name;
-  }
 
   return (
     <TabsContent value="transactions">
