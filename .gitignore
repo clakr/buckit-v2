@@ -18,3 +18,5 @@ dist/
 .idea
 
 .env
+
+supabase/seed.sql

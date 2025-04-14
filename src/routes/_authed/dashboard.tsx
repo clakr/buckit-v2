@@ -3,8 +3,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { queryClient } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
-import { OverviewTabsContent } from "@/modules/dashboard/sections/overview-tabs-content";
-import { TransactionsTabsContent } from "@/modules/dashboard/sections/transactions-tabs-content";
+import { OverviewTabsContent } from "@/modules/dashboard/template/overview-tabs-content";
+import { TransactionsTabsContent } from "@/modules/dashboard/template/transactions-tabs-content";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { createFileRoute } from "@tanstack/react-router";
 

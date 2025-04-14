@@ -18,6 +18,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
+import { BucketsChartCard } from "@/modules/dashboard/sections/buckets-chart-card";
 import {
   getTransactionParentName,
   getTransactionType,
@@ -91,6 +92,7 @@ export function OverviewTabsContent() {
           </CardContent>
         </Card>
       </section>
+      <BucketsChartCard />
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
