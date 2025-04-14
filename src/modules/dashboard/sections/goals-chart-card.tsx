@@ -70,13 +70,13 @@ export function GoalsChartCard() {
             <Bar
               dataKey="currentAmount"
               stackId="a"
-              fill="var(--chart-1)"
+              fill="var(--chart-4)"
               radius={[0, 0, 4, 4]}
             />
             <Bar
               dataKey="targetAmount"
               stackId="a"
-              fill="var(--chart-2)"
+              fill="var(--chart-1)"
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

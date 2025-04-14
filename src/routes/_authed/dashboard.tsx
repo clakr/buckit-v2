@@ -23,17 +23,9 @@ export function DashboardTemplate() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="buckets" disabled>
-            Buckets
-          </TabsTrigger>
-          <TabsTrigger value="goals" disabled>
-            Goals
-          </TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
         <OverviewTabsContent />
-        <TabsContent value="buckets">this is buckets</TabsContent>
-        <TabsContent value="goals">this is goals</TabsContent>
         <TransactionsTabsContent />
       </Tabs>
     </Main>

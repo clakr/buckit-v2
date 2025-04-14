@@ -17,7 +17,7 @@ export function Navbar() {
 
   return (
     <nav className="border-b py-2">
-      <div className="mx-auto flex max-w-5xl justify-between px-4">
+      <div className="mx-auto flex max-w-6xl justify-between px-4">
         <section className="flex items-center gap-x-4">
           <Button variant="link" className="px-0" asChild>
             <Link to="/dashboard">Dashboard</Link>

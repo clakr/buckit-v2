@@ -28,7 +28,7 @@ export function TransactionsTabsContent() {
   const { data: transactions } = useSuspenseQuery(transactionsQueryOptions);
 
   return (
-    <TabsContent value="transactions">
+    <TabsContent value="transactions" className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>All Transactions</CardTitle>

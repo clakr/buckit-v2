@@ -5,19 +5,7 @@ import { queryOptions } from "@tanstack/react-query";
 async function fetchBucketTransactions() {
   const { error, data } = await supabase
     .from("bucket_transactions")
-    .select(
-      `
-      id,
-      created_at,
-      description,
-      amount,
-      type,
-      buckets!inner ( 
-        id,
-        name
-      )
-    `,
-    )
+    .select(`*, buckets!inner(*)`)
     .eq("buckets.is_active", true);
   if (error) throw new Error(error.message);
 
@@ -27,19 +15,7 @@ async function fetchBucketTransactions() {
 async function fetchGoalTransactions() {
   const { error, data } = await supabase
     .from("goal_transactions")
-    .select(
-      `
-      id,
-      created_at,
-      description,
-      amount,
-      type,
-      goals!inner ( 
-        id,
-        name
-      )
-    `,
-    )
+    .select(`*, goals!inner(*)`)
     .eq("goals.is_active", true);
   if (error) throw new Error(error.message);
 
