@@ -19,6 +19,7 @@ import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
 import { BucketsChartCard } from "@/modules/dashboard/sections/buckets-chart-card";
+import { GoalsChartCard } from "@/modules/dashboard/sections/goals-chart-card";
 import {
   getTransactionParentName,
   getTransactionType,
@@ -92,7 +93,10 @@ export function OverviewTabsContent() {
           </CardContent>
         </Card>
       </section>
-      <BucketsChartCard />
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
+        <BucketsChartCard />
+        <GoalsChartCard />
+      </section>
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
