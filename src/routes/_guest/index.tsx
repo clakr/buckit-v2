@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LoginSchema } from "@/lib/schemas";
+import { loginSchema } from "@/lib/schemas";
 import { useAppForm } from "@/main";
 import { useAuthStore } from "@/modules/authentication/stores";
 import { Icon } from "@iconify/react";
@@ -19,9 +19,9 @@ function RouteComponent() {
     defaultValues: {
       email: "",
       password: "",
-    } as z.input<typeof LoginSchema>,
+    } as z.input<typeof loginSchema>,
     validators: {
-      onSubmit: LoginSchema,
+      onSubmit: loginSchema,
     },
     onSubmit: async ({ value }) => {
       await useAuthStore.getState().login(value);

@@ -31,7 +31,7 @@ export function ConvertToBucketDialog() {
 
   const form = useAppForm({
     defaultValues: {
-      goalId,
+      goal_id: goalId,
       name: bucket?.name,
       description: bucket?.description,
       current_amount: bucket?.current_amount.toString(),

@@ -1,4 +1,4 @@
-import { LoginSchema } from "@/lib/schemas";
+import { loginSchema } from "@/lib/schemas";
 import { supabase } from "@/supabase";
 import { User } from "@supabase/supabase-js";
 import { z } from "zod";
@@ -7,7 +7,7 @@ import { persist } from "zustand/middleware";
 
 type AuthState = {
   user: User | null;
-  login: (value: z.input<typeof LoginSchema>) => Promise<void>;
+  login: (value: z.input<typeof loginSchema>) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser(): Promise<void>;
   register: (value: unknown) => Promise<void>;
