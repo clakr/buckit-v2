@@ -1,6 +1,7 @@
 import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/main";
+import { CreateGoalDialog } from "@/modules/goals/composites/create-goal-dialog";
 import { GoalCard } from "@/modules/goals/composites/goal-card";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { useCreateGoalDialogStore } from "@/modules/goals/stores";
@@ -57,27 +58,35 @@ function GoalsComponent() {
 
   if (goals.length === 0) {
     return (
-      <IndexTemplate>
-        <StateSection state="empty">
-          <div>
-            <h2 className="text-xl font-medium">No goals yet.</h2>
-            <p className="text-muted-foreground text-sm">
-              Get started by creating your first goal.
-            </p>
-          </div>
-          <Button onClick={toggleCreateGoalDialog}>Create Goal</Button>
-        </StateSection>
-      </IndexTemplate>
+      <>
+        <IndexTemplate>
+          <StateSection state="empty">
+            <div>
+              <h2 className="text-xl font-medium">No goals yet.</h2>
+              <p className="text-muted-foreground text-sm">
+                Get started by creating your first goal.
+              </p>
+            </div>
+            <Button onClick={toggleCreateGoalDialog}>Create Goal</Button>
+          </StateSection>
+        </IndexTemplate>
+
+        <CreateGoalDialog />
+      </>
     );
   }
 
   return (
-    <IndexTemplate>
-      <section className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-        {goals.map((goal) => (
-          <GoalCard key={goal.id} goal={goal} />
-        ))}
-      </section>
-    </IndexTemplate>
+    <>
+      <IndexTemplate>
+        <section className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          {goals.map((goal) => (
+            <GoalCard key={goal.id} goal={goal} />
+          ))}
+        </section>
+      </IndexTemplate>
+
+      <CreateGoalDialog />
+    </>
   );
 }

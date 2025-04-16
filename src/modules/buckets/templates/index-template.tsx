@@ -13,7 +13,7 @@ export function IndexTemplate({ children }: PropsWithChildren) {
       <section className="flex items-end justify-between">
         <h1 className="text-3xl font-bold">Buckets</h1>
         <Button
-          className="mt-4 justify-self-center"
+          className="justify-self-center"
           onClick={toggleCreateBucketDialog}
         >
           Create Bucket

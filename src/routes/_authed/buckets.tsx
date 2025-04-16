@@ -58,31 +58,35 @@ function BucketsComponent() {
 
   if (buckets.length === 0) {
     return (
-      <IndexTemplate>
-        <StateSection state="empty">
-          <div>
-            <h2 className="text-xl font-medium">No buckets yet.</h2>
-            <p className="text-muted-foreground text-sm">
-              Get started by creating your first bucket.
-            </p>
-          </div>
-          <Button onClick={toggleCreateBucketDialog}>Create Bucket</Button>
-        </StateSection>
+      <>
+        <IndexTemplate>
+          <StateSection state="empty">
+            <div>
+              <h2 className="text-xl font-medium">No buckets yet.</h2>
+              <p className="text-muted-foreground text-sm">
+                Get started by creating your first bucket.
+              </p>
+            </div>
+            <Button onClick={toggleCreateBucketDialog}>Create Bucket</Button>
+          </StateSection>
+        </IndexTemplate>
 
         <CreateBucketDialog />
-      </IndexTemplate>
+      </>
     );
   }
 
   return (
-    <IndexTemplate>
-      <section className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-        {buckets.map((bucket) => (
-          <BucketCard bucket={bucket} key={bucket.id} />
-        ))}
-      </section>
+    <>
+      <IndexTemplate>
+        <section className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          {buckets.map((bucket) => (
+            <BucketCard bucket={bucket} key={bucket.id} />
+          ))}
+        </section>
+      </IndexTemplate>
 
       <CreateBucketDialog />
-    </IndexTemplate>
+    </>
   );
 }
