@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { createGoalSchema } from "@/lib/schemas";
 import { useAppForm } from "@/main";
-import { useCreateGoalMutation } from "@/modules/goals/hooks";
+import { useCreateGoalMutation } from "@/modules/goals/mutations";
 import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { z } from "zod";
 

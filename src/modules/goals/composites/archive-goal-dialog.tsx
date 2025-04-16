@@ -6,7 +6,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { closeDialog } from "@/lib/utils";
-import { useArchiveGoalMutation } from "@/modules/goals/hooks";
+import { useArchiveGoalMutation } from "@/modules/goals/mutations";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { useShallow } from "zustand/react/shallow";
 

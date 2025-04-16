@@ -33,11 +33,7 @@ export async function fetchTransactions() {
     .flatMap<
       | Awaited<ReturnType<typeof fetchBucketTransactions>>[number]
       | Awaited<ReturnType<typeof fetchGoalTransactions>>[number]
-    >((promise) => promise.value)
-    .toSorted(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    );
+    >((promise) => promise.value);
 }
 
 export const transactionsQueryOptions = queryOptions({

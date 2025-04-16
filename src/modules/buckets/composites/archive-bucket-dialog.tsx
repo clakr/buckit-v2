@@ -6,7 +6,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { closeDialog } from "@/lib/utils";
-import { useArchiveBucketMutation } from "@/modules/buckets/hooks";
+import { useArchiveBucketMutation } from "@/modules/buckets/mutations";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { useShallow } from "zustand/react/shallow";
 

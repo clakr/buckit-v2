@@ -27,6 +27,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 export function TransactionsTabsContent() {
   const { data: transactions } = useSuspenseQuery(transactionsQueryOptions);
 
+  const sortedTransactions = transactions.toSorted(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  );
+
   return (
     <TabsContent value="transactions" className="space-y-4">
       <Card>
@@ -48,7 +53,7 @@ export function TransactionsTabsContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
+              {sortedTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
                   <TableCell>{formatToDate(transaction.created_at)}</TableCell>
                   <TableCell>

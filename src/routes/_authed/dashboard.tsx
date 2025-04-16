@@ -1,5 +1,5 @@
 import { Main } from "@/components/shared/main";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";

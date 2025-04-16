@@ -26,7 +26,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 export function RecentTransactionsTable() {
   const { data: transactions } = useSuspenseQuery(transactionsQueryOptions);
 
-  const recentTransactions = transactions.slice(0, 5);
+  const recentTransactions = transactions
+    .toSorted(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )
+    .slice(0, 5);
 
   return (
     <Card>
