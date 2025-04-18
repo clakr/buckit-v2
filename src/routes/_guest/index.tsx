@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { loginSchema } from "@/lib/schemas";
 import { useAppForm } from "@/main";
 import { useAuthStore } from "@/modules/authentication/stores";
-import { Icon } from "@iconify/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -76,17 +73,6 @@ function RouteComponent() {
           <form.SubmitButton>Login</form.SubmitButton>
         </form.AppForm>
       </form>
-      <Separator />
-      <section className="flex justify-between">
-        <Button variant="outline">
-          <Icon icon="bxl:apple" />
-          Continue with Apple
-        </Button>
-        <Button variant="outline">
-          <Icon icon="bxl:google" />
-          Continue with Google
-        </Button>
-      </section>
       <p className="text-muted-foreground text-center text-xs text-balance [&>a]:underline">
         By clicking continue, you agree to our{" "}
         <Link to=".">Terms of Service</Link> and{" "}

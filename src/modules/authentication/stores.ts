@@ -1,4 +1,4 @@
-import { loginSchema } from "@/lib/schemas";
+import { loginSchema, registerSchema } from "@/lib/schemas";
 import { supabase } from "@/supabase";
 import { User } from "@supabase/supabase-js";
 import { z } from "zod";
@@ -10,7 +10,7 @@ type AuthState = {
   login: (value: z.input<typeof loginSchema>) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser(): Promise<void>;
-  register: (value: unknown) => Promise<void>;
+  register: (value: z.input<typeof registerSchema>) => Promise<void>;
 
   reset: () => void;
 };
@@ -60,7 +60,19 @@ export const useAuthStore = createStore<AuthState>()(
           get().reset();
         }
       },
-      register: async () => {},
+      register: async (value) => {
+        try {
+          const { error } = await supabase.auth.signUp(value);
+
+          if (error) throw new Error(error.message);
+
+          await get().fetchUser();
+        } catch (error) {
+          console.error(error);
+
+          get().reset();
+        }
+      },
 
       reset: () => {
         set({ user: null });
