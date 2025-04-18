@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { ArchiveGoalDialog } from "@/modules/goals/composites/archive-goal-dialog";
 import { ConvertToBucketDialog } from "@/modules/goals/composites/convert-to-bucket-dialog";
 import { CreateGoalTransactionDialog } from "@/modules/goals/composites/create-goal-transaction-dialog";
@@ -104,7 +105,12 @@ export function GoalActionsDropdownMenu({ goalId }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DialogContent className="grid max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)]">
+      <DialogContent
+        className={cn(
+          "grid max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)]",
+          dialogContentState === "view-transactions" && "sm:max-w-3xl",
+        )}
+      >
         <DialogContentState />
       </DialogContent>
     </Dialog>

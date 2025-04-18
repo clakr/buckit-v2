@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn, formatToCurrency } from "@/lib/utils";
+import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
 import { goalTransactionsQueryOptions } from "@/modules/goals/query-options";
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { Icon } from "@iconify/react";
@@ -83,44 +83,36 @@ export function ViewGoalTransactionsDialog() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-center">Type</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Description</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Current Balance</TableHead>
-            <TableHead className="text-right">Description</TableHead>
+            <TableHead>Direction</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {transactions.map((transaction) => (
             <TableRow key={transaction.id}>
+              <TableCell>{formatToDate(transaction.created_at)}</TableCell>
+              <TableCell>{transaction.description}</TableCell>
+              <TableCell>{formatToCurrency(transaction.amount)}</TableCell>
               <TableCell>
-                <div className="grid place-items-center">
-                  {transaction.type === "inbound" ? (
-                    <Icon
-                      icon="bx:plus-circle"
-                      className="size-5 text-green-600"
-                    />
-                  ) : (
-                    <Icon
-                      icon="bx:minus-circle"
-                      className="size-5 text-red-600"
-                    />
-                  )}
-                </div>
+                {formatToCurrency(transaction.current_balance ?? 0)}
               </TableCell>
               <TableCell
                 className={cn(
+                  "flex items-center gap-x-1 capitalize",
                   transaction.type === "inbound"
-                    ? "text-green-600"
-                    : "text-red-600",
+                    ? "text-primary"
+                    : "text-destructive",
                 )}
               >
-                {formatToCurrency(transaction.amount)}
-              </TableCell>
-              <TableCell>
-                {formatToCurrency(transaction.current_balance)}
-              </TableCell>
-              <TableCell className="text-right whitespace-normal">
-                {transaction.description}
+                {transaction.type === "inbound" ? (
+                  <Icon icon="bx:up-arrow-alt" />
+                ) : (
+                  <Icon icon="bx:down-arrow-alt" />
+                )}
+                {transaction.type}
               </TableCell>
             </TableRow>
           ))}

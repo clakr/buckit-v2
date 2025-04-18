@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { ArchiveBucketDialog } from "@/modules/buckets/composites/archive-bucket-dialog";
 import { ConvertToGoalDialog } from "@/modules/buckets/composites/convert-to-goal-dialog";
 import { CreateBucketTransactionDialog } from "@/modules/buckets/composites/create-bucket-transaction-dialog";
@@ -107,7 +108,12 @@ export function BucketActionsDropdownMenu({ bucketId }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DialogContent className="grid max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)]">
+      <DialogContent
+        className={cn(
+          "grid max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)]",
+          dialogContentState === "view-transactions" && "sm:max-w-3xl",
+        )}
+      >
         <DialogContentState />
       </DialogContent>
     </Dialog>
