@@ -20,3 +20,7 @@ export type GoalUpdate = TablesUpdate<"goals">;
 
 export type GoalTransaction = Tables<"goal_transactions">;
 export type GoalTransactionInsert = TablesInsert<"goal_transactions">;
+
+export type Distribution = Tables<"distributions">;
+export type DistributionInsert = TablesInsert<"distributions">;
+export type DistributionUpdate = TablesUpdate<"distributions">;

@@ -1,10 +1,15 @@
+import { DataTable } from "@/components/shared/composites/data-table";
 import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/main";
+import { columns } from "@/modules/distributions/columns";
+import { CreateDistributionDialog } from "@/modules/distributions/composites/create-distribution-dialog";
 import { distributionsQueryOptions } from "@/modules/distributions/query-options";
+import { useCreateDistributionDialogStore } from "@/modules/distributions/stores";
 import { IndexTemplate } from "@/modules/distributions/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
+import { useShallow } from "zustand/react/shallow";
 
 export const Route = createFileRoute("/_authed/distributions")({
   loader: () => {
@@ -47,6 +52,10 @@ function ErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function RouteComponent() {
+  const toggleDialog = useCreateDistributionDialogStore(
+    useShallow((state) => state.toggleDialog),
+  );
+
   const { data: distributions } = useSuspenseQuery(distributionsQueryOptions);
 
   if (distributions.length === 0) {
@@ -60,14 +69,22 @@ function RouteComponent() {
                 Get started by creating your first distribution.
               </p>
             </div>
-            <Button>Create Distribution</Button>
+            <Button onClick={toggleDialog}>Create Distribution</Button>
           </StateSection>
         </IndexTemplate>
+
+        <CreateDistributionDialog />
       </>
     );
   }
 
   return (
-    <IndexTemplate>{JSON.stringify(distributions, null, 2)}</IndexTemplate>
+    <>
+      <IndexTemplate>
+        <DataTable columns={columns} data={distributions} />
+      </IndexTemplate>
+
+      <CreateDistributionDialog />
+    </>
   );
 }

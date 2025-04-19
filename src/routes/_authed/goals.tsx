@@ -8,6 +8,7 @@ import { useCreateGoalDialogStore } from "@/modules/goals/stores";
 import { IndexTemplate } from "@/modules/goals/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
+import { useShallow } from "zustand/react/shallow";
 
 export const Route = createFileRoute("/_authed/goals")({
   loader: () => {
@@ -50,8 +51,8 @@ function ErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function RouteComponent() {
-  const toggleCreateGoalDialog = useCreateGoalDialogStore(
-    (state) => state.toggleDialog,
+  const toggleDialog = useCreateGoalDialogStore(
+    useShallow((state) => state.toggleDialog),
   );
 
   const { data: goals } = useSuspenseQuery(goalsQueryOptions);
@@ -67,7 +68,7 @@ function RouteComponent() {
                 Get started by creating your first goal.
               </p>
             </div>
-            <Button onClick={toggleCreateGoalDialog}>Create Goal</Button>
+            <Button onClick={toggleDialog}>Create Goal</Button>
           </StateSection>
         </IndexTemplate>
 

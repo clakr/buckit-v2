@@ -8,6 +8,7 @@ import { useCreateBucketDialogStore } from "@/modules/buckets/stores";
 import { IndexTemplate } from "@/modules/buckets/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
+import { useShallow } from "zustand/react/shallow";
 
 export const Route = createFileRoute("/_authed/buckets")({
   loader: () => {
@@ -50,8 +51,8 @@ function ErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function RouteComponent() {
-  const toggleCreateBucketDialog = useCreateBucketDialogStore(
-    (state) => state.toggleDialog,
+  const toggleDialog = useCreateBucketDialogStore(
+    useShallow((state) => state.toggleDialog),
   );
 
   const { data: buckets } = useSuspenseQuery(bucketsQueryOptions);
@@ -67,7 +68,7 @@ function RouteComponent() {
                 Get started by creating your first bucket.
               </p>
             </div>
-            <Button onClick={toggleCreateBucketDialog}>Create Bucket</Button>
+            <Button onClick={toggleDialog}>Create Bucket</Button>
           </StateSection>
         </IndexTemplate>
 

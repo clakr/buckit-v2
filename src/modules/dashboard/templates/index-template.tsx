@@ -1,4 +1,4 @@
-import { Main } from "@/components/shared/main";
+import { Main } from "@/components/shared/primitives/main";
 import { PropsWithChildren } from "react";
 
 export function IndexTemplate({ children }: PropsWithChildren) {

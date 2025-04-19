@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/shared/navbar";
+import { Navbar } from "@/components/shared/composites/navbar";
 import { useAuthStore } from "@/modules/authentication/stores";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 

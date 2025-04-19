@@ -1,10 +1,8 @@
+import { Dialog } from "@/lib/types";
 import { Goal } from "@/supabase/types";
 import { create } from "zustand";
 
-export const useCreateGoalDialogStore = create<{
-  isOpen: boolean;
-  toggleDialog: () => void;
-}>((set) => ({
+export const useCreateGoalDialogStore = create<Dialog>((set) => ({
   isOpen: false,
   toggleDialog: () => set((state) => ({ isOpen: !state.isOpen })),
 }));

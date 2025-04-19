@@ -21,7 +21,7 @@ import {
   getTransactionParentName,
   getTransactionType,
 } from "@/modules/dashboard/utils";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export function TransactionsTabsContent() {
