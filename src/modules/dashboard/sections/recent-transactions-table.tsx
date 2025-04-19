@@ -39,7 +39,7 @@ export function RecentTransactionsTable() {
         <CardTitle>Recent Transactions</CardTitle>
         <CardDescription>Your most recent financial activity</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -55,7 +55,7 @@ export function RecentTransactionsTable() {
               <TableRow key={transaction.id}>
                 <TableCell>{formatToDate(transaction.created_at)}</TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge>{getTransactionType(transaction)}</Badge>
                     <Badge variant="secondary" className="font-bold">
                       {getTransactionParentName(transaction)}
@@ -64,20 +64,22 @@ export function RecentTransactionsTable() {
                 </TableCell>
                 <TableCell>{transaction.description}</TableCell>
                 <TableCell>{formatToCurrency(transaction.amount)}</TableCell>
-                <TableCell
-                  className={cn(
-                    "flex items-center gap-x-1 capitalize",
-                    transaction.type === "inbound"
-                      ? "text-primary"
-                      : "text-destructive",
-                  )}
-                >
-                  {transaction.type === "inbound" ? (
-                    <Icon icon="bx:up-arrow-alt" />
-                  ) : (
-                    <Icon icon="bx:down-arrow-alt" />
-                  )}
-                  {transaction.type}
+                <TableCell>
+                  <div
+                    className={cn(
+                      "flex items-center gap-x-1 capitalize",
+                      transaction.type === "inbound"
+                        ? "text-primary"
+                        : "text-destructive",
+                    )}
+                  >
+                    {transaction.type === "inbound" ? (
+                      <Icon icon="bx:up-arrow-alt" />
+                    ) : (
+                      <Icon icon="bx:down-arrow-alt" />
+                    )}
+                    {transaction.type}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

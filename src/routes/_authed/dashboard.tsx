@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authed/dashboard")({
 export function DashboardTemplate() {
   return (
     <IndexTemplate>
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue="overview" className="overflow-x-auto">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>

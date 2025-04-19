@@ -41,7 +41,7 @@ export function TransactionsTabsContent() {
             Complete history of your financial activity
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -66,20 +66,22 @@ export function TransactionsTabsContent() {
                   </TableCell>
                   <TableCell>{transaction.description}</TableCell>
                   <TableCell>{formatToCurrency(transaction.amount)}</TableCell>
-                  <TableCell
-                    className={cn(
-                      "flex items-center gap-x-1 capitalize",
-                      transaction.type === "inbound"
-                        ? "text-primary"
-                        : "text-destructive",
-                    )}
-                  >
-                    {transaction.type === "inbound" ? (
-                      <Icon icon="bx:up-arrow-alt" />
-                    ) : (
-                      <Icon icon="bx:down-arrow-alt" />
-                    )}
-                    {transaction.type}
+                  <TableCell>
+                    <div
+                      className={cn(
+                        "flex items-center gap-x-1 capitalize",
+                        transaction.type === "inbound"
+                          ? "text-primary"
+                          : "text-destructive",
+                      )}
+                    >
+                      {transaction.type === "inbound" ? (
+                        <Icon icon="bx:up-arrow-alt" />
+                      ) : (
+                        <Icon icon="bx:down-arrow-alt" />
+                      )}
+                      {transaction.type}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
