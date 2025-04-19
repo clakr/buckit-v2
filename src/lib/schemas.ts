@@ -143,20 +143,64 @@ export const loginSchema = z.object({
 
 export const registerSchema = loginSchema;
 
-export const createDistributionSchema = z.object({
-  name: z.string().nonempty("Name is required"),
-  description: z
-    .string()
-    .max(1000, "Description must be less than 1000 characters")
-    .nullable(),
-  base_amount: z
-    .string()
-    .nonempty("Base amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+export const distributionAmountTypeSchema = z.union([
+  z.literal("percentage"),
+  z.literal("absolute"),
+]);
+
+export const createDistributionSchema = z
+  .object({
+    name: z.string().nonempty("Name is required"),
+    description: z
+      .string()
+      .max(1000, "Description must be less than 1000 characters")
+      .nullable(),
+    base_amount: z
+      .string()
+      .nonempty("Base amount is required")
+      .transform((value) => Number(value))
+      .pipe(
+        z
+          .number()
+          .gt(0, "Base amount must be greater than zero")
+          .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+      ),
+    distributions: z.array(
+      z.object({
+        target_id: z.string().nonempty("Target ID is required"),
+        amount_type: distributionAmountTypeSchema,
+        amount: z
+          .string()
+          .nonempty("Amount is required")
+          .transform((value) => Number(value))
+          .pipe(
+            z
+              .number()
+              .gt(0, "Amount must be greater than zero")
+              .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+          ),
+        description: z
+          .string()
+          .max(1000, "Description must be less than 1000 characters")
+          .nullable(),
+      }),
     ),
-});
+  })
+  .refine(
+    (data) => {
+      const totalDistributedAmount = data.distributions.reduce(
+        (sum, distribution) =>
+          distribution.amount_type === "absolute"
+            ? sum + distribution.amount
+            : sum + (data.base_amount * distribution.amount) / 100,
+        0,
+      );
+
+      return totalDistributedAmount <= data.base_amount;
+    },
+    {
+      message:
+        "Total distributed amount cannot exceed the base amount. It is okay to be less than the base amount. It cannot be greater than the base amount",
+      path: ["distributions"],
+    },
+  );

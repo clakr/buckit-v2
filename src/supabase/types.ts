@@ -24,3 +24,7 @@ export type GoalTransactionInsert = TablesInsert<"goal_transactions">;
 export type Distribution = Tables<"distributions">;
 export type DistributionInsert = TablesInsert<"distributions">;
 export type DistributionUpdate = TablesUpdate<"distributions">;
+
+export type DistributionTarget = Tables<"distribution_targets">;
+export type DistributionTargetInsert = TablesInsert<"distribution_targets">;
+export type DistributionTargetUpdate = TablesUpdate<"distribution_targets">;
