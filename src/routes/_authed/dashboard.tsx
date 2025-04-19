@@ -2,9 +2,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { transactionsQueryOptions } from "@/modules/dashboard/query-options";
-import { OverviewTabsContent } from "@/modules/dashboard/template/overview-tabs-content";
-import { TransactionsTabsContent } from "@/modules/dashboard/template/transactions-tabs-content";
 import { IndexTemplate } from "@/modules/dashboard/templates/index-template";
+import { OverviewTabsContent } from "@/modules/dashboard/templates/overview-tabs-content";
+import { TransactionsTabsContent } from "@/modules/dashboard/templates/transactions-tabs-content";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { createFileRoute } from "@tanstack/react-router";
 

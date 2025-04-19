@@ -1,6 +1,6 @@
 import { TabsContent } from "@/components/ui/tabs";
-import { BucketsChartCard } from "@/modules/dashboard/sections/buckets-chart-card";
-import { GoalsChartCard } from "@/modules/dashboard/sections/goals-chart-card";
+import { BucketsChartCard } from "@/modules/dashboard/composites/buckets-chart-card";
+import { GoalsChartCard } from "@/modules/dashboard/composites/goals-chart-card";
 import { RecentTransactionsTable } from "@/modules/dashboard/sections/recent-transactions-table";
 import { TotalAmountsSection } from "@/modules/dashboard/sections/total-amounts-section";
 

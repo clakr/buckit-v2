@@ -1,4 +1,4 @@
-import { Fieldset } from "@/components/shared/composites/fieldset";
+import { Fieldset } from "@/components/shared/primitives/fieldset";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useFieldContext } from "@/main";

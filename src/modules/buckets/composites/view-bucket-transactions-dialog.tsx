@@ -1,21 +1,13 @@
+import { DataTable } from "@/components/shared/composites/data-table";
 import { StateSection } from "@/components/shared/sections/state-section";
 import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
+import { columns } from "@/modules/buckets/columns";
 import { bucketTransactionsQueryOptions } from "@/modules/buckets/query-options";
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
-import { Icon } from "@iconify/react";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 import { useShallow } from "zustand/react/shallow";
@@ -81,44 +73,7 @@ export function ViewBucketTransactionsDialog() {
 
   return (
     <DialogContainer>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Current Balance</TableHead>
-            <TableHead>Direction</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.map((transaction) => (
-            <TableRow key={transaction.id}>
-              <TableCell>{formatToDate(transaction.created_at)}</TableCell>
-              <TableCell>{transaction.description}</TableCell>
-              <TableCell>{formatToCurrency(transaction.amount)}</TableCell>
-              <TableCell>
-                {formatToCurrency(transaction.current_balance ?? 0)}
-              </TableCell>
-              <TableCell
-                className={cn(
-                  "flex items-center gap-x-1 capitalize",
-                  transaction.type === "inbound"
-                    ? "text-primary"
-                    : "text-destructive",
-                )}
-              >
-                {transaction.type === "inbound" ? (
-                  <Icon icon="bx:up-arrow-alt" />
-                ) : (
-                  <Icon icon="bx:down-arrow-alt" />
-                )}
-                {transaction.type}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={transactions} />
     </DialogContainer>
   );
 }

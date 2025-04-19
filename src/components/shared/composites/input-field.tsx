@@ -1,4 +1,4 @@
-import { Fieldset } from "@/components/shared/composites/fieldset";
+import { Fieldset } from "@/components/shared/primitives/fieldset";
 import { Input } from "@/components/ui/input";
 import { useFieldContext } from "@/main";
 import type { ReactNode } from "@tanstack/react-router";
