@@ -13,12 +13,12 @@ export const Route = createFileRoute("/_authed/goals")({
   loader: () => {
     queryClient.ensureQueryData(goalsQueryOptions);
   },
-  pendingComponent: GoalsLoadingComponent,
-  errorComponent: GoalsErrorComponent,
-  component: GoalsComponent,
+  pendingComponent: PendingComponent,
+  errorComponent: ErrorComponent,
+  component: RouteComponent,
 });
 
-function GoalsLoadingComponent() {
+function PendingComponent() {
   return (
     <IndexTemplate>
       <StateSection state="loading">
@@ -33,7 +33,7 @@ function GoalsLoadingComponent() {
   );
 }
 
-function GoalsErrorComponent({ error }: ErrorComponentProps) {
+function ErrorComponent({ error }: ErrorComponentProps) {
   return (
     <IndexTemplate>
       <StateSection state="error">
@@ -49,7 +49,7 @@ function GoalsErrorComponent({ error }: ErrorComponentProps) {
   );
 }
 
-function GoalsComponent() {
+function RouteComponent() {
   const toggleCreateGoalDialog = useCreateGoalDialogStore(
     (state) => state.toggleDialog,
   );

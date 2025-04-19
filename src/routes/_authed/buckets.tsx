@@ -13,12 +13,12 @@ export const Route = createFileRoute("/_authed/buckets")({
   loader: () => {
     queryClient.ensureQueryData(bucketsQueryOptions);
   },
-  pendingComponent: BucketsLoadingComponent,
-  errorComponent: BucketsErrorComponent,
-  component: BucketsComponent,
+  pendingComponent: PendingComponent,
+  errorComponent: ErrorComponent,
+  component: RouteComponent,
 });
 
-function BucketsLoadingComponent() {
+function PendingComponent() {
   return (
     <IndexTemplate>
       <StateSection state="loading">
@@ -33,7 +33,7 @@ function BucketsLoadingComponent() {
   );
 }
 
-function BucketsErrorComponent({ error }: ErrorComponentProps) {
+function ErrorComponent({ error }: ErrorComponentProps) {
   return (
     <IndexTemplate>
       <StateSection state="error">
@@ -49,7 +49,7 @@ function BucketsErrorComponent({ error }: ErrorComponentProps) {
   );
 }
 
-function BucketsComponent() {
+function RouteComponent() {
   const toggleCreateBucketDialog = useCreateBucketDialogStore(
     (state) => state.toggleDialog,
   );

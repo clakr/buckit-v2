@@ -16,6 +16,7 @@ import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as GuestIndexImport } from './routes/_guest/index'
 import { Route as GuestRegisterImport } from './routes/_guest/register'
 import { Route as AuthedGoalsImport } from './routes/_authed/goals'
+import { Route as AuthedDistributionsImport } from './routes/_authed/distributions'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
 
@@ -46,6 +47,12 @@ const GuestRegisterRoute = GuestRegisterImport.update({
 const AuthedGoalsRoute = AuthedGoalsImport.update({
   id: '/goals',
   path: '/goals',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedDistributionsRoute = AuthedDistributionsImport.update({
+  id: '/distributions',
+  path: '/distributions',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
@@ -93,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardImport
       parentRoute: typeof AuthedRouteImport
     }
+    '/_authed/distributions': {
+      id: '/_authed/distributions'
+      path: '/distributions'
+      fullPath: '/distributions'
+      preLoaderRoute: typeof AuthedDistributionsImport
+      parentRoute: typeof AuthedRouteImport
+    }
     '/_authed/goals': {
       id: '/_authed/goals'
       path: '/goals'
@@ -122,12 +136,14 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteRouteChildren {
   AuthedBucketsRoute: typeof AuthedBucketsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedDistributionsRoute: typeof AuthedDistributionsRoute
   AuthedGoalsRoute: typeof AuthedGoalsRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedBucketsRoute: AuthedBucketsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedDistributionsRoute: AuthedDistributionsRoute,
   AuthedGoalsRoute: AuthedGoalsRoute,
 }
 
@@ -153,6 +169,7 @@ export interface FileRoutesByFullPath {
   '': typeof GuestRouteRouteWithChildren
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/distributions': typeof AuthedDistributionsRoute
   '/goals': typeof AuthedGoalsRoute
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
@@ -162,6 +179,7 @@ export interface FileRoutesByTo {
   '': typeof AuthedRouteRouteWithChildren
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/distributions': typeof AuthedDistributionsRoute
   '/goals': typeof AuthedGoalsRoute
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
@@ -173,6 +191,7 @@ export interface FileRoutesById {
   '/_guest': typeof GuestRouteRouteWithChildren
   '/_authed/buckets': typeof AuthedBucketsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/distributions': typeof AuthedDistributionsRoute
   '/_authed/goals': typeof AuthedGoalsRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/_guest/': typeof GuestIndexRoute
@@ -180,15 +199,30 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/buckets' | '/dashboard' | '/goals' | '/register' | '/'
+  fullPaths:
+    | ''
+    | '/buckets'
+    | '/dashboard'
+    | '/distributions'
+    | '/goals'
+    | '/register'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/buckets' | '/dashboard' | '/goals' | '/register' | '/'
+  to:
+    | ''
+    | '/buckets'
+    | '/dashboard'
+    | '/distributions'
+    | '/goals'
+    | '/register'
+    | '/'
   id:
     | '__root__'
     | '/_authed'
     | '/_guest'
     | '/_authed/buckets'
     | '/_authed/dashboard'
+    | '/_authed/distributions'
     | '/_authed/goals'
     | '/_guest/register'
     | '/_guest/'
@@ -224,6 +258,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authed/buckets",
         "/_authed/dashboard",
+        "/_authed/distributions",
         "/_authed/goals"
       ]
     },
@@ -240,6 +275,10 @@ export const routeTree = rootRoute
     },
     "/_authed/dashboard": {
       "filePath": "_authed/dashboard.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/distributions": {
+      "filePath": "_authed/distributions.tsx",
       "parent": "/_authed"
     },
     "/_authed/goals": {

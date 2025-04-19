@@ -28,6 +28,9 @@ export function Navbar() {
           <Button variant="link" className="px-0" asChild>
             <Link to="/goals">Goals</Link>
           </Button>
+          <Button variant="link" className="px-0" asChild>
+            <Link to="/distributions">Distributions</Link>
+          </Button>
         </section>
         <section>
           <Button variant="ghost" onClick={handleLogout}>
