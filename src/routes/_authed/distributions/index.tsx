@@ -3,15 +3,16 @@ import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/main";
 import { columns } from "@/modules/distributions/columns";
-import { CreateDistributionDialog } from "@/modules/distributions/composites/create-distribution-dialog";
 import { distributionsQueryOptions } from "@/modules/distributions/query-options";
-import { useCreateDistributionDialogStore } from "@/modules/distributions/stores";
 import { IndexTemplate } from "@/modules/distributions/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
-import { useShallow } from "zustand/react/shallow";
+import {
+  createFileRoute,
+  ErrorComponentProps,
+  Link,
+} from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authed/distributions")({
+export const Route = createFileRoute("/_authed/distributions/")({
   loader: () => {
     queryClient.ensureQueryData(distributionsQueryOptions);
   },
@@ -52,10 +53,6 @@ function ErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function RouteComponent() {
-  const toggleDialog = useCreateDistributionDialogStore(
-    useShallow((state) => state.toggleDialog),
-  );
-
   const { data: distributions } = useSuspenseQuery(distributionsQueryOptions);
 
   if (distributions.length === 0) {
@@ -69,11 +66,11 @@ function RouteComponent() {
                 Get started by creating your first distribution.
               </p>
             </div>
-            <Button onClick={toggleDialog}>Create Distribution</Button>
+            <Button asChild>
+              <Link to="/distributions/create">Create Distribution</Link>
+            </Button>
           </StateSection>
         </IndexTemplate>
-
-        <CreateDistributionDialog />
       </>
     );
   }
@@ -83,8 +80,6 @@ function RouteComponent() {
       <IndexTemplate>
         <DataTable columns={columns} data={distributions} />
       </IndexTemplate>
-
-      <CreateDistributionDialog />
     </>
   );
 }

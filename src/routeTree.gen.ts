@@ -16,9 +16,10 @@ import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as GuestIndexImport } from './routes/_guest/index'
 import { Route as GuestRegisterImport } from './routes/_guest/register'
 import { Route as AuthedGoalsImport } from './routes/_authed/goals'
-import { Route as AuthedDistributionsImport } from './routes/_authed/distributions'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
+import { Route as AuthedDistributionsIndexImport } from './routes/_authed/distributions/index'
+import { Route as AuthedDistributionsCreateImport } from './routes/_authed/distributions/create'
 
 // Create/Update Routes
 
@@ -50,12 +51,6 @@ const AuthedGoalsRoute = AuthedGoalsImport.update({
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
-const AuthedDistributionsRoute = AuthedDistributionsImport.update({
-  id: '/distributions',
-  path: '/distributions',
-  getParentRoute: () => AuthedRouteRoute,
-} as any)
-
 const AuthedDashboardRoute = AuthedDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -65,6 +60,18 @@ const AuthedDashboardRoute = AuthedDashboardImport.update({
 const AuthedBucketsRoute = AuthedBucketsImport.update({
   id: '/buckets',
   path: '/buckets',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedDistributionsIndexRoute = AuthedDistributionsIndexImport.update({
+  id: '/distributions/',
+  path: '/distributions/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedDistributionsCreateRoute = AuthedDistributionsCreateImport.update({
+  id: '/distributions/create',
+  path: '/distributions/create',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
@@ -100,13 +107,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardImport
       parentRoute: typeof AuthedRouteImport
     }
-    '/_authed/distributions': {
-      id: '/_authed/distributions'
-      path: '/distributions'
-      fullPath: '/distributions'
-      preLoaderRoute: typeof AuthedDistributionsImport
-      parentRoute: typeof AuthedRouteImport
-    }
     '/_authed/goals': {
       id: '/_authed/goals'
       path: '/goals'
@@ -128,6 +128,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestIndexImport
       parentRoute: typeof GuestRouteImport
     }
+    '/_authed/distributions/create': {
+      id: '/_authed/distributions/create'
+      path: '/distributions/create'
+      fullPath: '/distributions/create'
+      preLoaderRoute: typeof AuthedDistributionsCreateImport
+      parentRoute: typeof AuthedRouteImport
+    }
+    '/_authed/distributions/': {
+      id: '/_authed/distributions/'
+      path: '/distributions'
+      fullPath: '/distributions'
+      preLoaderRoute: typeof AuthedDistributionsIndexImport
+      parentRoute: typeof AuthedRouteImport
+    }
   }
 }
 
@@ -136,15 +150,17 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteRouteChildren {
   AuthedBucketsRoute: typeof AuthedBucketsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
-  AuthedDistributionsRoute: typeof AuthedDistributionsRoute
   AuthedGoalsRoute: typeof AuthedGoalsRoute
+  AuthedDistributionsCreateRoute: typeof AuthedDistributionsCreateRoute
+  AuthedDistributionsIndexRoute: typeof AuthedDistributionsIndexRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedBucketsRoute: AuthedBucketsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
-  AuthedDistributionsRoute: AuthedDistributionsRoute,
   AuthedGoalsRoute: AuthedGoalsRoute,
+  AuthedDistributionsCreateRoute: AuthedDistributionsCreateRoute,
+  AuthedDistributionsIndexRoute: AuthedDistributionsIndexRoute,
 }
 
 const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
@@ -169,20 +185,22 @@ export interface FileRoutesByFullPath {
   '': typeof GuestRouteRouteWithChildren
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/distributions': typeof AuthedDistributionsRoute
   '/goals': typeof AuthedGoalsRoute
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
+  '/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/distributions': typeof AuthedDistributionsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '': typeof AuthedRouteRouteWithChildren
   '/buckets': typeof AuthedBucketsRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/distributions': typeof AuthedDistributionsRoute
   '/goals': typeof AuthedGoalsRoute
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
+  '/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/distributions': typeof AuthedDistributionsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -191,10 +209,11 @@ export interface FileRoutesById {
   '/_guest': typeof GuestRouteRouteWithChildren
   '/_authed/buckets': typeof AuthedBucketsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
-  '/_authed/distributions': typeof AuthedDistributionsRoute
   '/_authed/goals': typeof AuthedGoalsRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/_guest/': typeof GuestIndexRoute
+  '/_authed/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/_authed/distributions/': typeof AuthedDistributionsIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -203,29 +222,32 @@ export interface FileRouteTypes {
     | ''
     | '/buckets'
     | '/dashboard'
-    | '/distributions'
     | '/goals'
     | '/register'
     | '/'
+    | '/distributions/create'
+    | '/distributions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
     | '/buckets'
     | '/dashboard'
-    | '/distributions'
     | '/goals'
     | '/register'
     | '/'
+    | '/distributions/create'
+    | '/distributions'
   id:
     | '__root__'
     | '/_authed'
     | '/_guest'
     | '/_authed/buckets'
     | '/_authed/dashboard'
-    | '/_authed/distributions'
     | '/_authed/goals'
     | '/_guest/register'
     | '/_guest/'
+    | '/_authed/distributions/create'
+    | '/_authed/distributions/'
   fileRoutesById: FileRoutesById
 }
 
@@ -258,8 +280,9 @@ export const routeTree = rootRoute
       "children": [
         "/_authed/buckets",
         "/_authed/dashboard",
-        "/_authed/distributions",
-        "/_authed/goals"
+        "/_authed/goals",
+        "/_authed/distributions/create",
+        "/_authed/distributions/"
       ]
     },
     "/_guest": {
@@ -277,10 +300,6 @@ export const routeTree = rootRoute
       "filePath": "_authed/dashboard.tsx",
       "parent": "/_authed"
     },
-    "/_authed/distributions": {
-      "filePath": "_authed/distributions.tsx",
-      "parent": "/_authed"
-    },
     "/_authed/goals": {
       "filePath": "_authed/goals.tsx",
       "parent": "/_authed"
@@ -292,6 +311,14 @@ export const routeTree = rootRoute
     "/_guest/": {
       "filePath": "_guest/index.tsx",
       "parent": "/_guest"
+    },
+    "/_authed/distributions/create": {
+      "filePath": "_authed/distributions/create.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/distributions/": {
+      "filePath": "_authed/distributions/index.tsx",
+      "parent": "/_authed"
     }
   }
 }

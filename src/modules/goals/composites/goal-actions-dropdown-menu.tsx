@@ -17,12 +17,19 @@ import { ViewGoalTransactionsDialog } from "@/modules/goals/composites/view-goal
 import { useGoalDropdownMenuStore } from "@/modules/goals/stores";
 import { Goal } from "@/supabase/types";
 import { Icon } from "@iconify/react";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = { goalId: Goal["id"] };
 
 export function GoalActionsDropdownMenu({ goalId }: Props) {
   const { dialogContentState, setDialogContentState, setGoalId } =
-    useGoalDropdownMenuStore();
+    useGoalDropdownMenuStore(
+      useShallow((state) => ({
+        dialogContentState: state.dialogContentState,
+        setDialogContentState: state.setDialogContentState,
+        setGoalId: state.setGoalId,
+      })),
+    );
 
   function handleOnOpenChange() {
     setGoalId(goalId);

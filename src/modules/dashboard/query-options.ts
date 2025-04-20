@@ -7,6 +7,7 @@ async function fetchBucketTransactions() {
     .from("bucket_transactions")
     .select(`*, buckets!inner(*)`)
     .eq("buckets.is_active", true);
+
   if (error) throw new Error(error.message);
 
   return data;
@@ -17,18 +18,19 @@ async function fetchGoalTransactions() {
     .from("goal_transactions")
     .select(`*, goals!inner(*)`)
     .eq("goals.is_active", true);
+
   if (error) throw new Error(error.message);
 
   return data;
 }
 
 export async function fetchTransactions() {
-  const response = await Promise.allSettled([
+  const promises = await Promise.allSettled([
     fetchBucketTransactions(),
     fetchGoalTransactions(),
   ]);
 
-  return response
+  return promises
     .filter((promise) => promise.status === "fulfilled")
     .flatMap<
       | Awaited<ReturnType<typeof fetchBucketTransactions>>[number]

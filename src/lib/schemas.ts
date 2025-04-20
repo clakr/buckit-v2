@@ -1,13 +1,13 @@
+import {
+  BucketTransaction,
+  BucketTransactionInsert,
+  GoalTransactionInsert,
+} from "@/supabase/types";
 import { z } from "zod";
 
 /**
  * PRIMITIVES
  */
-
-export const transactionTypeSchema = z.union([
-  z.literal("inbound"),
-  z.literal("outbound"),
-]);
 
 const baseBucketSchema = z.object({
   name: z
@@ -61,6 +61,11 @@ const baseGoalSchema = z.object({
     ),
 });
 
+export const transactionTypeSchema = z.union([
+  z.literal("inbound"),
+  z.literal("outbound"),
+]);
+
 const baseTransactionSchema = z.object({
   amount: z
     .string()
@@ -77,6 +82,54 @@ const baseTransactionSchema = z.object({
     .nonempty("Description is required")
     .max(1000, "Description must be less than 1000 characters"),
   type: transactionTypeSchema,
+});
+
+export const distributionAmountTypeSchema = z.union([
+  z.literal("percentage"),
+  z.literal("absolute"),
+]);
+
+export const distributionTargetTypeSchema = z.union([
+  z.literal("bucket"),
+  z.literal("goal"),
+]);
+
+export const distributionTargetSchema = z.object({
+  target_id: z.string().nonempty("Target ID is required"),
+  amount_type: distributionAmountTypeSchema,
+  amount: z
+    .string()
+    .nonempty("Amount is required")
+    .transform((value) => Number(value))
+    .pipe(
+      z
+        .number()
+        .gt(0, "Amount must be greater than zero")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    ),
+  description: z
+    .string()
+    .max(1000, "Description must be less than 1000 characters")
+    .nullable(),
+});
+
+export const baseDistributionSchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  description: z
+    .string()
+    .max(1000, "Description must be less than 1000 characters")
+    .nullable(),
+  base_amount: z
+    .string()
+    .nonempty("Base amount is required")
+    .transform((value) => Number(value))
+    .pipe(
+      z
+        .number()
+        .gt(0, "Base amount must be greater than zero")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    ),
+  distribution_targets: z.array(distributionTargetSchema),
 });
 
 /**
@@ -143,64 +196,63 @@ export const loginSchema = z.object({
 
 export const registerSchema = loginSchema;
 
-export const distributionAmountTypeSchema = z.union([
-  z.literal("percentage"),
-  z.literal("absolute"),
-]);
+export const createDistributionSchema = baseDistributionSchema.refine(
+  (data) => {
+    const totalDistributedAmount = data.distribution_targets.reduce(
+      (sum, distribution) =>
+        distribution.amount_type === "absolute"
+          ? sum + distribution.amount
+          : sum + (data.base_amount * distribution.amount) / 100,
+      0,
+    );
 
-export const createDistributionSchema = z
-  .object({
-    name: z.string().nonempty("Name is required"),
-    description: z
-      .string()
-      .max(1000, "Description must be less than 1000 characters")
-      .nullable(),
-    base_amount: z
-      .string()
-      .nonempty("Base amount is required")
-      .transform((value) => Number(value))
-      .pipe(
-        z
-          .number()
-          .gt(0, "Base amount must be greater than zero")
-          .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-      ),
-    distributions: z.array(
-      z.object({
-        target_id: z.string().nonempty("Target ID is required"),
-        amount_type: distributionAmountTypeSchema,
-        amount: z
-          .string()
-          .nonempty("Amount is required")
-          .transform((value) => Number(value))
-          .pipe(
-            z
-              .number()
-              .gt(0, "Amount must be greater than zero")
-              .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-          ),
-        description: z
-          .string()
-          .max(1000, "Description must be less than 1000 characters")
-          .nullable(),
+    return totalDistributedAmount <= data.base_amount;
+  },
+  {
+    message: "Total distributed amount cannot exceed the base amount.",
+    path: ["distributions"],
+  },
+);
+
+export const distributeFundsSchema = baseDistributionSchema
+  .extend({
+    distribution_targets: z.array(
+      distributionTargetSchema.extend({
+        target_type: distributionTargetTypeSchema,
       }),
     ),
   })
-  .refine(
-    (data) => {
-      const totalDistributedAmount = data.distributions.reduce(
-        (sum, distribution) =>
-          distribution.amount_type === "absolute"
-            ? sum + distribution.amount
-            : sum + (data.base_amount * distribution.amount) / 100,
-        0,
-      );
+  .transform((data) => {
+    const bucketTransactions: BucketTransactionInsert[] = [];
+    const goalTransactions: GoalTransactionInsert[] = [];
 
-      return totalDistributedAmount <= data.base_amount;
-    },
-    {
-      message:
-        "Total distributed amount cannot exceed the base amount. It is okay to be less than the base amount. It cannot be greater than the base amount",
-      path: ["distributions"],
-    },
-  );
+    data.distribution_targets.forEach((target) => {
+      const amount =
+        target.amount_type === "absolute"
+          ? target.amount
+          : (data.base_amount * target.amount) / 100;
+
+      const transactionData = {
+        description: data.name,
+        amount,
+        type: "inbound" as BucketTransaction["type"],
+      };
+
+      if (target.target_type === "bucket") {
+        bucketTransactions.push({
+          ...transactionData,
+          bucket_id: target.target_id,
+        });
+      } else {
+        goalTransactions.push({
+          ...transactionData,
+          goal_id: target.target_id,
+        });
+      }
+    });
+
+    return {
+      buckets: bucketTransactions,
+      goals: goalTransactions,
+    };
+  });

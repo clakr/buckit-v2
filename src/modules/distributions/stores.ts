@@ -1,7 +1,18 @@
-import { Dialog } from "@/lib/types";
+import { Distribution } from "@/supabase/types";
 import { create } from "zustand";
 
-export const useCreateDistributionDialogStore = create<Dialog>((set) => ({
-  isOpen: false,
-  toggleDialog: () => set((state) => ({ isOpen: !state.isOpen })),
+type DialogContentState = "distribute-funds";
+export const useDistributeDropdownMenuStore = create<{
+  dialogContentState: DialogContentState;
+  setDialogContentState: (dialogContentState: DialogContentState) => void;
+
+  distributionId: Distribution["id"];
+  setDistributionId: (distributionId: Distribution["id"]) => void;
+}>((set) => ({
+  dialogContentState: "distribute-funds",
+  setDialogContentState: (dialogContentState) =>
+    set(() => ({ dialogContentState })),
+
+  distributionId: "",
+  setDistributionId: (distributionId) => set(() => ({ distributionId })),
 }));

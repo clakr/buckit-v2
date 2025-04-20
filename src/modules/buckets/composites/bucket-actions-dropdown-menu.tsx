@@ -17,12 +17,19 @@ import { ViewBucketTransactionsDialog } from "@/modules/buckets/composites/view-
 import { useBucketDropdownMenuStore } from "@/modules/buckets/stores";
 import { Bucket } from "@/supabase/types";
 import { Icon } from "@iconify/react";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = { bucketId: Bucket["id"] };
 
 export function BucketActionsDropdownMenu({ bucketId }: Props) {
   const { dialogContentState, setDialogContentState, setBucketId } =
-    useBucketDropdownMenuStore();
+    useBucketDropdownMenuStore(
+      useShallow((state) => ({
+        dialogContentState: state.dialogContentState,
+        setDialogContentState: state.setDialogContentState,
+        setBucketId: state.setBucketId,
+      })),
+    );
 
   function handleOnOpenChange() {
     setBucketId(bucketId);

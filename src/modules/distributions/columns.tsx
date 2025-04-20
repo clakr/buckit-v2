@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { formatToCurrency, formatToDate } from "@/lib/utils";
+import { DistributionsActionsDropdownMenu } from "@/modules/distributions/composites/distributions-actions-dropdown-menu";
 import { Distribution } from "@/supabase/types";
-import { Icon } from "@iconify/react";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Distribution>[] = [
@@ -28,11 +27,8 @@ export const columns: ColumnDef<Distribution>[] = [
   {
     accessorKey: "actions",
     header: "",
-    cell: () => (
-      <Button variant="ghost" size="icon">
-        <Icon icon="bx:dots-horizontal-rounded" />
-        <span className="sr-only">distribution actions</span>
-      </Button>
+    cell: ({ row }) => (
+      <DistributionsActionsDropdownMenu distributionId={row.original.id} />
     ),
   },
 ];
