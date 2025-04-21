@@ -1,8 +1,3 @@
-import {
-  BucketTransaction,
-  BucketTransactionInsert,
-  GoalTransactionInsert,
-} from "@/supabase/types";
 import { z } from "zod";
 
 /**
@@ -56,7 +51,7 @@ const baseGoalSchema = z.object({
     .pipe(
       z
         .number()
-        .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
+        .gt(0, "Amount must be greater than zero")
         .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
     ),
 });
@@ -72,10 +67,10 @@ const baseTransactionSchema = z.object({
     .nonempty("Amount is required")
     .transform((value) => Number(value))
     .pipe(
-      z
-        .number()
-        .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+      z.number().max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    )
+    .or(
+      z.number().max(1_000_000_000, "Amount must be less than 1,000,000,000"),
     ),
   description: z
     .string()
@@ -162,7 +157,6 @@ export const createGoalSchema = baseGoalSchema.refine(
 export const updateGoalSchema = baseGoalSchema
   .omit({
     current_amount: true,
-    target_amount: true,
   })
   .extend({
     id: z.string().nonempty("Goal ID is required"),
@@ -214,45 +208,15 @@ export const createDistributionSchema = baseDistributionSchema.refine(
   },
 );
 
-export const distributeFundsSchema = baseDistributionSchema
-  .extend({
-    distribution_targets: z.array(
-      distributionTargetSchema.extend({
-        target_type: distributionTargetTypeSchema,
-      }),
-    ),
-  })
-  .transform((data) => {
-    const bucketTransactions: BucketTransactionInsert[] = [];
-    const goalTransactions: GoalTransactionInsert[] = [];
-
-    data.distribution_targets.forEach((target) => {
-      const amount =
-        target.amount_type === "absolute"
-          ? target.amount
-          : (data.base_amount * target.amount) / 100;
-
-      const transactionData = {
-        description: data.name,
-        amount,
-        type: "inbound" as BucketTransaction["type"],
-      };
-
-      if (target.target_type === "bucket") {
-        bucketTransactions.push({
-          ...transactionData,
-          bucket_id: target.target_id,
-        });
-      } else {
-        goalTransactions.push({
-          ...transactionData,
-          goal_id: target.target_id,
-        });
-      }
-    });
-
-    return {
-      buckets: bucketTransactions,
-      goals: goalTransactions,
-    };
-  });
+export const distributeFundsSchema = z.object({
+  buckets: z.array(
+    baseTransactionSchema.extend({
+      bucket_id: z.string().nonempty("Bucket ID is required"),
+    }),
+  ),
+  goals: z.array(
+    baseTransactionSchema.extend({
+      goal_id: z.string().nonempty("Goal ID is required"),
+    }),
+  ),
+});

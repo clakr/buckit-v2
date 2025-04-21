@@ -10,16 +10,19 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   createDistributionSchema,
   distributionAmountTypeSchema,
 } from "@/lib/schemas";
+import { formatToCurrency } from "@/lib/utils";
 import { useAppForm } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useCreateDistributionMutation } from "@/modules/distributions/mutations";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useStore } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
@@ -64,6 +67,20 @@ function RouteComponent() {
   const { data: buckets } = useSuspenseQuery(bucketsQueryOptions);
   const { data: goals } = useSuspenseQuery(goalsQueryOptions);
 
+  const baseAmount = useStore(form.store, (state) => +state.values.base_amount);
+  const accumulatedAmount = useStore(form.store, (state) =>
+    state.values.distribution_targets.reduce((sum, target) => {
+      const amount = +target.amount;
+
+      if (target.amount_type === "absolute") {
+        return sum + amount;
+      }
+
+      return sum + (baseAmount * amount) / 100;
+    }, 0),
+  );
+  const remainingAmount = baseAmount - accumulatedAmount;
+
   return (
     <Main className="grid gap-y-4">
       <section className="flex items-end justify-between">
@@ -107,12 +124,14 @@ function RouteComponent() {
                   label="Base Amount"
                   type="number"
                   description="The base amount of the distribution"
-                  min={0}
+                  step={0.01}
+                  min={1}
+                  max={1_000_000_000}
                 />
               )}
             </form.AppField>
           </TabsContent>
-          <TabsContent value="targets">
+          <TabsContent value="targets" className="grid gap-y-4">
             <form.AppField name="distribution_targets" mode="array">
               {(field) => (
                 <fieldset className="grid gap-y-4">
@@ -126,7 +145,7 @@ function RouteComponent() {
                           name={`distribution_targets[${i}].target_id`}
                         >
                           {(subField) => (
-                            <Fieldset label="Target" description="">
+                            <Fieldset label="Target">
                               <Select
                                 value={subField.state.value}
                                 onValueChange={(value) =>
@@ -165,7 +184,7 @@ function RouteComponent() {
                           name={`distribution_targets[${i}].amount_type`}
                         >
                           {(subField) => (
-                            <Fieldset label="Type" description="">
+                            <Fieldset label="Type">
                               <Select
                                 value={subField.state.value}
                                 onValueChange={(
@@ -195,9 +214,10 @@ function RouteComponent() {
                           {(subField) => (
                             <subField.InputField
                               label="Amount"
-                              description=""
                               type="number"
+                              step={0.01}
                               min={0}
+                              max={1_000_000_000}
                             />
                           )}
                         </form.AppField>
@@ -227,29 +247,45 @@ function RouteComponent() {
                     }
                   >
                     <Icon icon="bx:plus" />
-                    Add Distribution
+                    Add Target
                   </Button>
                 </fieldset>
               )}
             </form.AppField>
+
+            <Separator />
+
+            <section className="px-4">
+              <dl className="grid grid-cols-[minmax(0,1fr)_max-content] items-end gap-x-4 text-end [&_dd]:font-bold [&_dt]:font-medium">
+                <dt className="text-primary">Base Amount: </dt>
+                <dd className="text-primary text-3xl">
+                  {formatToCurrency(baseAmount)}
+                </dd>
+                <dt>Accumulated:</dt>
+                <dd className="text-xl">
+                  {formatToCurrency(accumulatedAmount)}
+                </dd>
+                {remainingAmount !== baseAmount ? (
+                  <>
+                    <dt>Remaining:</dt>
+                    <dd className="text-xl">
+                      {formatToCurrency(baseAmount - accumulatedAmount)}
+                    </dd>
+                  </>
+                ) : null}
+              </dl>
+            </section>
+
+            <Separator />
           </TabsContent>
+
+          <form.AppForm>
+            <form.SubmitButton className="self-end">
+              Create Distribution
+            </form.SubmitButton>
+          </form.AppForm>
         </form>
       </Tabs>
-
-      <form
-        className="grid gap-y-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
-        <form.AppForm>
-          <form.SubmitButton className="justify-self-end">
-            Create
-          </form.SubmitButton>
-        </form.AppForm>
-      </form>
     </Main>
   );
 }

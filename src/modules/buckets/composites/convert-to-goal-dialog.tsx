@@ -113,8 +113,11 @@ export function ConvertToGoalDialog() {
           {(field) => (
             <field.InputField
               label="Current Amount"
-              type="number"
               description="The current amount saved"
+              type="number"
+              step={0.01}
+              min={-1_000_000_000}
+              max={1_000_000_000}
             />
           )}
         </form.AppField>
@@ -122,8 +125,11 @@ export function ConvertToGoalDialog() {
           {(field) => (
             <field.InputField
               label="Target Amount"
-              type="number"
               description="The target amount to save"
+              type="number"
+              step={0.01}
+              min={1}
+              max={1_000_000_000}
             />
           )}
         </form.AppField>

@@ -112,8 +112,11 @@ export function UpdateGoalDialog() {
           {(field) => (
             <field.InputField
               label="Target Amount"
-              type="number"
               description="The target amount to save"
+              type="number"
+              step={0.01}
+              min={1}
+              max={1_000_000_000}
             />
           )}
         </form.AppField>
