@@ -265,11 +265,11 @@ function RouteComponent() {
                 <dd className="text-xl">
                   {formatToCurrency(accumulatedAmount)}
                 </dd>
-                {remainingAmount !== baseAmount ? (
+                {remainingAmount > 0 && remainingAmount !== baseAmount ? (
                   <>
                     <dt>Remaining:</dt>
                     <dd className="text-xl">
-                      {formatToCurrency(baseAmount - accumulatedAmount)}
+                      {formatToCurrency(remainingAmount)}
                     </dd>
                   </>
                 ) : null}

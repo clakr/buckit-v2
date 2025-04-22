@@ -1,4 +1,3 @@
-import { queryClient } from "@/main";
 import { fetchTransactions } from "@/modules/dashboard/query-options";
 import { supabase } from "@/supabase";
 import {
@@ -10,9 +9,11 @@ import {
   Goal,
   GoalInsert,
 } from "@/supabase/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateBucketMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: BucketInsert) => {
       const { error, data } = await supabase
@@ -38,6 +39,8 @@ export function useCreateBucketMutation() {
 }
 
 export function useArchiveBucketMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: { id: NonNullable<BucketUpdate["id"]> }) => {
       const { error, data } = await supabase
@@ -64,6 +67,8 @@ export function useArchiveBucketMutation() {
 }
 
 export function useUpdateBucketMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (
       payload: BucketInsert & { id: NonNullable<BucketInsert["id"]> },
@@ -102,6 +107,8 @@ export function useUpdateBucketMutation() {
 }
 
 export function useCreateBucketTransactionMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: BucketTransactionInsert) => {
       const { error, data } = await supabase
@@ -154,6 +161,8 @@ export function useCreateBucketTransactionMutation() {
 }
 
 export function useConvertToGoalMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       bucket_id,
