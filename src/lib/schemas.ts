@@ -141,6 +141,10 @@ export const updateBucketSchema = baseBucketSchema
     id: z.string().nonempty("Bucket ID is required"),
   });
 
+export const archiveBucketSchema = z.object({
+  id: z.string().nonempty("Bucket ID is required"),
+});
+
 export const createBucketTransactionSchema = baseTransactionSchema.extend({
   bucket_id: z.string().nonempty("Bucket ID is required"),
 });
@@ -161,6 +165,10 @@ export const updateGoalSchema = baseGoalSchema
   .extend({
     id: z.string().nonempty("Goal ID is required"),
   });
+
+export const archiveGoalSchema = z.object({
+  id: z.string().nonempty("Goal ID is required"),
+});
 
 export const createGoalTransactionSchema = baseTransactionSchema.extend({
   goal_id: z.string().nonempty("Goal ID is required"),

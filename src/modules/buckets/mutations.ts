@@ -31,11 +31,13 @@ export function useArchiveBucketMutation() {
 
   return useMutation({
     mutationFn: archiveBucket,
-    onSettled: (_, __, bucketId) => {
+    onSettled: (payload, _, variable) => {
+      if (!payload) return undefined;
+
       queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
         if (!prev) return undefined;
 
-        return prev.filter((bucket) => bucketId !== bucket.id);
+        return prev.filter((bucket) => variable.id !== bucket.id);
       });
     },
   });
@@ -121,20 +123,22 @@ export function useConvertToGoalMutation() {
       ...goalPayload
     }: GoalInsert & { bucket_id: Bucket["id"] }) => {
       try {
-        const [, goalPromise] = await Promise.allSettled([
-          archiveBucket(bucket_id),
+        const promises = await Promise.allSettled([
+          archiveBucket({ id: bucket_id }),
           createGoal(goalPayload),
         ]);
 
-        if (goalPromise.status === "rejected") {
-          throw new Error(goalPromise.reason);
-        }
+        promises.forEach((promise) => {
+          if (promise.status === "rejected") throw new Error(promise.reason);
+        });
 
-        return goalPromise.value;
+        const [, goalPromise] = promises;
+
+        return goalPromise.status === "fulfilled"
+          ? goalPromise.value
+          : undefined;
       } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(error.message);
-        }
+        if (error instanceof Error) throw new Error(error.message);
 
         throw new Error("An unknown error occurred");
       }

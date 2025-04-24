@@ -9,7 +9,7 @@ import {
 import { DistributeFundsDialog } from "@/modules/distributions/composites/distribute-funds-dialog";
 import { useDistributeDropdownMenuStore } from "@/modules/distributions/stores";
 import { Distribution } from "@/supabase/types";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import { useShallow } from "zustand/react/shallow";
 
 type Props = { distributionId: Distribution["id"] };

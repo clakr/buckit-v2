@@ -186,11 +186,11 @@ export async function updateBucket(
   return data;
 }
 
-export async function archiveBucket(bucketId: Bucket["id"]) {
+export async function archiveBucket(payload: { id: Bucket["id"] }) {
   const { error, data } = await supabase
     .from("buckets")
     .update({ is_active: false })
-    .eq("id", bucketId)
+    .eq("id", payload.id)
     .select()
     .single();
 
@@ -224,11 +224,11 @@ export async function updateGoal(payload: GoalUpdate & { id: Goal["id"] }) {
   return data;
 }
 
-export async function archiveGoal(goalId: Goal["id"]) {
+export async function archiveGoal(payload: { id: Goal["id"] }) {
   const { error, data } = await supabase
     .from("goals")
     .update({ is_active: false })
-    .eq("id", goalId)
+    .eq("id", payload.id)
     .select()
     .single();
 

@@ -1,4 +1,5 @@
 import { StateSection } from "@/components/shared/sections/state-section";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   DialogDescription,
   DialogHeader,
@@ -90,6 +91,12 @@ export function UpdateBucketDialog() {
           form.handleSubmit();
         }}
       >
+        {mutation.isError ? (
+          <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{mutation.error.message}</AlertDescription>
+          </Alert>
+        ) : null}
         <form.AppField name="name">
           {(field) => (
             <field.InputField

@@ -5,7 +5,6 @@ import {
   createGoalTransactions,
 } from "@/lib/actions";
 import { Transaction } from "@/lib/types";
-import { supabase } from "@/supabase";
 import {
   Bucket,
   BucketTransaction,
@@ -44,9 +43,7 @@ export function useCreateDistributionMutation() {
 
         return data;
       } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(error.message);
-        }
+        if (error instanceof Error) throw new Error(error.message);
 
         throw new Error("An unknown error occurred");
       }
@@ -71,17 +68,27 @@ export function useDistributeFundsMutation() {
       buckets: BucketTransactionInsert[];
       goals: GoalTransactionInsert[];
     }) => {
-      const promises = await Promise.allSettled([
-        createBucketTransactions(payload.buckets),
-        createGoalTransactions(payload.goals),
-      ]);
+      try {
+        const promises = await Promise.allSettled([
+          createBucketTransactions(payload.buckets),
+          createGoalTransactions(payload.goals),
+        ]);
 
-      return promises
-        .filter((promise) => promise.status === "fulfilled")
-        .flatMap<
-          | Awaited<ReturnType<typeof createBucketTransactions>>[number]
-          | Awaited<ReturnType<typeof createGoalTransactions>>[number]
-        >((promise) => promise.value);
+        promises.forEach((promise) => {
+          if (promise.status === "rejected") throw new Error(promise.reason);
+        });
+
+        return promises
+          .filter((promise) => promise.status === "fulfilled")
+          .flatMap<
+            | Awaited<ReturnType<typeof createBucketTransactions>>[number]
+            | Awaited<ReturnType<typeof createGoalTransactions>>[number]
+          >((promise) => promise.value);
+      } catch (error) {
+        if (error instanceof Error) throw new Error(error.message);
+
+        throw new Error("An unknown error occurred");
+      }
     },
     onSettled: (payload) => {
       if (!payload) return undefined;

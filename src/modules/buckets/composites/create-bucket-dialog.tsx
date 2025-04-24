@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,12 @@ export function CreateBucketDialog() {
             form.handleSubmit();
           }}
         >
+          {mutation.isError ? (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{mutation.error.message}</AlertDescription>
+            </Alert>
+          ) : null}
           <form.AppField name="name">
             {(field) => (
               <field.InputField

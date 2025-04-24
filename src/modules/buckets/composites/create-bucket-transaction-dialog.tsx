@@ -1,3 +1,4 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   DialogDescription,
   DialogHeader,
@@ -55,6 +56,12 @@ export function CreateBucketTransactionDialog() {
           form.handleSubmit();
         }}
       >
+        {mutation.isError ? (
+          <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{mutation.error.message}</AlertDescription>
+          </Alert>
+        ) : null}
         <form.AppField name="amount">
           {(field) => (
             <field.InputField

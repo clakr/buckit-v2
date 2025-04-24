@@ -1,5 +1,6 @@
 import { Fieldset } from "@/components/shared/primitives/fieldset";
 import { Main } from "@/components/shared/primitives/main";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -21,7 +22,7 @@ import { useAppForm } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { useCreateDistributionMutation } from "@/modules/distributions/mutations";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import { useStore } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -86,6 +87,13 @@ function RouteComponent() {
       <section className="flex items-end justify-between">
         <h1 className="text-3xl font-bold">Create Distribution</h1>
       </section>
+
+      {mutation.isError ? (
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{mutation.error.message}</AlertDescription>
+        </Alert>
+      ) : null}
 
       <Tabs defaultValue="details" asChild>
         <form
