@@ -209,14 +209,6 @@ export const createDistributionSchema = baseDistributionSchema.refine(
 );
 
 export const distributeFundsSchema = z.object({
-  buckets: z.array(
-    baseTransactionSchema.extend({
-      bucket_id: z.string().nonempty("Bucket ID is required"),
-    }),
-  ),
-  goals: z.array(
-    baseTransactionSchema.extend({
-      goal_id: z.string().nonempty("Goal ID is required"),
-    }),
-  ),
+  buckets: z.array(createBucketTransactionSchema),
+  goals: z.array(createGoalTransactionSchema),
 });

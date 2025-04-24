@@ -18,9 +18,7 @@ export function ArchiveBucketDialog() {
   const mutation = useArchiveBucketMutation();
 
   async function handleArchive() {
-    await mutation.mutateAsync({
-      id: bucketId,
-    });
+    await mutation.mutateAsync(bucketId);
 
     closeDialog();
   }

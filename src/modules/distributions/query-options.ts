@@ -1,51 +1,28 @@
-import { supabase } from "@/supabase";
+import {
+  fetchDistribution,
+  fetchDistributions,
+  fetchDistributionTargets,
+} from "@/lib/actions";
 import { Distribution } from "@/supabase/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const distributionsQueryOptions = queryOptions({
   queryKey: ["distributions"],
-  queryFn: async () => {
-    const { error, data } = await supabase
-      .from("distributions")
-      .select()
-      .eq("is_active", true);
-
-    if (error) throw new Error(error.message);
-
-    return data;
-  },
+  queryFn: fetchDistributions,
 });
 
 export function distributionQueryOptions(distributionId: Distribution["id"]) {
   return queryOptions({
     queryKey: ["distributions", distributionId],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("distributions")
-        .select(`*, distribution_targets(*)`)
-        .eq("id", distributionId)
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    queryFn: () => fetchDistribution(distributionId),
   });
 }
+
 export function distributionTargetsQueryOptions(
   distributionId: Distribution["id"],
 ) {
   return queryOptions({
     queryKey: ["distributions", distributionId, "targets"],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("distribution_targets")
-        .select()
-        .eq("distribution_id", distributionId);
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    queryFn: () => fetchDistributionTargets(distributionId),
   });
 }

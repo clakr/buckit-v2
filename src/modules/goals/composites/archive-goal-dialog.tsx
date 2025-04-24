@@ -18,9 +18,7 @@ export function ArchiveGoalDialog() {
   const mutation = useArchiveGoalMutation();
 
   async function handleArchive() {
-    await mutation.mutateAsync({
-      id: goalId,
-    });
+    await mutation.mutateAsync(goalId);
 
     closeDialog();
   }

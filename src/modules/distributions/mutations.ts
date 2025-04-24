@@ -1,3 +1,9 @@
+import {
+  createBucketTransactions,
+  createDistribution,
+  createDistributionTargets,
+  createGoalTransactions,
+} from "@/lib/actions";
 import { Transaction } from "@/lib/types";
 import { supabase } from "@/supabase";
 import {
@@ -22,28 +28,28 @@ export function useCreateDistributionMutation() {
         distribution_targets: DistributionTargetInsert[];
       },
     ) => {
-      const { distribution_targets: distributions, ...distributionPayload } =
-        payload;
+      try {
+        const { distribution_targets, ...distributionPayload } = payload;
 
-      const { error, data } = await supabase
-        .from("distributions")
-        .insert(distributionPayload)
-        .select()
-        .single();
+        const data = await createDistribution(distributionPayload);
 
-      if (error) throw new Error(error.message);
+        const distributionTargetsPayload = distribution_targets.map(
+          (distribution) => ({
+            ...distribution,
+            distribution_id: data.id,
+          }),
+        );
 
-      const distributionTargetsPayload = distributions.map((distribution) => ({
-        ...distribution,
-        distribution_id: data.id,
-      }));
+        await createDistributionTargets(distributionTargetsPayload);
 
-      await supabase
-        .from("distribution_targets")
-        .insert(distributionTargetsPayload)
-        .select();
+        return data;
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
 
-      return data;
+        throw new Error("An unknown error occurred");
+      }
     },
     onSettled: (payload) => {
       if (!payload) return undefined;
@@ -57,28 +63,6 @@ export function useCreateDistributionMutation() {
   });
 }
 
-async function insertBucketTransactions(payload: BucketTransactionInsert[]) {
-  const { error, data } = await supabase
-    .from("bucket_transactions")
-    .insert(payload)
-    .select(`*, buckets!inner(*)`);
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-async function insertGoalTransactions(payload: GoalTransactionInsert[]) {
-  const { error, data } = await supabase
-    .from("goal_transactions")
-    .insert(payload)
-    .select(`*, goals!inner(*)`);
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
 export function useDistributeFundsMutation() {
   const queryClient = useQueryClient();
 
@@ -88,15 +72,15 @@ export function useDistributeFundsMutation() {
       goals: GoalTransactionInsert[];
     }) => {
       const promises = await Promise.allSettled([
-        insertBucketTransactions(payload.buckets),
-        insertGoalTransactions(payload.goals),
+        createBucketTransactions(payload.buckets),
+        createGoalTransactions(payload.goals),
       ]);
 
       return promises
         .filter((promise) => promise.status === "fulfilled")
         .flatMap<
-          | Awaited<ReturnType<typeof insertBucketTransactions>>[number]
-          | Awaited<ReturnType<typeof insertGoalTransactions>>[number]
+          | Awaited<ReturnType<typeof createBucketTransactions>>[number]
+          | Awaited<ReturnType<typeof createGoalTransactions>>[number]
         >((promise) => promise.value);
     },
     onSettled: (payload) => {

@@ -1,43 +1,27 @@
+import {
+  fetchBucket,
+  fetchBuckets,
+  fetchBucketTransactions,
+} from "@/lib/actions";
+import { Transaction } from "@/lib/types";
 import { queryClient } from "@/main";
-import { supabase } from "@/supabase";
-import { Bucket } from "@/supabase/types";
+import { Bucket, BucketTransaction } from "@/supabase/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const bucketsQueryOptions = queryOptions({
   queryKey: ["buckets"],
-  queryFn: async () => {
-    const { error, data } = await supabase
-      .from("buckets")
-      .select()
-      .eq("is_active", true);
-
-    if (error) throw new Error(error.message);
-
-    return data;
-  },
+  queryFn: fetchBuckets,
 });
 
 export function bucketQueryOptions(bucketId: Bucket["id"]) {
   return queryOptions({
     queryKey: ["buckets", bucketId],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("buckets")
-        .select()
-        .eq("id", bucketId)
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    queryFn: () => fetchBucket(bucketId),
     initialData: () => {
-      const bucketsQueryData = queryClient.getQueryData([
-        "buckets",
-      ]) as Bucket[];
-      if (!bucketsQueryData) return undefined;
+      const buckets = queryClient.getQueryData<Bucket[]>(["buckets"]);
+      if (!buckets) return undefined;
 
-      return bucketsQueryData.find((bucket) => bucketId === bucket.id);
+      return buckets.find((bucket) => bucketId === bucket.id);
     },
   });
 }
@@ -45,18 +29,22 @@ export function bucketQueryOptions(bucketId: Bucket["id"]) {
 export function bucketTransactionsQueryOptions(bucketId: Bucket["id"]) {
   return queryOptions({
     queryKey: ["buckets", bucketId, "transactions"],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("bucket_transactions")
-        .select()
-        .eq("bucket_id", bucketId)
-        .order("created_at", {
-          ascending: false,
-        });
+    queryFn: () => fetchBucketTransactions(bucketId),
+    initialData: () => {
+      const transactions = queryClient.getQueryData<Transaction[]>([
+        "transactions",
+      ]);
+      if (!transactions) return undefined;
 
-      if (error) throw new Error(error.message);
+      return transactions.reduce<BucketTransaction[]>((prev, transaction) => {
+        if ("bucket_id" in transaction && transaction.bucket_id === bucketId) {
+          delete transaction.buckets;
 
-      return data;
+          prev.push(transaction);
+        }
+
+        return prev;
+      }, []);
     },
   });
 }

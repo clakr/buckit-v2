@@ -1,38 +1,20 @@
+import { fetchGoal, fetchGoals, fetchGoalTransactions } from "@/lib/actions";
+import { Transaction } from "@/lib/types";
 import { queryClient } from "@/main";
-import { supabase } from "@/supabase";
-import { Goal } from "@/supabase/types";
+import { Goal, GoalTransaction } from "@/supabase/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const goalsQueryOptions = queryOptions({
   queryKey: ["goals"],
-  queryFn: async () => {
-    const { error, data } = await supabase
-      .from("goals")
-      .select()
-      .eq("is_active", true);
-
-    if (error) throw new Error(error.message);
-
-    return data;
-  },
+  queryFn: fetchGoals,
 });
 
 export function goalQueryOptions(goalId: Goal["id"]) {
   return queryOptions({
     queryKey: ["goals", goalId],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("goals")
-        .select()
-        .eq("id", goalId)
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    queryFn: () => fetchGoal(goalId),
     initialData: () => {
-      const goalsQueryData = queryClient.getQueryData(["goals"]) as Goal[];
+      const goalsQueryData = queryClient.getQueryData<Goal[]>(["goals"]);
       if (!goalsQueryData) return undefined;
 
       return goalsQueryData.find((goal) => goalId === goal.id);
@@ -43,18 +25,22 @@ export function goalQueryOptions(goalId: Goal["id"]) {
 export function goalTransactionsQueryOptions(goalId: Goal["id"]) {
   return queryOptions({
     queryKey: ["goals", goalId, "transactions"],
-    queryFn: async () => {
-      const { error, data } = await supabase
-        .from("goal_transactions")
-        .select()
-        .eq("goal_id", goalId)
-        .order("created_at", {
-          ascending: false,
-        });
+    queryFn: () => fetchGoalTransactions(goalId),
+    initialData: () => {
+      const transactions = queryClient.getQueryData<Transaction[]>([
+        "transactions",
+      ]);
+      if (!transactions) return undefined;
 
-      if (error) throw new Error(error.message);
+      return transactions.reduce<GoalTransaction[]>((prev, transaction) => {
+        if ("goal_id" in transaction && transaction.goal_id === goalId) {
+          delete transaction.goals;
 
-      return data;
+          prev.push(transaction);
+        }
+
+        return prev;
+      }, []);
     },
   });
 }

@@ -92,35 +92,6 @@ export function ConvertToGoalDialog() {
           form.handleSubmit();
         }}
       >
-        <form.AppField name="name">
-          {(field) => (
-            <field.InputField
-              label="Name"
-              type="text"
-              description="The name of the goal"
-            />
-          )}
-        </form.AppField>
-        <form.AppField name="description">
-          {(field) => (
-            <field.TextareaField
-              label="Description"
-              description="A description of the goal"
-            />
-          )}
-        </form.AppField>
-        <form.AppField name="current_amount">
-          {(field) => (
-            <field.InputField
-              label="Current Amount"
-              description="The current amount saved"
-              type="number"
-              step={0.01}
-              min={-1_000_000_000}
-              max={1_000_000_000}
-            />
-          )}
-        </form.AppField>
         <form.AppField name="target_amount">
           {(field) => (
             <field.InputField

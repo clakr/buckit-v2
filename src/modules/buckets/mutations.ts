@@ -1,31 +1,19 @@
-import { fetchTransactions } from "@/modules/dashboard/query-options";
-import { supabase } from "@/supabase";
 import {
-  Bucket,
-  BucketInsert,
-  BucketTransaction,
-  BucketTransactionInsert,
-  BucketUpdate,
-  Goal,
-  GoalInsert,
-} from "@/supabase/types";
+  archiveBucket,
+  createBucket,
+  createBucketTransactions,
+  createGoal,
+  updateBucket,
+} from "@/lib/actions";
+import { Transaction } from "@/lib/types";
+import { Bucket, BucketTransaction, Goal, GoalInsert } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateBucketMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: BucketInsert) => {
-      const { error, data } = await supabase
-        .from("buckets")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    mutationFn: createBucket,
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -42,25 +30,12 @@ export function useArchiveBucketMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: { id: NonNullable<BucketUpdate["id"]> }) => {
-      const { error, data } = await supabase
-        .from("buckets")
-        .update({
-          is_active: false,
-        })
-        .eq("id", payload.id)
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
-    onSettled: (_, __, variable) => {
+    mutationFn: archiveBucket,
+    onSettled: (_, __, bucketId) => {
       queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
         if (!prev) return undefined;
 
-        return prev.filter((bucket) => bucket.id !== variable.id);
+        return prev.filter((bucket) => bucketId !== bucket.id);
       });
     },
   });
@@ -70,20 +45,7 @@ export function useUpdateBucketMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      payload: BucketInsert & { id: NonNullable<BucketInsert["id"]> },
-    ) => {
-      const { error, data } = await supabase
-        .from("buckets")
-        .update(payload)
-        .eq("id", payload.id)
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    mutationFn: updateBucket,
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -110,26 +72,19 @@ export function useCreateBucketTransactionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: BucketTransactionInsert) => {
-      const { error, data } = await supabase
-        .from("bucket_transactions")
-        .insert(payload)
-        .select(`*, buckets!inner(*)`)
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
+    mutationFn: createBucketTransactions,
     onSettled: (payload) => {
       if (!payload) return undefined;
 
+      const transaction = payload.at(0);
+      if (!transaction) return undefined;
+
       queryClient.setQueryData<BucketTransaction[]>(
-        ["buckets", payload.bucket_id, "transactions"],
+        ["buckets", transaction.id, "transactions"],
         (prev) => {
           if (!prev) return undefined;
 
-          return [...prev, payload];
+          return [...prev, transaction];
         },
       );
 
@@ -137,25 +92,22 @@ export function useCreateBucketTransactionMutation() {
         if (!prev) return undefined;
 
         const updatedBucketIndex = prev.findIndex(
-          (bucket) => payload.bucket_id === bucket.id,
+          (bucket) => transaction.bucket_id === bucket.id,
         );
 
-        return payload.current_balance
+        return transaction.current_balance
           ? prev.with(updatedBucketIndex, {
               ...prev[updatedBucketIndex],
-              current_amount: payload.current_balance,
+              current_amount: transaction.current_balance,
             })
           : prev;
       });
 
-      queryClient.setQueryData<Awaited<ReturnType<typeof fetchTransactions>>>(
-        ["transactions"],
-        (prev) => {
-          if (!prev) return undefined;
+      queryClient.setQueryData<Transaction[]>(["transactions"], (prev) => {
+        if (!prev) return undefined;
 
-          return [...prev, payload];
-        },
-      );
+        return [...prev, payload];
+      });
     },
   });
 }
@@ -168,24 +120,24 @@ export function useConvertToGoalMutation() {
       bucket_id,
       ...goalPayload
     }: GoalInsert & { bucket_id: Bucket["id"] }) => {
-      const { error: bucketError } = await supabase
-        .from("buckets")
-        .update({
-          is_active: false,
-        })
-        .eq("id", bucket_id);
+      try {
+        const [, goalPromise] = await Promise.allSettled([
+          archiveBucket(bucket_id),
+          createGoal(goalPayload),
+        ]);
 
-      if (bucketError) throw new Error(bucketError.message);
+        if (goalPromise.status === "rejected") {
+          throw new Error(goalPromise.reason);
+        }
 
-      const { error: goalError, data } = await supabase
-        .from("goals")
-        .insert([goalPayload])
-        .select()
-        .single();
+        return goalPromise.value;
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
 
-      if (goalError) throw new Error(goalError.message);
-
-      return data;
+        throw new Error("An unknown error occurred");
+      }
     },
     onSettled: async (payload, _, variable) => {
       if (!payload) return undefined;

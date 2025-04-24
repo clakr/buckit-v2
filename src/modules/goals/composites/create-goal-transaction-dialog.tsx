@@ -31,7 +31,7 @@ export function CreateGoalTransactionDialog() {
     onSubmit: async ({ value }) => {
       const payload = createGoalTransactionSchema.parse(value);
 
-      await mutation.mutateAsync(payload);
+      await mutation.mutateAsync([payload]);
 
       form.reset();
 

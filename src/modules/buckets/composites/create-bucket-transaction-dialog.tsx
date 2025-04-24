@@ -31,7 +31,7 @@ export function CreateBucketTransactionDialog() {
     onSubmit: async ({ value }) => {
       const payload = createBucketTransactionSchema.parse(value);
 
-      await mutation.mutateAsync(payload);
+      await mutation.mutateAsync([payload]);
 
       form.reset();
 
