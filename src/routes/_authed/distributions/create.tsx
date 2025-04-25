@@ -3,10 +3,19 @@ import { Main } from "@/components/shared/primitives/main";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
-  SelectLabel,
   SelectContent,
-  SelectGroup,
   SelectTrigger,
   SelectValue,
   SelectItem,
@@ -17,9 +26,10 @@ import {
   createDistributionSchema,
   distributionAmountTypeSchema,
 } from "@/lib/schemas";
-import { formatToCurrency } from "@/lib/utils";
+import { cn, formatToCurrency } from "@/lib/utils";
 import { useAppForm } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
+import { GoalCommandItem } from "@/modules/distributions/composites/goal-command-item";
 import { useCreateDistributionMutation } from "@/modules/distributions/mutations";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
 import { Icon } from "@iconify/react";
@@ -68,6 +78,10 @@ function RouteComponent() {
   const { data: buckets } = useSuspenseQuery(bucketsQueryOptions);
   const { data: goals } = useSuspenseQuery(goalsQueryOptions);
 
+  const filteredGoals = goals.filter(
+    (goal) => goal.current_amount < goal.target_amount,
+  );
+
   const baseAmount = useStore(form.store, (state) => +state.values.base_amount);
   const accumulatedAmount = useStore(form.store, (state) =>
     state.values.distribution_targets.reduce((sum, target) => {
@@ -81,6 +95,8 @@ function RouteComponent() {
     }, 0),
   );
   const remainingAmount = baseAmount - accumulatedAmount;
+
+  const allTargets = [...buckets, ...filteredGoals];
 
   return (
     <Main className="grid gap-y-4">
@@ -147,44 +163,80 @@ function RouteComponent() {
                     {field.state.value.map((_, i) => (
                       <div
                         key={i}
-                        className="grid grid-cols-[repeat(3,minmax(0,1fr))_max-content] items-end gap-x-3 rounded border border-dashed p-4 [&_button[data-slot='select-trigger']]:w-full"
+                        className="grid grid-cols-[repeat(3,minmax(0,1fr))_max-content] items-end gap-x-3 rounded border border-dashed p-4 [&_button[data-slot='popover-trigger']]:col-span-full [&_button[data-slot='select-trigger']]:w-full"
                       >
                         <form.AppField
                           name={`distribution_targets[${i}].target_id`}
                         >
                           {(subField) => (
                             <Fieldset label="Target">
-                              <Select
-                                value={subField.state.value}
-                                onValueChange={(value) =>
-                                  subField.handleChange(value)
-                                }
-                              >
-                                <SelectTrigger className="col-span-full">
-                                  <SelectValue placeholder="Select a target" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>Bucket</SelectLabel>
-                                    {buckets.map((bucket) => (
-                                      <SelectItem
-                                        key={bucket.id}
-                                        value={bucket.id}
-                                      >
-                                        {bucket.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                  <SelectGroup>
-                                    <SelectLabel>Goals</SelectLabel>
-                                    {goals.map((goal) => (
-                                      <SelectItem key={goal.id} value={goal.id}>
-                                        {goal.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className="justify-between"
+                                  >
+                                    {subField.state.value
+                                      ? allTargets.find(
+                                          (target) =>
+                                            target.id === subField.state.value,
+                                        )?.name
+                                      : "Select target"}
+                                    <Icon
+                                      icon="bx:chevron-down"
+                                      className="ml-2 shrink-0 opacity-50"
+                                    />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="p-0">
+                                  <Command>
+                                    <CommandList>
+                                      <CommandGroup heading="Buckets">
+                                        {buckets.map((bucket) => (
+                                          <CommandItem
+                                            key={bucket.id}
+                                            value={bucket.id}
+                                            onSelect={subField.handleChange}
+                                          >
+                                            <Icon
+                                              icon="bx:check"
+                                              className={cn(
+                                                "mr-2",
+                                                subField.state.value ===
+                                                  bucket.id
+                                                  ? "opacity-100"
+                                                  : "opacity-0",
+                                              )}
+                                            />
+                                            <strong>{bucket.name}</strong>
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                      <CommandGroup heading="Goals">
+                                        {filteredGoals.map((goal) => (
+                                          <GoalCommandItem
+                                            key={goal.id}
+                                            value={goal.id}
+                                            onSelect={subField.handleChange}
+                                            goal={goal}
+                                          >
+                                            <Icon
+                                              icon="bx:check"
+                                              className={cn(
+                                                "mr-2",
+                                                subField.state.value === goal.id
+                                                  ? "opacity-100"
+                                                  : "opacity-0",
+                                              )}
+                                            />
+                                          </GoalCommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
                             </Fieldset>
                           )}
                         </form.AppField>
@@ -199,7 +251,9 @@ function RouteComponent() {
                                   value: z.infer<
                                     typeof distributionAmountTypeSchema
                                   >,
-                                ) => subField.handleChange(value)}
+                                ) => {
+                                  subField.handleChange(value);
+                                }}
                               >
                                 <SelectTrigger className="col-span-full">
                                   <SelectValue placeholder="Select a type" />
