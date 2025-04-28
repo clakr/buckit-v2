@@ -101,6 +101,12 @@ export const distributionTargetSchema = z.object({
         .number()
         .gt(0, "Amount must be greater than zero")
         .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    )
+    .or(
+      z
+        .number()
+        .gt(0, "Amount must be greater than zero")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
     ),
   description: z
     .string()
@@ -119,6 +125,12 @@ export const baseDistributionSchema = z.object({
     .nonempty("Base amount is required")
     .transform((value) => Number(value))
     .pipe(
+      z
+        .number()
+        .gt(0, "Base amount must be greater than zero")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    )
+    .or(
       z
         .number()
         .gt(0, "Base amount must be greater than zero")
@@ -219,4 +231,8 @@ export const createDistributionSchema = baseDistributionSchema.refine(
 export const distributeFundsSchema = z.object({
   buckets: z.array(createBucketTransactionSchema),
   goals: z.array(createGoalTransactionSchema),
+});
+
+export const updateDistributionSchema = baseDistributionSchema.extend({
+  id: z.string().nonempty("Distribution ID is required"),
 });

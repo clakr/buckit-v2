@@ -16,56 +16,66 @@ import {
 import {
   Select,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectItem,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  createDistributionSchema,
   distributionAmountTypeSchema,
+  updateDistributionSchema,
 } from "@/lib/schemas";
 import { cn, formatToCurrency } from "@/lib/utils";
-import { useAppForm } from "@/main";
+import { queryClient, useAppForm } from "@/main";
 import { bucketsQueryOptions } from "@/modules/buckets/query-options";
 import { GoalCommandItem } from "@/modules/distributions/composites/goal-command-item";
-import { useCreateDistributionMutation } from "@/modules/distributions/mutations";
+import { useUpdateDistributionMutation } from "@/modules/distributions/mutations";
+import { distributionQueryOptions } from "@/modules/distributions/query-options";
 import { goalsQueryOptions } from "@/modules/goals/query-options";
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { useStore } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-export const Route = createFileRoute("/_authed/distributions/create")({
+export const Route = createFileRoute(
+  "/_authed/distributions/$distributionId/edit",
+)({
+  loader: ({ params }) => {
+    queryClient.ensureQueryData(
+      distributionQueryOptions(params.distributionId),
+    );
+  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { distributionId } = Route.useParams();
   const navigate = Route.useNavigate();
 
-  const mutation = useCreateDistributionMutation();
+  const { data } = useSuspenseQuery(distributionQueryOptions(distributionId));
+
+  const mutation = useUpdateDistributionMutation();
 
   const form = useAppForm({
     defaultValues: {
-      name: "",
-      description: "",
-      base_amount: "",
-      distribution_targets: [
-        {
-          target_id: "",
-          amount_type: "absolute",
-          amount: "",
-          description: "",
-        },
-      ],
-    } as z.input<typeof createDistributionSchema>,
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      base_amount: data.base_amount,
+      distribution_targets: data.distribution_targets.map((target) => ({
+        target_id: target.target_id,
+        amount_type: target.amount_type,
+        amount: target.amount,
+        description: target.description,
+      })),
+    } as z.input<typeof updateDistributionSchema>,
     validators: {
-      onSubmit: createDistributionSchema,
+      onSubmit: updateDistributionSchema,
     },
     onSubmit: async ({ value }) => {
-      const payload = createDistributionSchema.parse(value);
+      const payload = updateDistributionSchema.parse(value);
 
       await mutation.mutateAsync(payload);
 
@@ -101,7 +111,7 @@ function RouteComponent() {
   return (
     <Main className="grid gap-y-4">
       <section className="flex items-end justify-between">
-        <h1 className="text-3xl font-bold">Create Distribution</h1>
+        <h1 className="text-3xl font-bold">Update Distribution</h1>
       </section>
 
       {mutation.isError ? (
@@ -343,7 +353,7 @@ function RouteComponent() {
 
           <form.AppForm>
             <form.SubmitButton className="self-end">
-              Create Distribution
+              Update Distribution
             </form.SubmitButton>
           </form.AppForm>
         </form>

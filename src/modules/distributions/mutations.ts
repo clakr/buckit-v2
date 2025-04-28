@@ -3,6 +3,8 @@ import {
   createDistribution,
   createDistributionTargets,
   createGoalTransactions,
+  deleteDistributionTargets,
+  updateDistribution,
 } from "@/lib/actions";
 import { Transaction } from "@/lib/types";
 import {
@@ -12,6 +14,7 @@ import {
   Distribution,
   DistributionInsert,
   DistributionTargetInsert,
+  DistributionUpdate,
   Goal,
   GoalTransaction,
   GoalTransactionInsert,
@@ -152,6 +155,68 @@ export function useDistributeFundsMutation() {
 
         return [...prev, ...payload];
       });
+    },
+  });
+}
+
+export function useUpdateDistributionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      payload: DistributionUpdate & {
+        id: Distribution["id"];
+        distribution_targets: DistributionTargetInsert[];
+      },
+    ) => {
+      try {
+        const { distribution_targets, ...distributionPayload } = payload;
+
+        const distributionData = await updateDistribution(distributionPayload);
+
+        const distributionTargetsPayload = distribution_targets.map(
+          (distribution) => ({
+            ...distribution,
+            distribution_id: distributionData.id,
+          }),
+        );
+
+        await deleteDistributionTargets(distributionData.id);
+        const distributionTargetsData = await createDistributionTargets(
+          distributionTargetsPayload,
+        );
+
+        return {
+          ...distributionData,
+          distribution_targets: distributionTargetsData,
+        };
+      } catch (error) {
+        if (error instanceof Error) throw new Error(error.message);
+
+        throw new Error("An unknown error occurred");
+      }
+    },
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Distribution[]>(["distributions"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedDistributionIndex = prev.findIndex(
+          (distribution) => payload.id === distribution.id,
+        );
+
+        return prev.with(updatedDistributionIndex, payload);
+      });
+
+      queryClient.setQueryData<Distribution>(
+        ["distributions", payload.id],
+        (prev) => {
+          if (!prev) return undefined;
+
+          return payload;
+        },
+      );
     },
   });
 }

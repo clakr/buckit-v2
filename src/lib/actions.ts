@@ -7,6 +7,7 @@ import {
   Distribution,
   DistributionInsert,
   DistributionTargetInsert,
+  DistributionUpdate,
   Goal,
   GoalInsert,
   GoalTransactionInsert,
@@ -280,6 +281,35 @@ export async function createGoalTransactions(payload: GoalTransactionInsert[]) {
     .from("goal_transactions")
     .insert(payload)
     .select(`*, goals!inner(*)`);
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function updateDistribution(
+  payload: DistributionUpdate & { id: Distribution["id"] },
+) {
+  const { error, data } = await supabase
+    .from("distributions")
+    .update(payload)
+    .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function deleteDistributionTargets(
+  distributionId: Distribution["id"],
+) {
+  const { error, data } = await supabase
+    .from("distribution_targets")
+    .delete()
+    .eq("distribution_id", distributionId)
+    .select();
 
   if (error) throw new Error(error.message);
 

@@ -20,6 +20,7 @@ import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
 import { Route as AuthedDistributionsIndexImport } from './routes/_authed/distributions/index'
 import { Route as AuthedDistributionsCreateImport } from './routes/_authed/distributions/create'
+import { Route as AuthedDistributionsDistributionIdEditImport } from './routes/_authed/distributions/$distributionId/edit'
 
 // Create/Update Routes
 
@@ -74,6 +75,13 @@ const AuthedDistributionsCreateRoute = AuthedDistributionsCreateImport.update({
   path: '/distributions/create',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
+
+const AuthedDistributionsDistributionIdEditRoute =
+  AuthedDistributionsDistributionIdEditImport.update({
+    id: '/distributions/$distributionId/edit',
+    path: '/distributions/$distributionId/edit',
+    getParentRoute: () => AuthedRouteRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -142,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDistributionsIndexImport
       parentRoute: typeof AuthedRouteImport
     }
+    '/_authed/distributions/$distributionId/edit': {
+      id: '/_authed/distributions/$distributionId/edit'
+      path: '/distributions/$distributionId/edit'
+      fullPath: '/distributions/$distributionId/edit'
+      preLoaderRoute: typeof AuthedDistributionsDistributionIdEditImport
+      parentRoute: typeof AuthedRouteImport
+    }
   }
 }
 
@@ -153,6 +168,7 @@ interface AuthedRouteRouteChildren {
   AuthedGoalsRoute: typeof AuthedGoalsRoute
   AuthedDistributionsCreateRoute: typeof AuthedDistributionsCreateRoute
   AuthedDistributionsIndexRoute: typeof AuthedDistributionsIndexRoute
+  AuthedDistributionsDistributionIdEditRoute: typeof AuthedDistributionsDistributionIdEditRoute
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
@@ -161,6 +177,8 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedGoalsRoute: AuthedGoalsRoute,
   AuthedDistributionsCreateRoute: AuthedDistributionsCreateRoute,
   AuthedDistributionsIndexRoute: AuthedDistributionsIndexRoute,
+  AuthedDistributionsDistributionIdEditRoute:
+    AuthedDistributionsDistributionIdEditRoute,
 }
 
 const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
@@ -190,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/': typeof GuestIndexRoute
   '/distributions/create': typeof AuthedDistributionsCreateRoute
   '/distributions': typeof AuthedDistributionsIndexRoute
+  '/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
 export interface FileRoutesByTo {
@@ -201,6 +220,7 @@ export interface FileRoutesByTo {
   '/': typeof GuestIndexRoute
   '/distributions/create': typeof AuthedDistributionsCreateRoute
   '/distributions': typeof AuthedDistributionsIndexRoute
+  '/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
 export interface FileRoutesById {
@@ -214,6 +234,7 @@ export interface FileRoutesById {
   '/_guest/': typeof GuestIndexRoute
   '/_authed/distributions/create': typeof AuthedDistributionsCreateRoute
   '/_authed/distributions/': typeof AuthedDistributionsIndexRoute
+  '/_authed/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
 export interface FileRouteTypes {
@@ -227,6 +248,7 @@ export interface FileRouteTypes {
     | '/'
     | '/distributions/create'
     | '/distributions'
+    | '/distributions/$distributionId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -237,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/distributions/create'
     | '/distributions'
+    | '/distributions/$distributionId/edit'
   id:
     | '__root__'
     | '/_authed'
@@ -248,6 +271,7 @@ export interface FileRouteTypes {
     | '/_guest/'
     | '/_authed/distributions/create'
     | '/_authed/distributions/'
+    | '/_authed/distributions/$distributionId/edit'
   fileRoutesById: FileRoutesById
 }
 
@@ -282,7 +306,8 @@ export const routeTree = rootRoute
         "/_authed/dashboard",
         "/_authed/goals",
         "/_authed/distributions/create",
-        "/_authed/distributions/"
+        "/_authed/distributions/",
+        "/_authed/distributions/$distributionId/edit"
       ]
     },
     "/_guest": {
@@ -318,6 +343,10 @@ export const routeTree = rootRoute
     },
     "/_authed/distributions/": {
       "filePath": "_authed/distributions/index.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/distributions/$distributionId/edit": {
+      "filePath": "_authed/distributions/$distributionId/edit.tsx",
       "parent": "/_authed"
     }
   }

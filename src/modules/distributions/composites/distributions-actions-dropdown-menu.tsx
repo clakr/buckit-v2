@@ -3,13 +3,17 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DistributeFundsDialog } from "@/modules/distributions/composites/distribute-funds-dialog";
 import { useDistributeDropdownMenuStore } from "@/modules/distributions/stores";
 import { Distribution } from "@/supabase/types";
 import { Icon } from "@iconify/react";
+import { Link } from "@tanstack/react-router";
 import { useShallow } from "zustand/react/shallow";
 
 type Props = { distributionId: Distribution["id"] };
@@ -49,15 +53,31 @@ export function DistributionsActionsDropdownMenu({ distributionId }: Props) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DialogTrigger
-            onClick={() => handleTrigger("distribute-funds")}
-            asChild
-          >
-            <DropdownMenuItem>
-              <Icon icon="fluent-mdl2:distribute-down" />
-              Distribute Funds
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Distributions</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link
+                to="/distributions/$distributionId/edit"
+                params={{ distributionId }}
+              >
+                <Icon icon="bx:edit" />
+                Edit
+              </Link>
             </DropdownMenuItem>
-          </DialogTrigger>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Others</DropdownMenuLabel>
+            <DialogTrigger
+              onClick={() => handleTrigger("distribute-funds")}
+              asChild
+            >
+              <DropdownMenuItem>
+                <Icon icon="fluent-mdl2:distribute-down" />
+                Distribute Funds
+              </DropdownMenuItem>
+            </DialogTrigger>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
