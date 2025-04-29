@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ArchiveDistributionDialog } from "@/modules/distributions/composites/archive-distribution-dialog";
 import { DistributeFundsDialog } from "@/modules/distributions/composites/distribute-funds-dialog";
 import { useDistributeDropdownMenuStore } from "@/modules/distributions/stores";
 import { Distribution } from "@/supabase/types";
@@ -39,6 +40,8 @@ export function DistributionsActionsDropdownMenu({ distributionId }: Props) {
   function DialogContentState() {
     if (dialogContentState === "distribute-funds") {
       return <DistributeFundsDialog />;
+    } else if (dialogContentState === "archive-distribution") {
+      return <ArchiveDistributionDialog />;
     }
 
     return null;
@@ -61,10 +64,19 @@ export function DistributionsActionsDropdownMenu({ distributionId }: Props) {
                 params={{ distributionId }}
               >
                 <Icon icon="bx:edit" />
-                Edit
+                Edit Distribution
               </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DialogTrigger
+            onClick={() => handleTrigger("archive-distribution")}
+            asChild
+          >
+            <DropdownMenuItem>
+              <Icon icon="bx:trash" />
+              Archive Distribution
+            </DropdownMenuItem>
+          </DialogTrigger>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuLabel>Others</DropdownMenuLabel>

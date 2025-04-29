@@ -315,3 +315,16 @@ export async function deleteDistributionTargets(
 
   return data;
 }
+
+export async function archiveDistribution(payload: { id: Distribution["id"] }) {
+  const { error, data } = await supabase
+    .from("distributions")
+    .update({ is_active: false })
+    .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}

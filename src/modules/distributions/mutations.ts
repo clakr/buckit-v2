@@ -1,4 +1,5 @@
 import {
+  archiveDistribution,
   createBucketTransactions,
   createDistribution,
   createDistributionTargets,
@@ -217,6 +218,23 @@ export function useUpdateDistributionMutation() {
           return payload;
         },
       );
+    },
+  });
+}
+
+export function useArchiveDistributionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: archiveDistribution,
+    onSettled: (payload, _, variable) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Distribution[]>(["distributions"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((distribution) => variable.id !== distribution.id);
+      });
     },
   });
 }

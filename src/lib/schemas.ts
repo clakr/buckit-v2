@@ -236,3 +236,7 @@ export const distributeFundsSchema = z.object({
 export const updateDistributionSchema = baseDistributionSchema.extend({
   id: z.string().nonempty("Distribution ID is required"),
 });
+
+export const archiveDistributionSchema = z.object({
+  id: z.string().nonempty("Distribution ID is required"),
+});

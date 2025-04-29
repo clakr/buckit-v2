@@ -1,7 +1,8 @@
 import { Distribution } from "@/supabase/types";
 import { create } from "zustand";
 
-type DialogContentState = "distribute-funds";
+type DialogContentState = "distribute-funds" | "archive-distribution";
+
 export const useDistributeDropdownMenuStore = create<{
   dialogContentState: DialogContentState;
   setDialogContentState: (dialogContentState: DialogContentState) => void;
