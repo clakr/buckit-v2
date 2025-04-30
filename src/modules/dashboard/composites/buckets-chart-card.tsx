@@ -44,7 +44,7 @@ export function BucketsChartCard() {
           <BarChart
             accessibilityLayer
             data={chartData}
-            margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            margin={{ top: 20, bottom: 20, left: 30, right: 30 }}
           >
             <CartesianGrid vertical={false} />
             <ChartTooltip

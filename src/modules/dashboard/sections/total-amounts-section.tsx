@@ -9,28 +9,28 @@ export function TotalAmountsSection() {
   const { data: buckets } = useSuspenseQuery(bucketsQueryOptions);
   const { data: goals } = useSuspenseQuery(goalsQueryOptions);
 
-  const totalBalance = buckets.reduce(
+  const totalBucketsAmount = buckets.reduce(
     (total, bucket) => total + bucket.current_amount,
     0,
   );
 
-  const totalGoals = goals.reduce(
+  const totalGoalsAmount = goals.reduce(
     (total, goal) => total + goal.current_amount,
     0,
   );
 
-  const netWorth = totalBalance + totalGoals;
+  const netWorth = totalBucketsAmount + totalGoalsAmount;
 
   return (
     <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-          <Icon icon="bx:wallet" className="text-primary" />
+          <CardTitle className="text-sm font-medium">Total Buckets</CardTitle>
+          <Icon icon="mdi:bucket-outline" className="text-primary" />
         </CardHeader>
         <CardContent>
           <strong className="text-2xl font-bold">
-            {formatToCurrency(totalBalance)}
+            {formatToCurrency(totalBucketsAmount)}
           </strong>
           <p className="text-muted-foreground text-xs">
             Total amount for all buckets
@@ -44,7 +44,7 @@ export function TotalAmountsSection() {
         </CardHeader>
         <CardContent>
           <strong className="text-2xl font-bold">
-            {formatToCurrency(totalGoals)}
+            {formatToCurrency(totalGoalsAmount)}
           </strong>
           <p className="text-muted-foreground text-xs">
             Total amount for all goals
