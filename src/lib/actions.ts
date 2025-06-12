@@ -341,3 +341,11 @@ export async function createExpense(payload: ExpenseInsert) {
 
   return data;
 }
+
+export async function fetchExpenses() {
+  const { error, data } = await supabase.from("expenses").select();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}

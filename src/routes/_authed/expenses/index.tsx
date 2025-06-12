@@ -1,9 +1,21 @@
+import { DataTable } from "@/components/shared/composites/data-table";
 import { StateSection } from "@/components/shared/sections/state-section";
+import { Button } from "@/components/ui/button";
+import { queryClient } from "@/main";
+import { columns } from "@/modules/expenses/columns";
+import { expensesQueryOptions } from "@/modules/expenses/query-options";
 import { IndexTemplate } from "@/modules/expenses/templates/index-template";
-import { createFileRoute, ErrorComponentProps } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  ErrorComponentProps,
+  Link,
+} from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed/expenses/")({
-  loader: () => {},
+  loader: () => {
+    queryClient.ensureQueryData(expensesQueryOptions);
+  },
   pendingComponent: PendingComponent,
   errorComponent: ErrorComponent,
   component: RouteComponent,
@@ -41,5 +53,33 @@ function ErrorComponent({ error }: ErrorComponentProps) {
 }
 
 function RouteComponent() {
-  return <IndexTemplate>Hello "/_authed/expenses/"!</IndexTemplate>;
+  const { data: expenses } = useSuspenseQuery(expensesQueryOptions);
+
+  if (expenses.length === 0) {
+    return (
+      <>
+        <IndexTemplate>
+          <StateSection state="empty">
+            <div>
+              <h2 className="text-xl font-medium">No distributions yet.</h2>
+              <p className="text-muted-foreground text-sm">
+                Get started by creating your first distribution.
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/distributions/create">Create Distribution</Link>
+            </Button>
+          </StateSection>
+        </IndexTemplate>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <IndexTemplate>
+        <DataTable columns={columns} data={expenses} />
+      </IndexTemplate>
+    </>
+  );
 }
