@@ -28,3 +28,7 @@ export type DistributionUpdate = TablesUpdate<"distributions">;
 export type DistributionTarget = Tables<"distribution_targets">;
 export type DistributionTargetInsert = TablesInsert<"distribution_targets">;
 export type DistributionTargetUpdate = TablesUpdate<"distribution_targets">;
+
+export type Expense = Tables<"expenses">;
+export type ExpenseInsert = TablesInsert<"expenses">;
+export type ExpenseUpdate = TablesUpdate<"expenses">;

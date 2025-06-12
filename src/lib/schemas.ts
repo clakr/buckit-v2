@@ -139,6 +139,21 @@ export const baseDistributionSchema = z.object({
   distribution_targets: z.array(distributionTargetSchema),
 });
 
+export const expenseStatusTypeSchema = z.union([
+  z.literal("draft"),
+  z.literal("calculated"),
+  z.literal("settled"),
+]);
+
+export const baseExpenseSchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  description: z
+    .string()
+    .max(1000, "Description must be less than 1000 characters")
+    .nullable(),
+  status: expenseStatusTypeSchema,
+});
+
 /**
  * COMPOSITES
  */
@@ -240,3 +255,5 @@ export const updateDistributionSchema = baseDistributionSchema.extend({
 export const archiveDistributionSchema = z.object({
   id: z.string().nonempty("Distribution ID is required"),
 });
+
+export const createExpenseSchema = baseExpenseSchema;

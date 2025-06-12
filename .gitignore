@@ -19,4 +19,4 @@ dist/
 
 .env
 
-supabase/seed.sql
+supabase/*.sql

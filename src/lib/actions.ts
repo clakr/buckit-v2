@@ -8,6 +8,7 @@ import {
   DistributionInsert,
   DistributionTargetInsert,
   DistributionUpdate,
+  ExpenseInsert,
   Goal,
   GoalInsert,
   GoalTransactionInsert,
@@ -321,6 +322,18 @@ export async function archiveDistribution(payload: { id: Distribution["id"] }) {
     .from("distributions")
     .update({ is_active: false })
     .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createExpense(payload: ExpenseInsert) {
+  const { error, data } = await supabase
+    .from("expenses")
+    .insert(payload)
     .select()
     .single();
 

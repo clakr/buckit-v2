@@ -13,6 +13,49 @@ import { useAuthStore } from "@/modules/authentication/stores";
 import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "@tanstack/react-router";
 
+const links = [
+  {
+    label: "Dashboard",
+    to: "/dashboard",
+    icon: {
+      active: "material-symbols:dashboard",
+      inactive: "material-symbols:dashboard-outline",
+    },
+  },
+  {
+    label: "Buckets",
+    to: "/buckets",
+    icon: {
+      active: "mdi:bucket",
+      inactive: "mdi:bucket-outline",
+    },
+  },
+  {
+    label: "Goals",
+    to: "/goals",
+    icon: {
+      active: "mage:goals-fill",
+      inactive: "mage:goals",
+    },
+  },
+  {
+    label: "Distributions",
+    to: "/distributions",
+    icon: {
+      active: "lsicon:integral-distribute-filled",
+      inactive: "lsicon:integral-distribute-outline",
+    },
+  },
+  {
+    label: "Expenses",
+    to: "/expenses",
+    icon: {
+      active: "si:money-fill",
+      inactive: "si:money-line",
+    },
+  },
+];
+
 export function Sidebar() {
   return (
     <UISidebar>
@@ -29,70 +72,24 @@ function SidebarContent() {
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/dashboard" activeProps={{ "data-active": true }}>
-                  {({ isActive }) => (
-                    <>
-                      <Icon
-                        icon={
-                          isActive
-                            ? "material-symbols:dashboard"
-                            : "material-symbols:dashboard-outline"
-                        }
-                      />
-                      <span>Dashboard</span>
-                    </>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/buckets" activeProps={{ "data-active": true }}>
-                  {({ isActive }) => (
-                    <>
-                      <Icon
-                        icon={isActive ? "mdi:bucket" : "mdi:bucket-outline"}
-                      />
-                      <span>Buckets</span>
-                    </>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/goals" activeProps={{ "data-active": true }}>
-                  {({ isActive }) => (
-                    <>
-                      <Icon
-                        icon={isActive ? "mage:goals-fill" : "mage:goals"}
-                      />
-                      <span>Goals</span>
-                    </>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link to="/distributions" activeProps={{ "data-active": true }}>
-                  {({ isActive }) => (
-                    <>
-                      <Icon
-                        icon={
-                          isActive
-                            ? "lsicon:integral-distribute-filled"
-                            : "lsicon:integral-distribute-outline"
-                        }
-                      />
-                      <span>Distributions</span>
-                    </>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {links.map((link) => (
+              <SidebarMenuItem key={link.to}>
+                <SidebarMenuButton asChild>
+                  <Link to={link.to} activeProps={{ "data-active": true }}>
+                    {({ isActive }) => (
+                      <>
+                        <Icon
+                          icon={
+                            isActive ? link.icon.active : link.icon.inactive
+                          }
+                        />
+                        <span>{link.label}</span>
+                      </>
+                    )}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

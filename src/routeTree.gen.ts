@@ -18,7 +18,9 @@ import { Route as GuestRegisterImport } from './routes/_guest/register'
 import { Route as AuthedGoalsImport } from './routes/_authed/goals'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
 import { Route as AuthedBucketsImport } from './routes/_authed/buckets'
+import { Route as AuthedExpensesIndexImport } from './routes/_authed/expenses/index'
 import { Route as AuthedDistributionsIndexImport } from './routes/_authed/distributions/index'
+import { Route as AuthedExpensesCreateImport } from './routes/_authed/expenses/create'
 import { Route as AuthedDistributionsCreateImport } from './routes/_authed/distributions/create'
 import { Route as AuthedDistributionsDistributionIdEditImport } from './routes/_authed/distributions/$distributionId/edit'
 
@@ -64,9 +66,21 @@ const AuthedBucketsRoute = AuthedBucketsImport.update({
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
+const AuthedExpensesIndexRoute = AuthedExpensesIndexImport.update({
+  id: '/expenses/',
+  path: '/expenses/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
 const AuthedDistributionsIndexRoute = AuthedDistributionsIndexImport.update({
   id: '/distributions/',
   path: '/distributions/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedExpensesCreateRoute = AuthedExpensesCreateImport.update({
+  id: '/expenses/create',
+  path: '/expenses/create',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 
@@ -143,11 +157,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDistributionsCreateImport
       parentRoute: typeof AuthedRouteImport
     }
+    '/_authed/expenses/create': {
+      id: '/_authed/expenses/create'
+      path: '/expenses/create'
+      fullPath: '/expenses/create'
+      preLoaderRoute: typeof AuthedExpensesCreateImport
+      parentRoute: typeof AuthedRouteImport
+    }
     '/_authed/distributions/': {
       id: '/_authed/distributions/'
       path: '/distributions'
       fullPath: '/distributions'
       preLoaderRoute: typeof AuthedDistributionsIndexImport
+      parentRoute: typeof AuthedRouteImport
+    }
+    '/_authed/expenses/': {
+      id: '/_authed/expenses/'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof AuthedExpensesIndexImport
       parentRoute: typeof AuthedRouteImport
     }
     '/_authed/distributions/$distributionId/edit': {
@@ -167,7 +195,9 @@ interface AuthedRouteRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedGoalsRoute: typeof AuthedGoalsRoute
   AuthedDistributionsCreateRoute: typeof AuthedDistributionsCreateRoute
+  AuthedExpensesCreateRoute: typeof AuthedExpensesCreateRoute
   AuthedDistributionsIndexRoute: typeof AuthedDistributionsIndexRoute
+  AuthedExpensesIndexRoute: typeof AuthedExpensesIndexRoute
   AuthedDistributionsDistributionIdEditRoute: typeof AuthedDistributionsDistributionIdEditRoute
 }
 
@@ -176,7 +206,9 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedGoalsRoute: AuthedGoalsRoute,
   AuthedDistributionsCreateRoute: AuthedDistributionsCreateRoute,
+  AuthedExpensesCreateRoute: AuthedExpensesCreateRoute,
   AuthedDistributionsIndexRoute: AuthedDistributionsIndexRoute,
+  AuthedExpensesIndexRoute: AuthedExpensesIndexRoute,
   AuthedDistributionsDistributionIdEditRoute:
     AuthedDistributionsDistributionIdEditRoute,
 }
@@ -207,7 +239,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
   '/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/expenses/create': typeof AuthedExpensesCreateRoute
   '/distributions': typeof AuthedDistributionsIndexRoute
+  '/expenses': typeof AuthedExpensesIndexRoute
   '/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
@@ -219,7 +253,9 @@ export interface FileRoutesByTo {
   '/register': typeof GuestRegisterRoute
   '/': typeof GuestIndexRoute
   '/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/expenses/create': typeof AuthedExpensesCreateRoute
   '/distributions': typeof AuthedDistributionsIndexRoute
+  '/expenses': typeof AuthedExpensesIndexRoute
   '/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
@@ -233,7 +269,9 @@ export interface FileRoutesById {
   '/_guest/register': typeof GuestRegisterRoute
   '/_guest/': typeof GuestIndexRoute
   '/_authed/distributions/create': typeof AuthedDistributionsCreateRoute
+  '/_authed/expenses/create': typeof AuthedExpensesCreateRoute
   '/_authed/distributions/': typeof AuthedDistributionsIndexRoute
+  '/_authed/expenses/': typeof AuthedExpensesIndexRoute
   '/_authed/distributions/$distributionId/edit': typeof AuthedDistributionsDistributionIdEditRoute
 }
 
@@ -247,7 +285,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/'
     | '/distributions/create'
+    | '/expenses/create'
     | '/distributions'
+    | '/expenses'
     | '/distributions/$distributionId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -258,7 +298,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/'
     | '/distributions/create'
+    | '/expenses/create'
     | '/distributions'
+    | '/expenses'
     | '/distributions/$distributionId/edit'
   id:
     | '__root__'
@@ -270,7 +312,9 @@ export interface FileRouteTypes {
     | '/_guest/register'
     | '/_guest/'
     | '/_authed/distributions/create'
+    | '/_authed/expenses/create'
     | '/_authed/distributions/'
+    | '/_authed/expenses/'
     | '/_authed/distributions/$distributionId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -306,7 +350,9 @@ export const routeTree = rootRoute
         "/_authed/dashboard",
         "/_authed/goals",
         "/_authed/distributions/create",
+        "/_authed/expenses/create",
         "/_authed/distributions/",
+        "/_authed/expenses/",
         "/_authed/distributions/$distributionId/edit"
       ]
     },
@@ -341,8 +387,16 @@ export const routeTree = rootRoute
       "filePath": "_authed/distributions/create.tsx",
       "parent": "/_authed"
     },
+    "/_authed/expenses/create": {
+      "filePath": "_authed/expenses/create.tsx",
+      "parent": "/_authed"
+    },
     "/_authed/distributions/": {
       "filePath": "_authed/distributions/index.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/expenses/": {
+      "filePath": "_authed/expenses/index.tsx",
       "parent": "/_authed"
     },
     "/_authed/distributions/$distributionId/edit": {
