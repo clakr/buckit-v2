@@ -124,7 +124,7 @@ function RouteComponent() {
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="targets">Targets</TabsTrigger>
           </TabsList>
-          <TabsContent value="details" className="grid gap-y-3">
+          <TabsContent value="details" className="grid gap-y-4">
             <form.AppField name="name">
               {(field) => (
                 <field.InputField

@@ -32,3 +32,7 @@ export type DistributionTargetUpdate = TablesUpdate<"distribution_targets">;
 export type Expense = Tables<"expenses">;
 export type ExpenseInsert = TablesInsert<"expenses">;
 export type ExpenseUpdate = TablesUpdate<"expenses">;
+
+export type ExpenseParticipant = Tables<"expense_participants">;
+export type ExpenseParticipantInsert = TablesInsert<"expense_participants">;
+export type ExpenseParticipantUpdate = TablesUpdate<"expense_participants">;

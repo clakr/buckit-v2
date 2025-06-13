@@ -89,7 +89,7 @@ export const distributionTargetTypeSchema = z.union([
   z.literal("goal"),
 ]);
 
-export const distributionTargetSchema = z.object({
+export const baseDistributionTargetSchema = z.object({
   target_id: z.string().nonempty("Target ID is required"),
   amount_type: distributionAmountTypeSchema,
   amount: z
@@ -136,7 +136,7 @@ export const baseDistributionSchema = z.object({
         .gt(0, "Base amount must be greater than zero")
         .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
     ),
-  distribution_targets: z.array(distributionTargetSchema),
+  distribution_targets: z.array(baseDistributionTargetSchema),
 });
 
 export const expenseStatusTypeSchema = z.union([
@@ -145,6 +145,10 @@ export const expenseStatusTypeSchema = z.union([
   z.literal("settled"),
 ]);
 
+export const baseExpenseParticipantSchema = z.object({
+  name: z.string().nonempty("Participant is required"),
+});
+
 export const baseExpenseSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z
@@ -152,6 +156,7 @@ export const baseExpenseSchema = z.object({
     .max(1000, "Description must be less than 1000 characters")
     .nullable(),
   status: expenseStatusTypeSchema,
+  participants: z.array(baseExpenseParticipantSchema),
 });
 
 /**

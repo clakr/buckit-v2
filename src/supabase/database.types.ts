@@ -179,6 +179,35 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_participants: {
+        Row: {
+          created_at: string
+          expense_id: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          expense_id?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          expense_id?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_participants_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           created_at: string
