@@ -20,7 +20,7 @@ import { useCreateExpenseMutation } from "@/modules/expenses/mutations";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useStore } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/_authed/expenses/create")({
@@ -61,18 +61,25 @@ function RouteComponent() {
     },
   });
 
-  const [participantInput, setParticipantInput] = useState("");
+  const participants = form.getFieldValue("participants");
+
+  const participantOptions = participants.map((participant) => ({
+    value: participant.name,
+    label: participant.name,
+  }));
+
+  const participantInputRef = useRef<HTMLInputElement>(null);
 
   function handleAddParticipant() {
-    const participants = form.state.values.participants;
+    const inputElement = participantInputRef.current;
+    if (!inputElement) return;
 
-    if (
-      participants.some((participant) => participant.name === participantInput)
-    )
-      return;
+    const participant = inputElement.value;
+
+    if (participants.some((p) => p.name === participant)) return;
 
     const { success, error, data } = baseExpenseParticipantSchema.safeParse({
-      name: participantInput,
+      name: participant,
       expense_id: expenseId,
     });
 
@@ -80,34 +87,45 @@ function RouteComponent() {
 
     form.pushFieldValue("participants", data);
 
-    const newParticipants = [...participants, data];
-
     form.setFieldValue("items", (items) =>
-      items.map((item) => {
-        const expenseItemId = crypto.randomUUID();
-
-        return {
-          ...item,
-          id: expenseItemId,
-          distributions: newParticipants.map((participant) => ({
-            expense_item_id: expenseItemId,
-            expense_participant_id: participant.name,
+      items.map((item) => ({
+        ...item,
+        distributions: [
+          ...item.distributions,
+          {
+            expense_item_id: item.id,
+            expense_participant_id: data.name,
             type: item.type,
-            amount: "",
-          })),
-        };
-      }),
+            amount: "0",
+          },
+        ],
+      })),
     );
 
-    setParticipantInput("");
+    inputElement.value = "";
   }
 
-  const participantOptions = form.state.values.participants.map(
-    (participant) => ({
-      value: participant.name,
-      label: participant.name,
-    }),
-  );
+  function handleRemoveParticipant({
+    index,
+    name,
+  }: {
+    index: number;
+    name: string;
+  }) {
+    form.removeFieldValue("participants", index);
+    form.setFieldValue("items", (items) =>
+      items.map((item) => ({
+        ...item,
+        expense_participant_id:
+          item.expense_participant_id === name
+            ? ""
+            : item.expense_participant_id,
+        distributions: item.distributions.filter(
+          (distribution) => distribution.expense_participant_id !== name,
+        ),
+      })),
+    );
+  }
 
   const formState = useStore(form.store, (state) => state.values);
 
@@ -185,7 +203,12 @@ function RouteComponent() {
                             <button
                               type="button"
                               className="grid size-4 cursor-pointer place-content-center"
-                              onClick={() => field.removeValue(i)}
+                              onClick={() => {
+                                handleRemoveParticipant({
+                                  index: i,
+                                  name: participant.name,
+                                });
+                              }}
                             >
                               <Icon icon="bx:x" />
                             </button>
@@ -196,21 +219,19 @@ function RouteComponent() {
                   )}
                   <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 gap-y-1.5">
                     <Input
-                      value={participantInput}
-                      onChange={(e) => setParticipantInput(e.target.value)}
+                      ref={participantInputRef}
+                      id="participant-input"
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddParticipant();
-                        }
+                        if (e.key !== "Enter") return;
+
+                        e.preventDefault();
+                        handleAddParticipant();
                       }}
                     />
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => {
-                        handleAddParticipant();
-                      }}
+                      onClick={handleAddParticipant}
                     >
                       <Icon icon="bx:plus" />
                       Add Participant
@@ -235,7 +256,7 @@ function RouteComponent() {
               {(field) => (
                 <section className="grid gap-y-4">
                   <ul className="grid gap-y-4">
-                    {field.state.value.map((item, i) => (
+                    {field.state.value.map((_, i) => (
                       <li
                         key={i}
                         className="border-accent/75 flex flex-col gap-y-3 rounded-md border"
@@ -267,9 +288,7 @@ function RouteComponent() {
                               <Fieldset label="Participant">
                                 <Select
                                   value={subField.state.value}
-                                  onValueChange={(value) => {
-                                    subField.handleChange(value);
-                                  }}
+                                  onValueChange={subField.handleChange}
                                   disabled={participantOptions.length === 0}
                                 >
                                   <SelectTrigger className="col-span-full w-full capitalize">
@@ -292,7 +311,7 @@ function RouteComponent() {
                           </form.AppField>
                         </div>
 
-                        {form.state.values.participants.length > 0 && (
+                        {participants.length > 0 && (
                           <div className="bg-accent/25 border-accent/75 flex flex-col gap-y-4 border-t p-4">
                             <form.AppField name={`items[${i}].type`}>
                               {(subField) => (
