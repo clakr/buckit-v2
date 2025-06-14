@@ -9,6 +9,7 @@ import {
   DistributionTargetInsert,
   DistributionUpdate,
   ExpenseInsert,
+  ExpenseItemDistributionInsert,
   ExpenseItemInsert,
   ExpenseParticipantInsert,
   Goal,
@@ -368,6 +369,19 @@ export async function createExpenseParticipants(
 export async function createExpenseItems(payload: ExpenseItemInsert[]) {
   const { error, data } = await supabase
     .from("expense_items")
+    .insert(payload)
+    .select();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createExpenseItemsDistributions(
+  payload: ExpenseItemDistributionInsert[],
+) {
+  const { error, data } = await supabase
+    .from("expense_item_distributions")
     .insert(payload)
     .select();
 

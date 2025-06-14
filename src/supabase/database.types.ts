@@ -179,6 +179,48 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_item_distributions: {
+        Row: {
+          amount: number
+          created_at: string
+          expense_item_id: string | null
+          expense_participant_id: string | null
+          id: string
+          type: Database["public"]["Enums"]["expense_item_distribution_type"]
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          expense_item_id?: string | null
+          expense_participant_id?: string | null
+          id?: string
+          type: Database["public"]["Enums"]["expense_item_distribution_type"]
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          expense_item_id?: string | null
+          expense_participant_id?: string | null
+          id?: string
+          type?: Database["public"]["Enums"]["expense_item_distribution_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_item_distributions_expense_item_id_fkey"
+            columns: ["expense_item_id"]
+            isOneToOne: false
+            referencedRelation: "expense_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_item_distributions_expense_participant_id_fkey"
+            columns: ["expense_participant_id"]
+            isOneToOne: false
+            referencedRelation: "expense_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_items: {
         Row: {
           amount: number
@@ -186,7 +228,7 @@ export type Database = {
           description: string
           expense_id: string | null
           expense_participant_id: string
-          id: number
+          id: string
           type: Database["public"]["Enums"]["expense_item_type"]
         }
         Insert: {
@@ -195,7 +237,7 @@ export type Database = {
           description: string
           expense_id?: string | null
           expense_participant_id: string
-          id?: number
+          id?: string
           type: Database["public"]["Enums"]["expense_item_type"]
         }
         Update: {
@@ -204,7 +246,7 @@ export type Database = {
           description?: string
           expense_id?: string | null
           expense_participant_id?: string
-          id?: number
+          id?: string
           type?: Database["public"]["Enums"]["expense_item_type"]
         }
         Relationships: [
@@ -361,6 +403,7 @@ export type Database = {
     Enums: {
       distribution_amount_type: "absolute" | "percentage"
       distribution_target_type: "bucket" | "goal"
+      expense_item_distribution_type: "absolute" | "percentage"
       expense_item_type: "absolute" | "percentage"
       expense_status_type: "draft" | "calculated" | "settled"
       transaction_type: "inbound" | "outbound"
@@ -484,6 +527,7 @@ export const Constants = {
     Enums: {
       distribution_amount_type: ["absolute", "percentage"],
       distribution_target_type: ["bucket", "goal"],
+      expense_item_distribution_type: ["absolute", "percentage"],
       expense_item_type: ["absolute", "percentage"],
       expense_status_type: ["draft", "calculated", "settled"],
       transaction_type: ["inbound", "outbound"],

@@ -18,6 +18,7 @@ import {
 import { useAppForm } from "@/main";
 import { useCreateExpenseMutation } from "@/modules/expenses/mutations";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useStore } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
@@ -26,21 +27,27 @@ export const Route = createFileRoute("/_authed/expenses/create")({
   component: RouteComponent,
 });
 
+const expenseId = crypto.randomUUID();
+
 function RouteComponent() {
   const mutation = useCreateExpenseMutation();
 
   const form = useAppForm({
     defaultValues: {
+      id: expenseId,
       name: "",
       description: "",
       status: "calculated",
       participants: [],
       items: [
         {
+          id: crypto.randomUUID(),
+          expense_id: expenseId,
           description: "",
           amount: "",
           expense_participant_id: "",
           type: "percentage",
+          distributions: [],
         },
       ],
     } as z.input<typeof createExpenseSchema>,
@@ -56,19 +63,41 @@ function RouteComponent() {
 
   const [participantInput, setParticipantInput] = useState("");
 
-  function handleAddParticipant(
-    participant: z.input<typeof baseExpenseParticipantSchema>,
-  ) {
+  function handleAddParticipant() {
     const participants = form.state.values.participants;
 
-    if (participants.some((p) => p.name === participant.name)) return;
+    if (
+      participants.some((participant) => participant.name === participantInput)
+    )
+      return;
 
-    const { success, error, data } =
-      baseExpenseParticipantSchema.safeParse(participant);
+    const { success, error, data } = baseExpenseParticipantSchema.safeParse({
+      name: participantInput,
+      expense_id: expenseId,
+    });
 
     if (!success && error) return;
 
-    form.setFieldValue("participants", [...participants, data]);
+    form.pushFieldValue("participants", data);
+
+    const newParticipants = [...participants, data];
+
+    form.setFieldValue("items", (items) =>
+      items.map((item) => {
+        const expenseItemId = crypto.randomUUID();
+
+        return {
+          ...item,
+          id: expenseItemId,
+          distributions: newParticipants.map((participant) => ({
+            expense_item_id: expenseItemId,
+            expense_participant_id: participant.name,
+            type: item.type,
+            amount: "",
+          })),
+        };
+      }),
+    );
 
     setParticipantInput("");
   }
@@ -80,11 +109,15 @@ function RouteComponent() {
     }),
   );
 
+  const formState = useStore(form.store, (state) => state.values);
+
   return (
     <Main className="grid gap-y-4">
       <section className="flex items-end justify-between">
         <h1 className="text-3xl font-bold">Create Expenses</h1>
       </section>
+
+      <pre>{JSON.stringify(formState, null, 2)}</pre>
 
       <Tabs defaultValue="details" asChild>
         <form
@@ -168,9 +201,7 @@ function RouteComponent() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handleAddParticipant({
-                            name: participantInput,
-                          });
+                          handleAddParticipant();
                         }
                       }}
                     />
@@ -178,9 +209,7 @@ function RouteComponent() {
                       type="button"
                       variant="secondary"
                       onClick={() => {
-                        handleAddParticipant({
-                          name: participantInput,
-                        });
+                        handleAddParticipant();
                       }}
                     >
                       <Icon icon="bx:plus" />
@@ -262,20 +291,52 @@ function RouteComponent() {
                             )}
                           </form.AppField>
                         </div>
-                        <div className="bg-accent/25 border-accent/75 border-t p-4">
-                          <form.AppField name={`items[${i}].type`}>
-                            {(subField) => (
-                              <subField.RadioGroupField
-                                label="Type"
-                                options={[
-                                  { value: "absolute", label: "Absolute" },
-                                  { value: "percentage", label: "Percentage" },
-                                ]}
-                                orientation="horizontal"
-                              />
-                            )}
-                          </form.AppField>
-                        </div>
+
+                        {form.state.values.participants.length > 0 && (
+                          <div className="bg-accent/25 border-accent/75 flex flex-col gap-y-4 border-t p-4">
+                            <form.AppField name={`items[${i}].type`}>
+                              {(subField) => (
+                                <subField.RadioGroupField
+                                  label="Type"
+                                  options={[
+                                    { value: "absolute", label: "Absolute" },
+                                    {
+                                      value: "percentage",
+                                      label: "Percentage",
+                                    },
+                                  ]}
+                                  orientation="horizontal"
+                                />
+                              )}
+                            </form.AppField>
+                            <form.AppField
+                              name={`items[${i}].distributions`}
+                              mode="array"
+                            >
+                              {(subSubField) => (
+                                <section className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
+                                  {subSubField.state.value.map(
+                                    (distribution, j) => (
+                                      <div key={j}>
+                                        <form.AppField
+                                          name={`items[${i}].distributions[${j}].amount`}
+                                        >
+                                          {(subSubSubField) => (
+                                            <subSubSubField.InputField
+                                              label={
+                                                distribution.expense_participant_id
+                                              }
+                                            />
+                                          )}
+                                        </form.AppField>
+                                      </div>
+                                    ),
+                                  )}
+                                </section>
+                              )}
+                            </form.AppField>
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -284,10 +345,13 @@ function RouteComponent() {
                     variant="secondary"
                     onClick={() =>
                       field.pushValue({
+                        id: crypto.randomUUID(),
+                        expense_id: expenseId,
                         description: "",
                         amount: "",
                         expense_participant_id: "",
                         type: "percentage",
+                        distributions: [],
                       })
                     }
                   >

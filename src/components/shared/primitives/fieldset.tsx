@@ -10,7 +10,10 @@ export function Fieldset({ children, label, description }: Props) {
   return (
     <fieldset className="group grid grid-cols-2 gap-y-1.5">
       <div>
-        <Label htmlFor={field.name} className="group-has-[em]:text-destructive">
+        <Label
+          htmlFor={field.name}
+          className="group-has-[em]:text-destructive capitalize"
+        >
           {label}
         </Label>
         {description ? (

@@ -145,16 +145,37 @@ export const expenseStatusTypeSchema = z.union([
   z.literal("settled"),
 ]);
 
-export const baseExpenseParticipantSchema = z.object({
-  name: z.string().nonempty("Participant is required"),
-});
-
 export const expenseItemTypeSchema = z.union([
   z.literal("absolute"),
   z.literal("percentage"),
 ]);
 
+export const expenseItemDistributionTypeSchema = z.union([
+  z.literal("absolute"),
+  z.literal("percentage"),
+]);
+
+export const baseExpenseParticipantSchema = z.object({
+  expense_id: z.string().uuid().nonempty("Expense ID is required"),
+  name: z.string().nonempty("Participant is required"),
+});
+
+export const baseExpenseItemDistributionSchema = z.object({
+  expense_item_id: z.string().uuid().nonempty("Expense item ID is required"),
+  expense_participant_id: z
+    .string()
+    .nonempty("Expense participant is required"),
+  type: expenseItemDistributionTypeSchema,
+  amount: z
+    .string()
+    .nonempty("Amount is required")
+    .transform((value) => Number(value))
+    .pipe(z.number().gt(0, "Amount must be greater than zero")),
+});
+
 export const baseExpenseItemSchema = z.object({
+  id: z.string().uuid().nonempty("Expense item ID is required"),
+  expense_id: z.string().uuid().nonempty("Expense ID is required"),
   amount: z
     .string()
     .nonempty("Amount is required")
@@ -172,9 +193,11 @@ export const baseExpenseItemSchema = z.object({
     .string()
     .nonempty("Expense participant ID is required"),
   type: expenseItemTypeSchema,
+  distributions: z.array(baseExpenseItemDistributionSchema),
 });
 
 export const baseExpenseSchema = z.object({
+  id: z.string().uuid(),
   name: z.string().nonempty("Name is required"),
   description: z
     .string()
