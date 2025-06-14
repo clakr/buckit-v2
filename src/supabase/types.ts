@@ -36,3 +36,7 @@ export type ExpenseUpdate = TablesUpdate<"expenses">;
 export type ExpenseParticipant = Tables<"expense_participants">;
 export type ExpenseParticipantInsert = TablesInsert<"expense_participants">;
 export type ExpenseParticipantUpdate = TablesUpdate<"expense_participants">;
+
+export type ExpenseItem = Tables<"expense_items">;
+export type ExpenseItemInsert = TablesInsert<"expense_items">;
+export type ExpenseItemUpdate = TablesUpdate<"expense_items">;

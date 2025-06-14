@@ -1,8 +1,13 @@
-import { createExpense, createExpenseParticipants } from "@/lib/actions";
+import {
+  createExpense,
+  createExpenseItems,
+  createExpenseParticipants,
+} from "@/lib/actions";
 import {
   Expense,
   ExpenseInsert,
   ExpenseParticipantInsert,
+  ExpenseItemInsert,
 } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -11,21 +16,37 @@ export function useCreateExpenseMutation() {
 
   return useMutation({
     mutationFn: async (
-      payload: ExpenseInsert & { participants: ExpenseParticipantInsert[] },
+      payload: ExpenseInsert & {
+        participants: ExpenseParticipantInsert[];
+        items: ExpenseItemInsert[];
+      },
     ) => {
       try {
-        const { participants, ...expensePayload } = payload;
+        const { participants, items, ...expensePayload } = payload;
 
-        const data = await createExpense(expensePayload);
+        const expenseData = await createExpense(expensePayload);
 
         const expenseParticipantsPayload = participants.map((participant) => ({
           ...participant,
-          expense_id: data.id,
+          expense_id: expenseData.id,
         }));
 
-        await createExpenseParticipants(expenseParticipantsPayload);
+        const expenseParticipantsData = await createExpenseParticipants(
+          expenseParticipantsPayload,
+        );
 
-        return data;
+        const expenseItemsPayload = items.map((item) => ({
+          ...item,
+          expense_id: expenseData.id,
+          expense_participant_id:
+            expenseParticipantsData.find(
+              (participant) => participant.name === item.expense_participant_id,
+            )?.id ?? "",
+        }));
+
+        await createExpenseItems(expenseItemsPayload);
+
+        return expenseData;
       } catch (error) {
         if (error instanceof Error) throw new Error(error.message);
 

@@ -61,13 +61,13 @@ function RouteComponent() {
         <IndexTemplate>
           <StateSection state="empty">
             <div>
-              <h2 className="text-xl font-medium">No distributions yet.</h2>
+              <h2 className="text-xl font-medium">No expenses yet.</h2>
               <p className="text-muted-foreground text-sm">
-                Get started by creating your first distribution.
+                Get started by creating your first expense.
               </p>
             </div>
             <Button asChild>
-              <Link to="/distributions/create">Create Distribution</Link>
+              <Link to="/expenses/create">Create Expense</Link>
             </Button>
           </StateSection>
         </IndexTemplate>

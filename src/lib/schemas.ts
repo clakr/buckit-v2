@@ -149,6 +149,31 @@ export const baseExpenseParticipantSchema = z.object({
   name: z.string().nonempty("Participant is required"),
 });
 
+export const expenseItemTypeSchema = z.union([
+  z.literal("absolute"),
+  z.literal("percentage"),
+]);
+
+export const baseExpenseItemSchema = z.object({
+  amount: z
+    .string()
+    .nonempty("Amount is required")
+    .transform((value) => Number(value))
+    .pipe(
+      z
+        .number()
+        .gt(0, "Amount must be greater than zero")
+        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+    ),
+  description: z
+    .string()
+    .max(1000, "Description must be less than 1000 characters"),
+  expense_participant_id: z
+    .string()
+    .nonempty("Expense participant ID is required"),
+  type: expenseItemTypeSchema,
+});
+
 export const baseExpenseSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z
@@ -157,6 +182,7 @@ export const baseExpenseSchema = z.object({
     .nullable(),
   status: expenseStatusTypeSchema,
   participants: z.array(baseExpenseParticipantSchema),
+  items: z.array(baseExpenseItemSchema),
 });
 
 /**

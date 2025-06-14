@@ -179,6 +179,51 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_items: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          expense_id: string | null
+          expense_participant_id: string
+          id: number
+          type: Database["public"]["Enums"]["expense_item_type"]
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          expense_id?: string | null
+          expense_participant_id: string
+          id?: number
+          type: Database["public"]["Enums"]["expense_item_type"]
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          expense_id?: string | null
+          expense_participant_id?: string
+          id?: number
+          type?: Database["public"]["Enums"]["expense_item_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_items_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_items_expense_participant_id_fkey"
+            columns: ["expense_participant_id"]
+            isOneToOne: false
+            referencedRelation: "expense_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_participants: {
         Row: {
           created_at: string
@@ -316,6 +361,7 @@ export type Database = {
     Enums: {
       distribution_amount_type: "absolute" | "percentage"
       distribution_target_type: "bucket" | "goal"
+      expense_item_type: "absolute" | "percentage"
       expense_status_type: "draft" | "calculated" | "settled"
       transaction_type: "inbound" | "outbound"
     }
@@ -438,6 +484,7 @@ export const Constants = {
     Enums: {
       distribution_amount_type: ["absolute", "percentage"],
       distribution_target_type: ["bucket", "goal"],
+      expense_item_type: ["absolute", "percentage"],
       expense_status_type: ["draft", "calculated", "settled"],
       transaction_type: ["inbound", "outbound"],
     },

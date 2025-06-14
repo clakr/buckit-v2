@@ -1,6 +1,7 @@
 import { Fieldset } from "@/components/shared/primitives/fieldset";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 import { useFieldContext } from "@/main";
 import type { ReactNode } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
@@ -17,12 +18,14 @@ type Props = Omit<
   label: ReactNode;
   description?: ReactNode;
   options: Option[];
+  orientation?: "horizontal" | "vertical";
 };
 
 export default function RadioGroupField({
   label,
   description,
   options,
+  orientation = "vertical",
   ...props
 }: Props) {
   const field = useFieldContext<string>();
@@ -34,13 +37,13 @@ export default function RadioGroupField({
         name={field.name}
         value={field.state.value}
         onValueChange={field.handleChange}
-        className="col-span-full gap-y-2"
+        className={cn(
+          "col-span-full gap-y-2",
+          orientation === "horizontal" && "flex flex-row",
+        )}
       >
         {options.map((option) => (
-          <div
-            key={option.value}
-            className="flex items-center gap-x-2 first:mt-2"
-          >
+          <div key={option.value} className="flex items-center gap-x-2">
             <RadioGroupItem
               value={option.value}
               id={`${field.name}-${option.value}`}
