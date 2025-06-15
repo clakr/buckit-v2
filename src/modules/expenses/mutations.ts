@@ -61,7 +61,6 @@ export function useCreateExpenseMutation() {
                     participant.name === distribution.expense_participant_id,
                 )?.id ?? "",
               amount: distribution.amount,
-              type: distribution.type,
             })),
           );
 

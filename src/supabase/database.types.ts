@@ -186,7 +186,6 @@ export type Database = {
           expense_item_id: string | null;
           expense_participant_id: string | null;
           id: string;
-          type: Database["public"]["Enums"]["expense_item_distribution_type"];
         };
         Insert: {
           amount: number;
@@ -194,7 +193,6 @@ export type Database = {
           expense_item_id?: string | null;
           expense_participant_id?: string | null;
           id?: string;
-          type: Database["public"]["Enums"]["expense_item_distribution_type"];
         };
         Update: {
           amount?: number;
@@ -202,7 +200,6 @@ export type Database = {
           expense_item_id?: string | null;
           expense_participant_id?: string | null;
           id?: string;
-          type?: Database["public"]["Enums"]["expense_item_distribution_type"];
         };
         Relationships: [
           {
@@ -403,7 +400,6 @@ export type Database = {
     Enums: {
       distribution_amount_type: "absolute" | "percentage";
       distribution_target_type: "bucket" | "goal";
-      expense_item_distribution_type: "absolute" | "percentage";
       expense_item_type: "absolute" | "percentage";
       expense_status_type: "draft" | "calculated" | "settled";
       transaction_type: "inbound" | "outbound";
@@ -527,7 +523,6 @@ export const Constants = {
     Enums: {
       distribution_amount_type: ["absolute", "percentage"],
       distribution_target_type: ["bucket", "goal"],
-      expense_item_distribution_type: ["absolute", "percentage"],
       expense_item_type: ["absolute", "percentage"],
       expense_status_type: ["draft", "calculated", "settled"],
       transaction_type: ["inbound", "outbound"],

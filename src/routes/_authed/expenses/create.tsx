@@ -95,7 +95,6 @@ function RouteComponent() {
           {
             expense_item_id: item.id,
             expense_participant_id: data.name,
-            type: item.type,
             amount: "0",
           },
         ],
@@ -125,6 +124,24 @@ function RouteComponent() {
         ),
       })),
     );
+  }
+
+  function handleAddItem() {
+    const itemId = crypto.randomUUID();
+
+    form.pushFieldValue("items", {
+      id: itemId,
+      expense_id: expenseId,
+      description: "",
+      amount: "",
+      expense_participant_id: "",
+      type: "percentage",
+      distributions: participants.map((participant) => ({
+        expense_item_id: itemId,
+        expense_participant_id: participant.name,
+        amount: "0",
+      })),
+    });
   }
 
   const formState = useStore(form.store, (state) => state.values);
@@ -362,17 +379,7 @@ function RouteComponent() {
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() =>
-                      field.pushValue({
-                        id: crypto.randomUUID(),
-                        expense_id: expenseId,
-                        description: "",
-                        amount: "",
-                        expense_participant_id: "",
-                        type: "percentage",
-                        distributions: [],
-                      })
-                    }
+                    onClick={handleAddItem}
                   >
                     <Icon icon="bx:plus" />
                     Add Item
