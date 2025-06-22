@@ -21,8 +21,8 @@ export function CreateGoalDialog() {
     defaultValues: {
       name: "",
       description: "",
-      current_amount: "",
-      target_amount: "",
+      current_amount: 0,
+      target_amount: 0,
     } as z.input<typeof createGoalSchema>,
     validators: {
       onSubmit: createGoalSchema,

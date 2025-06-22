@@ -29,25 +29,13 @@ const baseGoalSchema = z.object({
     .max(1000, "Description must be less than 1000 characters")
     .nullable(),
   current_amount: z
-    .string()
-    .nonempty("Current amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
   target_amount: z
-    .string()
-    .nonempty("Target amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .gt(0, "Amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .gt(0, "Amount must be greater than zero")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
 });
 
 export const transactionTypeSchema = z.union([
@@ -230,15 +218,15 @@ export const updateGoalSchema = baseGoalSchema
     current_amount: true,
   })
   .extend({
-    id: z.string().nonempty("Goal ID is required"),
+    id: z.string().uuid().nonempty("Goal ID is required"),
   });
 
 export const archiveGoalSchema = z.object({
-  id: z.string().nonempty("Goal ID is required"),
+  id: z.string().uuid().nonempty("Goal ID is required"),
 });
 
 export const createGoalTransactionSchema = baseTransactionSchema.extend({
-  goal_id: z.string().nonempty("Goal ID is required"),
+  goal_id: z.string().uuid().nonempty("Goal ID is required"),
 });
 
 export const convertToGoalSchema = baseGoalSchema

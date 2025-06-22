@@ -35,7 +35,7 @@ export function UpdateGoalDialog() {
       id: goal?.id,
       name: goal?.name,
       description: goal?.description,
-      target_amount: goal?.target_amount.toString(),
+      target_amount: goal?.target_amount,
     } as z.input<typeof updateGoalSchema>,
     validators: {
       onSubmit: updateGoalSchema,

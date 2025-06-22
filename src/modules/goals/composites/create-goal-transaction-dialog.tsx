@@ -22,7 +22,7 @@ export function CreateGoalTransactionDialog() {
   const form = useAppForm({
     defaultValues: {
       goal_id: goalId,
-      amount: "",
+      amount: 0,
       description: "",
       type: "inbound",
     } as z.input<typeof createGoalTransactionSchema>,
@@ -32,7 +32,7 @@ export function CreateGoalTransactionDialog() {
     onSubmit: async ({ value }) => {
       const payload = createGoalTransactionSchema.parse(value);
 
-      await mutation.mutateAsync([payload]);
+      await mutation.mutateAsync(payload);
 
       form.reset();
 

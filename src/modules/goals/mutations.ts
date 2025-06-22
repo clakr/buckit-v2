@@ -5,15 +5,23 @@ import {
   createGoalTransactions,
   updateGoal,
 } from "@/lib/actions";
+import {
+  createGoalSchema,
+  updateGoalSchema,
+  archiveGoalSchema,
+  createGoalTransactionSchema,
+} from "@/lib/schemas";
 import { Transaction } from "@/lib/types";
 import { Bucket, BucketInsert, Goal, GoalTransaction } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 
 export function useCreateGoalMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createGoal,
+    mutationFn: async (payload: z.output<typeof createGoalSchema>) =>
+      await createGoal(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -26,28 +34,12 @@ export function useCreateGoalMutation() {
   });
 }
 
-export function useArchiveGoalMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: archiveGoal,
-    onSettled: (payload, __, variable) => {
-      if (!payload) return undefined;
-
-      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
-        if (!prev) return undefined;
-
-        return prev.filter((goal) => goal.id !== variable.id);
-      });
-    },
-  });
-}
-
 export function useUpdateGoalMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateGoal,
+    mutationFn: async (payload: z.output<typeof updateGoalSchema>) =>
+      await updateGoal(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -70,11 +62,30 @@ export function useUpdateGoalMutation() {
   });
 }
 
+export function useArchiveGoalMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: z.output<typeof archiveGoalSchema>) =>
+      await archiveGoal(payload),
+    onSettled: (payload, __, variable) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Goal[]>(["goals"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((goal) => goal.id !== variable.id);
+      });
+    },
+  });
+}
+
 export function useCreateGoalTransactionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createGoalTransactions,
+    mutationFn: async (payload: z.output<typeof createGoalTransactionSchema>) =>
+      await createGoalTransactions(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
