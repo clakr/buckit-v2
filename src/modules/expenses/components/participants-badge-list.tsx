@@ -8,7 +8,7 @@ export function ParticipantsBadgeList({
   removeParticipant,
 }: {
   participants: z.input<typeof baseExpenseParticipantSchema>[];
-  removeParticipant: ({ index }: { index: number }) => void;
+  removeParticipant: (index: number) => void;
 }) {
   return participants.length === 0 ? (
     <p className="text-muted-foreground text-sm">No participants added yet.</p>
@@ -26,7 +26,7 @@ export function ParticipantsBadgeList({
             <button
               type="button"
               className="grid size-4 cursor-pointer place-content-center"
-              onClick={() => removeParticipant({ index })}
+              onClick={() => removeParticipant(index)}
             >
               <Icon icon="bx:x" />
             </button>

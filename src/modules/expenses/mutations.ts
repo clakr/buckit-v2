@@ -5,32 +5,24 @@ import {
   createExpenseParticipants,
   createExpenseSettlements,
 } from "@/lib/actions";
+import { createExpenseSchema } from "@/lib/schemas";
 import {
   calculateBreakdown,
   calculateSettlements,
 } from "@/modules/expenses/utils";
 import {
-  Expense,
-  ExpenseInsert,
-  ExpenseParticipantInsert,
   ExpenseItemInsert,
   ExpenseItemDistributionInsert,
   ExpenseSettlementInsert,
 } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 
 export function useCreateExpenseMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      payload: ExpenseInsert & {
-        participants: ExpenseParticipantInsert[];
-        items: (ExpenseItemInsert & {
-          distributions: ExpenseItemDistributionInsert[];
-        })[];
-      },
-    ) => {
+    mutationFn: async (payload: z.output<typeof createExpenseSchema>) => {
       try {
         const {
           participants: participantsPayload,
@@ -43,13 +35,20 @@ export function useCreateExpenseMutation() {
         const participantsData =
           await createExpenseParticipants(participantsPayload);
 
+        function findParticipantId(participantName: string) {
+          return (
+            participantsData.find(
+              (participant) => participant.name === participantName,
+            )?.id ?? "NO_PARTICIPANT_ID"
+          );
+        }
+
         const itemsPayload: ExpenseItemInsert[] = items.map((item) => ({
           id: item.id,
           expense_id: item.expense_id,
-          expense_participant_id:
-            participantsData.find(
-              (participant) => participant.name === item.expense_participant_id,
-            )?.id ?? "",
+          expense_participant_id: findParticipantId(
+            item.expense_participant_id,
+          ),
           amount: item.amount,
           description: item.description,
           type: item.type,
@@ -61,18 +60,16 @@ export function useCreateExpenseMutation() {
           items.flatMap((item) =>
             item.distributions.map((distribution) => ({
               expense_item_id: distribution.expense_item_id,
-              expense_participant_id:
-                participantsData.find(
-                  (participant) =>
-                    participant.name === distribution.expense_participant_id,
-                )?.id ?? "",
+              expense_participant_id: findParticipantId(
+                distribution.expense_participant_id,
+              ),
               amount: distribution.amount,
             })),
           );
 
         await createExpenseItemsDistributions(distributionsPayload);
 
-        const breakdown = calculateBreakdown(participantsPayload, items);
+        const breakdown = calculateBreakdown(participantsData, items);
         const settlements = calculateSettlements({
           expenseId: expensePayload.id ?? "",
           breakdown,
@@ -81,16 +78,12 @@ export function useCreateExpenseMutation() {
         const settlementsPayload: ExpenseSettlementInsert[] = settlements.map(
           (settlement) => ({
             ...settlement,
-            payer_participant_id:
-              participantsData.find(
-                (participant) =>
-                  participant.name === settlement.payer_participant_id,
-              )?.id ?? "",
-            receiver_participant_id:
-              participantsData.find(
-                (participant) =>
-                  participant.name === settlement.receiver_participant_id,
-              )?.id ?? "",
+            payer_participant_id: findParticipantId(
+              settlement.payer_participant_id,
+            ),
+            receiver_participant_id: findParticipantId(
+              settlement.receiver_participant_id,
+            ),
           }),
         );
 
@@ -101,14 +94,8 @@ export function useCreateExpenseMutation() {
         throw new Error("An unknown error occurred");
       }
     },
-    onSettled: (payload) => {
-      if (!payload) return undefined;
-
-      queryClient.setQueryData<Expense[]>(["expenses"], (prev) => {
-        if (!prev) return undefined;
-
-        return [...prev, payload];
-      });
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
   });
 }

@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { SummaryBreakdown, SummarySettlementPlan } from "@/lib/types";
 import { cn, formatToCurrency, formatToDate } from "@/lib/utils";
 import { badgeExpenseStatusMapping } from "@/modules/expenses/utils";
-import { Expense, ExpenseSettlement } from "@/supabase/types";
+import { Expense } from "@/supabase/types";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const indexColumns: ColumnDef<Expense>[] = [
@@ -83,5 +83,7 @@ export const settlementPlanColumns: ColumnDef<SummarySettlementPlan>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
+    cell: ({ getValue }) =>
+      formatToCurrency(getValue<SummarySettlementPlan["amount"]>()),
   },
 ];

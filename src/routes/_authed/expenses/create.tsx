@@ -42,7 +42,19 @@ export const Route = createFileRoute("/_authed/expenses/create")({
 
 const expenseId = crypto.randomUUID();
 
+const DEFAULT_ITEM_VALUE: z.input<typeof baseExpenseItemSchema> = {
+  id: crypto.randomUUID(),
+  expense_id: expenseId,
+  description: "",
+  amount: 0,
+  expense_participant_id: "",
+  type: "equal",
+  distributions: [],
+};
+
 function RouteComponent() {
+  const navigate = Route.useNavigate();
+
   const mutation = useCreateExpenseMutation();
 
   const form = useAppForm({
@@ -52,17 +64,7 @@ function RouteComponent() {
       description: "",
       status: "calculated",
       participants: [],
-      items: [
-        {
-          id: crypto.randomUUID(),
-          expense_id: expenseId,
-          description: "",
-          amount: "",
-          expense_participant_id: "",
-          type: "equal",
-          distributions: [],
-        },
-      ],
+      items: [{ ...DEFAULT_ITEM_VALUE }],
     } as z.input<typeof createExpenseSchema>,
     validators: {
       onSubmit: createExpenseSchema,
@@ -71,6 +73,10 @@ function RouteComponent() {
       const payload = createExpenseSchema.parse(value);
 
       await mutation.mutateAsync(payload);
+
+      navigate({
+        to: "/expenses",
+      });
     },
   });
 
@@ -101,21 +107,17 @@ function RouteComponent() {
     inputElement.value = "";
   }
 
-  function handleRemoveParticipant({ index }: { index: number }) {
-    form.removeFieldValue("participants", index);
-  }
-
   function calculateDistributions(item: z.input<typeof baseExpenseItemSchema>) {
     let amount = 0;
 
     if (item.amount && item.type === "equal") {
-      amount = Number(item.amount) / participants.length;
+      amount = item.amount / participants.length;
     }
 
     return participants.map((participant) => ({
       expense_item_id: item.id,
       expense_participant_id: participant.name,
-      amount: amount.toString(),
+      amount,
     }));
   }
 
@@ -144,22 +146,18 @@ function RouteComponent() {
     const itemId = crypto.randomUUID();
 
     form.pushFieldValue("items", {
+      ...DEFAULT_ITEM_VALUE,
       id: itemId,
-      expense_id: expenseId,
-      description: "",
-      amount: "",
-      expense_participant_id: "",
-      type: "equal",
       distributions: participants.map((participant) => ({
         expense_item_id: itemId,
         expense_participant_id: participant.name,
-        amount: "0",
+        amount: 0,
       })),
     });
   }
 
   const totalSummary = useStore(form.store, (state) =>
-    state.values.items.reduce((acc, item) => acc + Number(item.amount), 0),
+    state.values.items.reduce((acc, item) => acc + item.amount, 0),
   );
 
   const { breakdown, settlements } = useStore(form.store, (state) => {
@@ -167,6 +165,7 @@ function RouteComponent() {
       state.values.participants,
       state.values.items,
     );
+
     const settlements = calculateSettlements({
       expenseId,
       breakdown,
@@ -235,7 +234,9 @@ function RouteComponent() {
                     {(participants) => (
                       <ParticipantsBadgeList
                         participants={participants}
-                        removeParticipant={handleRemoveParticipant}
+                        removeParticipant={(index) => {
+                          form.removeFieldValue("participants", index);
+                        }}
                       />
                     )}
                   </form.Subscribe>
@@ -285,7 +286,7 @@ function RouteComponent() {
                             key={itemIndex}
                             className="border-accent/75 flex flex-col gap-y-3 rounded-md border"
                           >
-                            <div className="grid grid-cols-[repeat(3,minmax(0px,200px))] gap-x-3 p-6">
+                            <div className="grid grid-cols-[repeat(3,minmax(0px,200px))_minmax(0,1fr)] gap-x-3 p-6">
                               <form.AppField
                                 name={`items[${itemIndex}].amount`}
                                 listeners={{
@@ -354,6 +355,18 @@ function RouteComponent() {
                                   </Fieldset>
                                 )}
                               </form.AppField>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                className="self-end justify-self-start"
+                                onClick={() => {
+                                  if (items.length === 1) return;
+                                  form.removeFieldValue("items", itemIndex);
+                                }}
+                                disabled={items.length === 1}
+                              >
+                                <Icon icon="bx:trash" />
+                              </Button>
                             </div>
 
                             <form.Subscribe

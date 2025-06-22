@@ -26,7 +26,7 @@ export function calculateBreakdown(
     const paid = items.reduce(
       (acc, item) =>
         item.expense_participant_id === participant.name
-          ? acc + Number(item.amount)
+          ? acc + item.amount
           : acc,
       0,
     );
@@ -40,12 +40,9 @@ export function calculateBreakdown(
       if (!participantDistribution) return acc;
 
       if (item.type === "percentage")
-        return (
-          acc +
-          (Number(item.amount) * Number(participantDistribution.amount)) / 100
-        );
+        return acc + (item.amount * participantDistribution.amount) / 100;
 
-      return acc + Number(participantDistribution.amount);
+      return acc + participantDistribution.amount;
     }, 0);
 
     const netBalance = paid - owes;

@@ -162,25 +162,17 @@ export const baseExpenseItemDistributionSchema = z.object({
     .string()
     .nonempty("Expense participant is required"),
   amount: z
-    .string()
-    .nonempty("Amount is required")
-    .transform((value) => Number(value))
-    .pipe(z.number().gt(0, "Amount must be greater than zero")),
+    .number()
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
 });
 
 export const baseExpenseItemSchema = z.object({
   id: z.string().uuid().nonempty("Expense item ID is required"),
   expense_id: z.string().uuid().nonempty("Expense ID is required"),
   amount: z
-    .string()
-    .nonempty("Amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .gt(0, "Amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .gt(0, "Amount must be greater than zero")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
   description: z
     .string()
     .max(1000, "Description must be less than 1000 characters"),

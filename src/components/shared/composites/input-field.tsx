@@ -9,8 +9,13 @@ type Props = ComponentProps<"input"> & {
   description?: ReactNode;
 };
 
-export default function InputField({ label, description, ...props }: Props) {
-  const field = useFieldContext<string>();
+export default function InputField({
+  label,
+  description,
+  type,
+  ...props
+}: Props) {
+  const field = useFieldContext<string | number>();
 
   return (
     <Fieldset label={label} description={description}>
@@ -19,8 +24,13 @@ export default function InputField({ label, description, ...props }: Props) {
         name={field.name}
         id={field.name}
         value={field.state.value}
+        type={type}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) =>
+          field.handleChange(
+            type === "number" ? e.target.valueAsNumber : e.target.value,
+          )
+        }
         className="group-has-[em]:border-destructive col-span-full"
       />
     </Fieldset>
