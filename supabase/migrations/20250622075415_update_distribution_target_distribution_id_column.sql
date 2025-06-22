@@ -1,0 +1,1 @@
+alter table "public"."distribution_targets" alter column "distribution_id" set not null;

@@ -14,6 +14,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  baseCreateExpenseItemSchema,
   baseExpenseItemSchema,
   baseExpenseParticipantSchema,
   createExpenseSchema,
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/_authed/expenses/create")({
 
 const expenseId = crypto.randomUUID();
 
-const DEFAULT_ITEM_VALUE: z.input<typeof baseExpenseItemSchema> = {
+const DEFAULT_ITEM_VALUE: z.input<typeof baseCreateExpenseItemSchema> = {
   id: crypto.randomUUID(),
   expense_id: expenseId,
   description: "",

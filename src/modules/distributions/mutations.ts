@@ -17,11 +17,9 @@ import { Transaction } from "@/lib/types";
 import {
   Bucket,
   BucketTransaction,
-  BucketTransactionInsert,
   Distribution,
   Goal,
   GoalTransaction,
-  GoalTransactionInsert,
 } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";

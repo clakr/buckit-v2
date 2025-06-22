@@ -136,6 +136,9 @@ export const baseExpenseItemSchema = z.object({
     .string()
     .nonempty("Expense participant ID is required"),
   type: expenseItemTypeSchema,
+});
+
+export const baseCreateExpenseItemSchema = baseExpenseItemSchema.extend({
   distributions: z.array(baseExpenseItemDistributionSchema),
 });
 
@@ -159,8 +162,11 @@ export const baseExpenseSchema = z.object({
     .max(1000, "Description must be less than 1000 characters")
     .nullable(),
   status: expenseStatusTypeSchema,
+});
+
+export const baseCreateExpenseSchema = baseExpenseSchema.extend({
   participants: z.array(baseExpenseParticipantSchema),
-  items: z.array(baseExpenseItemSchema),
+  items: z.array(baseCreateExpenseItemSchema),
 });
 
 /**
@@ -265,4 +271,4 @@ export const archiveDistributionSchema = z.object({
   id: z.string().uuid().nonempty("Distribution ID is required"),
 });
 
-export const createExpenseSchema = baseExpenseSchema;
+export const createExpenseSchema = baseCreateExpenseSchema;

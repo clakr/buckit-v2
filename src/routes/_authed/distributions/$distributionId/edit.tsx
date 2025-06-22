@@ -95,10 +95,10 @@ function RouteComponent() {
 
   const allTargets = [...buckets, ...filteredGoals];
 
-  const baseAmount = useStore(form.store, (state) => +state.values.base_amount);
+  const baseAmount = useStore(form.store, (state) => state.values.base_amount);
   const accumulatedAmount = useStore(form.store, (state) =>
     state.values.distribution_targets.reduce((sum, target) => {
-      const amount = +target.amount;
+      const amount = target.amount;
 
       if (target.amount_type === "absolute") {
         return sum + amount;

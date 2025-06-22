@@ -10,18 +10,14 @@ import {
   baseDistributionSchema,
   baseDistributionTargetSchema,
   archiveDistributionSchema,
+  baseExpenseSchema,
+  baseExpenseParticipantSchema,
+  baseExpenseItemSchema,
+  baseExpenseItemDistributionSchema,
+  baseExpenseSettlementSchema,
 } from "@/lib/schemas";
 import { supabase } from "@/supabase";
-import {
-  Bucket,
-  Distribution,
-  ExpenseInsert,
-  ExpenseItemDistributionInsert,
-  ExpenseItemInsert,
-  ExpenseParticipantInsert,
-  ExpenseSettlementInsert,
-  Goal,
-} from "@/supabase/types";
+import { Bucket, Distribution, Goal } from "@/supabase/types";
 import { z } from "zod";
 
 export async function fetchBuckets() {
@@ -106,8 +102,12 @@ export async function fetchBucketTransactions(bucketId: Bucket["id"]) {
 }
 
 export async function createBucketTransactions(
-  payload: z.output<typeof createBucketTransactionSchema>[],
+  payload:
+    | z.output<typeof createBucketTransactionSchema>
+    | z.output<typeof createBucketTransactionSchema>[],
 ) {
+  payload = Array.isArray(payload) ? payload : [payload];
+
   const { error, data } = await supabase
     .from("bucket_transactions")
     .insert(payload)
@@ -194,8 +194,12 @@ export async function fetchGoalTransactions(goalId: Goal["id"]) {
 }
 
 export async function createGoalTransactions(
-  payload: z.output<typeof createGoalTransactionSchema>[],
+  payload:
+    | z.output<typeof createGoalTransactionSchema>
+    | z.output<typeof createGoalTransactionSchema>[],
 ) {
+  payload = Array.isArray(payload) ? payload : [payload];
+
   const { error, data } = await supabase
     .from("goal_transactions")
     .insert(payload)
@@ -355,7 +359,17 @@ export async function archiveDistribution(
   return data;
 }
 
-export async function createExpense(payload: ExpenseInsert) {
+export async function fetchExpenses() {
+  const { error, data } = await supabase.from("expenses").select();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createExpense(
+  payload: z.output<typeof baseExpenseSchema>,
+) {
   const { error, data } = await supabase
     .from("expenses")
     .insert(payload)
@@ -367,16 +381,8 @@ export async function createExpense(payload: ExpenseInsert) {
   return data;
 }
 
-export async function fetchExpenses() {
-  const { error, data } = await supabase.from("expenses").select();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
 export async function createExpenseParticipants(
-  payload: ExpenseParticipantInsert[],
+  payload: z.output<typeof baseExpenseParticipantSchema>[],
 ) {
   const { error, data } = await supabase
     .from("expense_participants")
@@ -388,7 +394,9 @@ export async function createExpenseParticipants(
   return data;
 }
 
-export async function createExpenseItems(payload: ExpenseItemInsert[]) {
+export async function createExpenseItems(
+  payload: z.output<typeof baseExpenseItemSchema>[],
+) {
   const { error, data } = await supabase
     .from("expense_items")
     .insert(payload)
@@ -400,7 +408,7 @@ export async function createExpenseItems(payload: ExpenseItemInsert[]) {
 }
 
 export async function createExpenseItemsDistributions(
-  payload: ExpenseItemDistributionInsert[],
+  payload: z.output<typeof baseExpenseItemDistributionSchema>[],
 ) {
   const { error, data } = await supabase
     .from("expense_item_distributions")
@@ -413,7 +421,7 @@ export async function createExpenseItemsDistributions(
 }
 
 export async function createExpenseSettlements(
-  payload: ExpenseSettlementInsert[],
+  payload: z.output<typeof baseExpenseSettlementSchema>[],
 ) {
   const { error, data } = await supabase
     .from("expense_settlements")

@@ -127,7 +127,7 @@ export function DistributeFundsDialog() {
 
   const distributionTargets = Object.values(defaultValues).flat();
   const totalAmount = distributionTargets.reduce(
-    (acc, target) => acc + +target.amount,
+    (acc, target) => acc + target.amount,
     0,
   );
 

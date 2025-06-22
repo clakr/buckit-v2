@@ -10,11 +10,6 @@ import {
   calculateBreakdown,
   calculateSettlements,
 } from "@/modules/expenses/utils";
-import {
-  ExpenseItemInsert,
-  ExpenseItemDistributionInsert,
-  ExpenseSettlementInsert,
-} from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
@@ -43,47 +38,45 @@ export function useCreateExpenseMutation() {
           );
         }
 
-        const itemsPayload: ExpenseItemInsert[] = items.map((item) => ({
-          id: item.id,
-          expense_id: item.expense_id,
-          expense_participant_id: findParticipantId(
-            item.expense_participant_id,
-          ),
-          amount: item.amount,
-          description: item.description,
-          type: item.type,
-        }));
+        const itemsPayload = items.map(
+          ({ expense_participant_id: participantName, ...item }) => ({
+            id: item.id,
+            expense_id: item.id,
+            expense_participant_id: findParticipantId(participantName),
+            amount: item.amount,
+            description: item.description,
+            type: item.type,
+          }),
+        );
 
         await createExpenseItems(itemsPayload);
 
-        const distributionsPayload: ExpenseItemDistributionInsert[] =
-          items.flatMap((item) =>
-            item.distributions.map((distribution) => ({
-              expense_item_id: distribution.expense_item_id,
-              expense_participant_id: findParticipantId(
-                distribution.expense_participant_id,
-              ),
-              amount: distribution.amount,
-            })),
-          );
+        const distributionsPayload = items.flatMap((item) =>
+          item.distributions.map(
+            ({ expense_participant_id: participantName, ...distribution }) => ({
+              ...distribution,
+              expense_participant_id: findParticipantId(participantName),
+            }),
+          ),
+        );
 
         await createExpenseItemsDistributions(distributionsPayload);
 
         const breakdown = calculateBreakdown(participantsData, items);
         const settlements = calculateSettlements({
-          expenseId: expensePayload.id ?? "",
+          expenseId: expensePayload.id,
           breakdown,
         });
 
-        const settlementsPayload: ExpenseSettlementInsert[] = settlements.map(
-          (settlement) => ({
+        const settlementsPayload = settlements.map(
+          ({
+            payer_participant_id: payerName,
+            receiver_participant_id: receiverName,
+            ...settlement
+          }) => ({
             ...settlement,
-            payer_participant_id: findParticipantId(
-              settlement.payer_participant_id,
-            ),
-            receiver_participant_id: findParticipantId(
-              settlement.receiver_participant_id,
-            ),
+            payer_participant_id: findParticipantId(payerName),
+            receiver_participant_id: findParticipantId(receiverName),
           }),
         );
 
