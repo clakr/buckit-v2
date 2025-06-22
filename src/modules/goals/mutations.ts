@@ -13,7 +13,7 @@ import {
   convertToBucketSchema,
 } from "@/lib/schemas";
 import { Transaction } from "@/lib/types";
-import { Bucket, BucketInsert, Goal, GoalTransaction } from "@/supabase/types";
+import { Bucket, Goal, GoalTransaction } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 

@@ -45,11 +45,11 @@ export function DistributeFundsDialog() {
   };
 
   distribution?.distribution_targets.forEach((target) => {
-    const amount = (
+    const amount =
       target.amount_type === "absolute"
         ? target.amount
-        : (distribution.base_amount * target.amount) / 100
-    ).toFixed(2);
+        : Math.round(((distribution.base_amount * target.amount) / 100) * 100) /
+          100;
 
     const transactionData = {
       description: distribution.name,
@@ -160,7 +160,7 @@ export function DistributeFundsDialog() {
                 <TableCell>
                   {"bucket_id" in target ? target.bucket_id : target.goal_id}
                 </TableCell>
-                <TableCell>{formatToCurrency(+target.amount)}</TableCell>
+                <TableCell>{formatToCurrency(target.amount)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -65,6 +65,7 @@ function RouteComponent() {
       description: data.description,
       base_amount: data.base_amount,
       distribution_targets: data.distribution_targets.map((target) => ({
+        distribution_id: target.distribution_id,
         target_id: target.target_id,
         amount_type: target.amount_type,
         amount: target.amount,
@@ -311,9 +312,10 @@ function RouteComponent() {
                     className="justify-self-start"
                     onClick={() =>
                       field.pushValue({
+                        distribution_id: data.id,
                         target_id: "",
                         amount_type: "absolute",
-                        amount: "",
+                        amount: 0,
                         description: "",
                       })
                     }

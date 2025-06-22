@@ -5,16 +5,16 @@ import {
   createBucketTransactionSchema,
   createGoalSchema,
   updateGoalSchema,
-  createGoalTransactionSchema,
   archiveGoalSchema,
+  createGoalTransactionSchema,
+  baseDistributionSchema,
+  baseDistributionTargetSchema,
+  archiveDistributionSchema,
 } from "@/lib/schemas";
 import { supabase } from "@/supabase";
 import {
   Bucket,
   Distribution,
-  DistributionInsert,
-  DistributionTargetInsert,
-  DistributionUpdate,
   ExpenseInsert,
   ExpenseItemDistributionInsert,
   ExpenseItemInsert,
@@ -106,7 +106,7 @@ export async function fetchBucketTransactions(bucketId: Bucket["id"]) {
 }
 
 export async function createBucketTransactions(
-  payload: z.output<typeof createBucketTransactionSchema>,
+  payload: z.output<typeof createBucketTransactionSchema>[],
 ) {
   const { error, data } = await supabase
     .from("bucket_transactions")
@@ -193,6 +193,19 @@ export async function fetchGoalTransactions(goalId: Goal["id"]) {
   return data;
 }
 
+export async function createGoalTransactions(
+  payload: z.output<typeof createGoalTransactionSchema>[],
+) {
+  const { error, data } = await supabase
+    .from("goal_transactions")
+    .insert(payload)
+    .select(`*, goals!inner(*)`);
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
 export async function fetchBucketsTransactions() {
   const { error, data } = await supabase
     .from("bucket_transactions")
@@ -246,6 +259,33 @@ export async function fetchDistributions() {
   return data;
 }
 
+export async function createDistribution(
+  payload: z.output<typeof baseDistributionSchema>,
+) {
+  const { error, data } = await supabase
+    .from("distributions")
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createDistributionTargets(
+  payload: z.output<typeof baseDistributionTargetSchema>[],
+) {
+  const { error, data } = await supabase
+    .from("distribution_targets")
+    .insert(payload)
+    .select();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
 export async function fetchDistribution(distributionId: Distribution["id"]) {
   const { error, data } = await supabase
     .from("distributions")
@@ -271,46 +311,8 @@ export async function fetchDistributionTargets(
   return data;
 }
 
-export async function createDistribution(payload: DistributionInsert) {
-  const { error, data } = await supabase
-    .from("distributions")
-    .insert(payload)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-export async function createDistributionTargets(
-  payload: DistributionTargetInsert[],
-) {
-  const { error, data } = await supabase
-    .from("distribution_targets")
-    .insert(payload)
-    .select();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-export async function createGoalTransactions(
-  payload: z.output<typeof createGoalTransactionSchema>,
-) {
-  const { error, data } = await supabase
-    .from("goal_transactions")
-    .insert(payload)
-    .select(`*, goals!inner(*)`);
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
 export async function updateDistribution(
-  payload: DistributionUpdate & { id: Distribution["id"] },
+  payload: z.output<typeof baseDistributionSchema>,
 ) {
   const { error, data } = await supabase
     .from("distributions")
@@ -338,7 +340,9 @@ export async function deleteDistributionTargets(
   return data;
 }
 
-export async function archiveDistribution(payload: { id: Distribution["id"] }) {
+export async function archiveDistribution(
+  payload: z.output<typeof archiveDistributionSchema>,
+) {
   const { error, data } = await supabase
     .from("distributions")
     .update({ is_active: false })

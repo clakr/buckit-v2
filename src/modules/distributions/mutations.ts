@@ -7,41 +7,37 @@ import {
   deleteDistributionTargets,
   updateDistribution,
 } from "@/lib/actions";
+import {
+  archiveDistributionSchema,
+  createDistributionSchema,
+  distributeFundsSchema,
+  updateDistributionSchema,
+} from "@/lib/schemas";
 import { Transaction } from "@/lib/types";
 import {
   Bucket,
   BucketTransaction,
   BucketTransactionInsert,
   Distribution,
-  DistributionInsert,
-  DistributionTargetInsert,
-  DistributionUpdate,
   Goal,
   GoalTransaction,
   GoalTransactionInsert,
 } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 
 export function useCreateDistributionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      payload: DistributionInsert & {
-        distribution_targets: DistributionTargetInsert[];
-      },
-    ) => {
+    mutationFn: async (payload: z.output<typeof createDistributionSchema>) => {
       try {
-        const { distribution_targets, ...distributionPayload } = payload;
+        const {
+          distribution_targets: distributionTargetsPayload,
+          ...distributionPayload
+        } = payload;
 
         const data = await createDistribution(distributionPayload);
-
-        const distributionTargetsPayload = distribution_targets.map(
-          (distribution) => ({
-            ...distribution,
-            distribution_id: data.id,
-          }),
-        );
 
         await createDistributionTargets(distributionTargetsPayload);
 
@@ -64,14 +60,64 @@ export function useCreateDistributionMutation() {
   });
 }
 
+export function useUpdateDistributionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: z.output<typeof updateDistributionSchema>) => {
+      try {
+        const {
+          distribution_targets: distributionTargetsPayload,
+          ...distributionPayload
+        } = payload;
+
+        const distributionData = await updateDistribution(distributionPayload);
+
+        await deleteDistributionTargets(distributionData.id);
+        const distributionTargetsData = await createDistributionTargets(
+          distributionTargetsPayload,
+        );
+
+        return {
+          ...distributionData,
+          distribution_targets: distributionTargetsData,
+        };
+      } catch (error) {
+        if (error instanceof Error) throw new Error(error.message);
+
+        throw new Error("An unknown error occurred");
+      }
+    },
+    onSettled: (payload) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Distribution[]>(["distributions"], (prev) => {
+        if (!prev) return undefined;
+
+        const updatedDistributionIndex = prev.findIndex(
+          (distribution) => payload.id === distribution.id,
+        );
+
+        return prev.with(updatedDistributionIndex, payload);
+      });
+
+      queryClient.setQueryData<Distribution>(
+        ["distributions", payload.id],
+        (prev) => {
+          if (!prev) return undefined;
+
+          return payload;
+        },
+      );
+    },
+  });
+}
+
 export function useDistributeFundsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: {
-      buckets: BucketTransactionInsert[];
-      goals: GoalTransactionInsert[];
-    }) => {
+    mutationFn: async (payload: z.output<typeof distributeFundsSchema>) => {
       try {
         const promises = await Promise.allSettled([
           createBucketTransactions(payload.buckets),
@@ -160,73 +206,15 @@ export function useDistributeFundsMutation() {
   });
 }
 
-export function useUpdateDistributionMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (
-      payload: DistributionUpdate & {
-        id: Distribution["id"];
-        distribution_targets: DistributionTargetInsert[];
-      },
-    ) => {
-      try {
-        const { distribution_targets, ...distributionPayload } = payload;
-
-        const distributionData = await updateDistribution(distributionPayload);
-
-        const distributionTargetsPayload = distribution_targets.map(
-          (distribution) => ({
-            ...distribution,
-            distribution_id: distributionData.id,
-          }),
-        );
-
-        await deleteDistributionTargets(distributionData.id);
-        const distributionTargetsData = await createDistributionTargets(
-          distributionTargetsPayload,
-        );
-
-        return {
-          ...distributionData,
-          distribution_targets: distributionTargetsData,
-        };
-      } catch (error) {
-        if (error instanceof Error) throw new Error(error.message);
-
-        throw new Error("An unknown error occurred");
-      }
-    },
-    onSettled: (payload) => {
-      if (!payload) return undefined;
-
-      queryClient.setQueryData<Distribution[]>(["distributions"], (prev) => {
-        if (!prev) return undefined;
-
-        const updatedDistributionIndex = prev.findIndex(
-          (distribution) => payload.id === distribution.id,
-        );
-
-        return prev.with(updatedDistributionIndex, payload);
-      });
-
-      queryClient.setQueryData<Distribution>(
-        ["distributions", payload.id],
-        (prev) => {
-          if (!prev) return undefined;
-
-          return payload;
-        },
-      );
-    },
-  });
-}
-
 export function useArchiveDistributionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: archiveDistribution,
+    mutationFn: async (payload: z.output<typeof archiveDistributionSchema>) => {
+      const data = await archiveDistribution(payload);
+
+      return data;
+    },
     onSettled: (payload, _, variable) => {
       if (!payload) return undefined;
 

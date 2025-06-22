@@ -65,24 +65,13 @@ export const distributionTargetTypeSchema = z.union([
 ]);
 
 export const baseDistributionTargetSchema = z.object({
+  distribution_id: z.string().uuid().nonempty("Distribution ID is required"),
   target_id: z.string().nonempty("Target ID is required"),
   amount_type: distributionAmountTypeSchema,
   amount: z
-    .string()
-    .nonempty("Amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .gt(0, "Amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    )
-    .or(
-      z
-        .number()
-        .gt(0, "Amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .gt(0, "Amount must be greater than zero")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
   description: z
     .string()
     .max(1000, "Description must be less than 1000 characters")
@@ -90,27 +79,19 @@ export const baseDistributionTargetSchema = z.object({
 });
 
 export const baseDistributionSchema = z.object({
+  id: z.string().uuid().nonempty("Distribution ID is required"),
   name: z.string().nonempty("Name is required"),
   description: z
     .string()
     .max(1000, "Description must be less than 1000 characters")
     .nullable(),
   base_amount: z
-    .string()
-    .nonempty("Base amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .gt(0, "Base amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    )
-    .or(
-      z
-        .number()
-        .gt(0, "Base amount must be greater than zero")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .gt(0, "Base amount must be greater than zero")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
+});
+
+export const baseCreateDistributionSchema = baseDistributionSchema.extend({
   distribution_targets: z.array(baseDistributionTargetSchema),
 });
 
@@ -253,7 +234,7 @@ export const loginSchema = z.object({
 
 export const registerSchema = loginSchema;
 
-export const createDistributionSchema = baseDistributionSchema.refine(
+export const createDistributionSchema = baseCreateDistributionSchema.refine(
   (data) => {
     const totalDistributedAmount = data.distribution_targets.reduce(
       (sum, distribution) =>
@@ -276,12 +257,12 @@ export const distributeFundsSchema = z.object({
   goals: z.array(createGoalTransactionSchema),
 });
 
-export const updateDistributionSchema = baseDistributionSchema.extend({
-  id: z.string().nonempty("Distribution ID is required"),
+export const updateDistributionSchema = baseCreateDistributionSchema.extend({
+  id: z.string().uuid().nonempty("Distribution ID is required"),
 });
 
 export const archiveDistributionSchema = z.object({
-  id: z.string().nonempty("Distribution ID is required"),
+  id: z.string().uuid().nonempty("Distribution ID is required"),
 });
 
 export const createExpenseSchema = baseExpenseSchema;

@@ -23,6 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  baseDistributionTargetSchema,
   createDistributionSchema,
   distributionAmountTypeSchema,
 } from "@/lib/schemas";
@@ -42,6 +43,16 @@ export const Route = createFileRoute("/_authed/distributions/create")({
   component: RouteComponent,
 });
 
+const distributionId = crypto.randomUUID();
+
+const DEFAULT_TARGET_VALUE: z.input<typeof baseDistributionTargetSchema> = {
+  distribution_id: distributionId,
+  target_id: "",
+  amount_type: "absolute",
+  amount: 0,
+  description: "",
+};
+
 function RouteComponent() {
   const navigate = Route.useNavigate();
 
@@ -49,17 +60,11 @@ function RouteComponent() {
 
   const form = useAppForm({
     defaultValues: {
+      id: distributionId,
       name: "",
       description: "",
-      base_amount: "",
-      distribution_targets: [
-        {
-          target_id: "",
-          amount_type: "absolute",
-          amount: "",
-          description: "",
-        },
-      ],
+      base_amount: 0,
+      distribution_targets: [{ ...DEFAULT_TARGET_VALUE }],
     } as z.input<typeof createDistributionSchema>,
     validators: {
       onSubmit: createDistributionSchema,
@@ -84,10 +89,10 @@ function RouteComponent() {
 
   const allTargets = [...buckets, ...filteredGoals];
 
-  const baseAmount = useStore(form.store, (state) => +state.values.base_amount);
+  const baseAmount = useStore(form.store, (state) => state.values.base_amount);
   const accumulatedAmount = useStore(form.store, (state) =>
     state.values.distribution_targets.reduce((sum, target) => {
-      const amount = +target.amount;
+      const amount = target.amount;
 
       if (target.amount_type === "absolute") {
         return sum + amount;
@@ -301,10 +306,7 @@ function RouteComponent() {
                     className="justify-self-start"
                     onClick={() =>
                       field.pushValue({
-                        target_id: "",
-                        amount_type: "absolute",
-                        amount: "",
-                        description: "",
+                        ...DEFAULT_TARGET_VALUE,
                       })
                     }
                   >
