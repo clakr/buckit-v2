@@ -3,13 +3,19 @@ import {
   createExpenseItems,
   createExpenseItemsDistributions,
   createExpenseParticipants,
+  createExpenseSettlements,
 } from "@/lib/actions";
+import {
+  calculateBreakdown,
+  calculateSettlements,
+} from "@/modules/expenses/utils";
 import {
   Expense,
   ExpenseInsert,
   ExpenseParticipantInsert,
   ExpenseItemInsert,
   ExpenseItemDistributionInsert,
+  ExpenseSettlementInsert,
 } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -34,14 +40,14 @@ export function useCreateExpenseMutation() {
 
         await createExpense(expensePayload);
 
-        const expenseParticipantsData =
+        const participantsData =
           await createExpenseParticipants(participantsPayload);
 
-        const expenseItemsPayload: ExpenseItemInsert[] = items.map((item) => ({
+        const itemsPayload: ExpenseItemInsert[] = items.map((item) => ({
           id: item.id,
           expense_id: item.expense_id,
           expense_participant_id:
-            expenseParticipantsData.find(
+            participantsData.find(
               (participant) => participant.name === item.expense_participant_id,
             )?.id ?? "",
           amount: item.amount,
@@ -49,14 +55,14 @@ export function useCreateExpenseMutation() {
           type: item.type,
         }));
 
-        await createExpenseItems(expenseItemsPayload);
+        await createExpenseItems(itemsPayload);
 
-        const expenseItemDistributionsPayload: ExpenseItemDistributionInsert[] =
+        const distributionsPayload: ExpenseItemDistributionInsert[] =
           items.flatMap((item) =>
             item.distributions.map((distribution) => ({
               expense_item_id: distribution.expense_item_id,
               expense_participant_id:
-                expenseParticipantsData.find(
+                participantsData.find(
                   (participant) =>
                     participant.name === distribution.expense_participant_id,
                 )?.id ?? "",
@@ -64,7 +70,31 @@ export function useCreateExpenseMutation() {
             })),
           );
 
-        await createExpenseItemsDistributions(expenseItemDistributionsPayload);
+        await createExpenseItemsDistributions(distributionsPayload);
+
+        const breakdown = calculateBreakdown(participantsPayload, items);
+        const settlements = calculateSettlements({
+          expenseId: expensePayload.id ?? "",
+          breakdown,
+        });
+
+        const settlementsPayload: ExpenseSettlementInsert[] = settlements.map(
+          (settlement) => ({
+            ...settlement,
+            payer_participant_id:
+              participantsData.find(
+                (participant) =>
+                  participant.name === settlement.payer_participant_id,
+              )?.id ?? "",
+            receiver_participant_id:
+              participantsData.find(
+                (participant) =>
+                  participant.name === settlement.receiver_participant_id,
+              )?.id ?? "",
+          }),
+        );
+
+        await createExpenseSettlements(settlementsPayload);
       } catch (error) {
         if (error instanceof Error) throw new Error(error.message);
 

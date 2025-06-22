@@ -2,7 +2,7 @@ import { DataTable } from "@/components/shared/composites/data-table";
 import { StateSection } from "@/components/shared/sections/state-section";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/main";
-import { columns } from "@/modules/expenses/columns";
+import { indexColumns } from "@/modules/expenses/columns";
 import { expensesQueryOptions } from "@/modules/expenses/query-options";
 import { IndexTemplate } from "@/modules/expenses/templates/index-template";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -78,7 +78,7 @@ function RouteComponent() {
   return (
     <>
       <IndexTemplate>
-        <DataTable columns={columns} data={expenses} />
+        <DataTable columns={indexColumns} data={expenses} />
       </IndexTemplate>
     </>
   );

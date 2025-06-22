@@ -148,6 +148,7 @@ export const expenseStatusTypeSchema = z.union([
 export const expenseItemTypeSchema = z.union([
   z.literal("absolute"),
   z.literal("percentage"),
+  z.literal("equal"),
 ]);
 
 export const baseExpenseParticipantSchema = z.object({
@@ -188,6 +189,18 @@ export const baseExpenseItemSchema = z.object({
     .nonempty("Expense participant ID is required"),
   type: expenseItemTypeSchema,
   distributions: z.array(baseExpenseItemDistributionSchema),
+});
+
+export const baseExpenseSettlementSchema = z.object({
+  expense_id: z.string().uuid().nonempty("Expense ID is required"),
+  payer_participant_id: z.string().nonempty("Payer participant ID is required"),
+  receiver_participant_id: z
+    .string()
+    .nonempty("Receiver participant ID is required"),
+  amount: z
+    .number()
+    .gt(0, "Amount must be greater than zero")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
 });
 
 export const baseExpenseSchema = z.object({

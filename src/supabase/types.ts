@@ -46,3 +46,7 @@ export type ExpenseItemDistributionInsert =
   TablesInsert<"expense_item_distributions">;
 export type ExpenseItemDistributionUpdate =
   TablesUpdate<"expense_item_distributions">;
+
+export type ExpenseSettlement = Tables<"expense_settlements">;
+export type ExpenseSettlementInsert = TablesInsert<"expense_settlements">;
+export type ExpenseSettlementUpdate = TablesUpdate<"expense_settlements">;

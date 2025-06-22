@@ -1,4 +1,4 @@
-import { fetchTransactions } from "@/modules/dashboard/query-options";
+import { fetchTransactions } from "@/lib/actions";
 
 export type Dialog = {
   isOpen: boolean;
@@ -6,3 +6,16 @@ export type Dialog = {
 };
 
 export type Transaction = Awaited<ReturnType<typeof fetchTransactions>>[number];
+
+export type SummaryBreakdown = {
+  participant: string;
+  paid: number;
+  owes: number;
+  netBalance: number;
+};
+
+export type SummarySettlementPlan = {
+  payer_participant_id: string;
+  receiver_participant_id: string;
+  amount: number;
+};

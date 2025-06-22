@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/shared/composites/data-table";
 import { Fieldset } from "@/components/shared/primitives/fieldset";
 import { Main } from "@/components/shared/primitives/main";
 import { Badge } from "@/components/ui/badge";
@@ -10,17 +11,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  baseExpenseItemSchema,
   baseExpenseParticipantSchema,
   createExpenseSchema,
 } from "@/lib/schemas";
+import { formatToCurrency } from "@/lib/utils";
 import { useAppForm } from "@/main";
+import {
+  settlementPlanColumns,
+  summaryBreakdownColumns,
+} from "@/modules/expenses/columns";
+import { ParticipantsBadgeList } from "@/modules/expenses/components/participants-badge-list";
 import { useCreateExpenseMutation } from "@/modules/expenses/mutations";
+import {
+  calculateBreakdown,
+  calculateSettlements,
+} from "@/modules/expenses/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useStore } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/_authed/expenses/create")({
@@ -46,7 +59,7 @@ function RouteComponent() {
           description: "",
           amount: "",
           expense_participant_id: "",
-          type: "percentage",
+          type: "equal",
           distributions: [],
         },
       ],
@@ -61,12 +74,10 @@ function RouteComponent() {
     },
   });
 
-  const participants = form.getFieldValue("participants");
-
-  const participantOptions = participants.map((participant) => ({
-    value: participant.name,
-    label: participant.name,
-  }));
+  const participants = useStore(
+    form.store,
+    (state) => state.values.participants,
+  );
 
   const participantInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,43 +98,46 @@ function RouteComponent() {
 
     form.pushFieldValue("participants", data);
 
-    form.setFieldValue("items", (items) =>
-      items.map((item) => ({
-        ...item,
-        distributions: [
-          ...item.distributions,
-          {
-            expense_item_id: item.id,
-            expense_participant_id: data.name,
-            amount: "0",
-          },
-        ],
-      })),
-    );
-
     inputElement.value = "";
   }
 
-  function handleRemoveParticipant({
-    index,
-    name,
-  }: {
-    index: number;
-    name: string;
-  }) {
+  function handleRemoveParticipant({ index }: { index: number }) {
     form.removeFieldValue("participants", index);
+  }
+
+  function calculateDistributions(item: z.input<typeof baseExpenseItemSchema>) {
+    let amount = 0;
+
+    if (item.amount && item.type === "equal") {
+      amount = Number(item.amount) / participants.length;
+    }
+
+    return participants.map((participant) => ({
+      expense_item_id: item.id,
+      expense_participant_id: participant.name,
+      amount: amount.toString(),
+    }));
+  }
+
+  useEffect(() => {
     form.setFieldValue("items", (items) =>
-      items.map((item) => ({
-        ...item,
-        expense_participant_id:
-          item.expense_participant_id === name
-            ? ""
-            : item.expense_participant_id,
-        distributions: item.distributions.filter(
-          (distribution) => distribution.expense_participant_id !== name,
-        ),
-      })),
+      items.map((item) => {
+        const distributions = calculateDistributions(item);
+
+        return {
+          ...item,
+          distributions,
+        };
+      }),
     );
+  }, [participants]);
+
+  function handleSyncDistributions(itemIndex: number) {
+    const item = form.getFieldValue(`items[${itemIndex}]`);
+
+    const distributions = calculateDistributions(item);
+
+    form.setFieldValue(`items[${itemIndex}].distributions`, distributions);
   }
 
   function handleAddItem() {
@@ -135,7 +149,7 @@ function RouteComponent() {
       description: "",
       amount: "",
       expense_participant_id: "",
-      type: "percentage",
+      type: "equal",
       distributions: participants.map((participant) => ({
         expense_item_id: itemId,
         expense_participant_id: participant.name,
@@ -144,15 +158,28 @@ function RouteComponent() {
     });
   }
 
-  const formState = useStore(form.store, (state) => state.values);
+  const totalSummary = useStore(form.store, (state) =>
+    state.values.items.reduce((acc, item) => acc + Number(item.amount), 0),
+  );
+
+  const { breakdown, settlements } = useStore(form.store, (state) => {
+    const breakdown = calculateBreakdown(
+      state.values.participants,
+      state.values.items,
+    );
+    const settlements = calculateSettlements({
+      expenseId,
+      breakdown,
+    });
+
+    return { breakdown, settlements };
+  });
 
   return (
     <Main className="grid gap-y-4">
       <section className="flex items-end justify-between">
         <h1 className="text-3xl font-bold">Create Expenses</h1>
       </section>
-
-      <pre>{JSON.stringify(formState, null, 2)}</pre>
 
       <Tabs defaultValue="details" asChild>
         <form
@@ -199,41 +226,19 @@ function RouteComponent() {
               )}
             </form.AppField>
             <form.AppField name="participants" mode="array">
-              {(field) => (
+              {() => (
                 <section className="flex flex-col gap-y-2 rounded-md border p-4">
                   <h2 className="text-sm font-medium">Participants</h2>
-                  {field.state.value.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      No participants added yet.
-                    </p>
-                  ) : (
-                    <ul className="flex flex-wrap gap-2">
-                      {field.state.value.map((participant, i) => (
-                        <Badge
-                          key={i}
-                          variant="secondary"
-                          className="font-semibold"
-                          asChild
-                        >
-                          <li>
-                            {participant.name}
-                            <button
-                              type="button"
-                              className="grid size-4 cursor-pointer place-content-center"
-                              onClick={() => {
-                                handleRemoveParticipant({
-                                  index: i,
-                                  name: participant.name,
-                                });
-                              }}
-                            >
-                              <Icon icon="bx:x" />
-                            </button>
-                          </li>
-                        </Badge>
-                      ))}
-                    </ul>
-                  )}
+                  <form.Subscribe
+                    selector={(state) => state.values.participants}
+                  >
+                    {(participants) => (
+                      <ParticipantsBadgeList
+                        participants={participants}
+                        removeParticipant={handleRemoveParticipant}
+                      />
+                    )}
+                  </form.Subscribe>
                   <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 gap-y-1.5">
                     <Input
                       ref={participantInputRef}
@@ -270,111 +275,183 @@ function RouteComponent() {
           </TabsContent>
           <TabsContent value="items">
             <form.AppField name="items" mode="array">
-              {(field) => (
+              {() => (
                 <section className="grid gap-y-4">
                   <ul className="grid gap-y-4">
-                    {field.state.value.map((_, i) => (
-                      <li
-                        key={i}
-                        className="border-accent/75 flex flex-col gap-y-3 rounded-md border"
-                      >
-                        <div className="grid grid-cols-[repeat(3,minmax(0px,200px))] gap-x-3 p-4">
-                          <form.AppField name={`items[${i}].amount`}>
-                            {(subField) => (
-                              <subField.InputField
-                                label="Amount"
-                                type="number"
-                                step={0.01}
-                                min={0}
-                                max={1_000_000_000}
-                              />
-                            )}
-                          </form.AppField>
-                          <form.AppField name={`items[${i}].description`}>
-                            {(subField) => (
-                              <subField.InputField
-                                label="Description"
-                                type="text"
-                              />
-                            )}
-                          </form.AppField>
-                          <form.AppField
-                            name={`items[${i}].expense_participant_id`}
+                    <form.Subscribe selector={(state) => state.values.items}>
+                      {(items) =>
+                        items.map((_, itemIndex) => (
+                          <li
+                            key={itemIndex}
+                            className="border-accent/75 flex flex-col gap-y-3 rounded-md border"
                           >
-                            {(subField) => (
-                              <Fieldset label="Participant">
-                                <Select
-                                  value={subField.state.value}
-                                  onValueChange={subField.handleChange}
-                                  disabled={participantOptions.length === 0}
-                                >
-                                  <SelectTrigger className="col-span-full w-full capitalize">
-                                    <SelectValue placeholder="Select a participant" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {participantOptions.map((option) => (
-                                      <SelectItem
-                                        key={option.value}
-                                        value={option.value}
-                                        className="capitalize"
-                                      >
-                                        {option.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </Fieldset>
-                            )}
-                          </form.AppField>
-                        </div>
-
-                        {participants.length > 0 && (
-                          <div className="bg-accent/25 border-accent/75 flex flex-col gap-y-4 border-t p-4">
-                            <form.AppField name={`items[${i}].type`}>
-                              {(subField) => (
-                                <subField.RadioGroupField
-                                  label="Type"
-                                  options={[
-                                    { value: "absolute", label: "Absolute" },
-                                    {
-                                      value: "percentage",
-                                      label: "Percentage",
-                                    },
-                                  ]}
-                                  orientation="horizontal"
-                                />
-                              )}
-                            </form.AppField>
-                            <form.AppField
-                              name={`items[${i}].distributions`}
-                              mode="array"
-                            >
-                              {(subSubField) => (
-                                <section className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
-                                  {subSubField.state.value.map(
-                                    (distribution, j) => (
-                                      <div key={j}>
-                                        <form.AppField
-                                          name={`items[${i}].distributions[${j}].amount`}
+                            <div className="grid grid-cols-[repeat(3,minmax(0px,200px))] gap-x-3 p-6">
+                              <form.AppField
+                                name={`items[${itemIndex}].amount`}
+                                listeners={{
+                                  onChange: () =>
+                                    handleSyncDistributions(itemIndex),
+                                }}
+                              >
+                                {(field) => (
+                                  <field.InputField
+                                    label="Amount"
+                                    type="number"
+                                    step={0.01}
+                                    min={0}
+                                    max={1_000_000_000}
+                                  />
+                                )}
+                              </form.AppField>
+                              <form.AppField
+                                name={`items[${itemIndex}].description`}
+                              >
+                                {(field) => (
+                                  <field.InputField
+                                    label="Description"
+                                    type="text"
+                                  />
+                                )}
+                              </form.AppField>
+                              <form.AppField
+                                name={`items[${itemIndex}].expense_participant_id`}
+                              >
+                                {(field) => (
+                                  <Fieldset label="Payer">
+                                    <form.Subscribe
+                                      selector={(state) =>
+                                        state.values.participants.map(
+                                          (participant) => ({
+                                            value: participant.name,
+                                            label: participant.name,
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      {(options) => (
+                                        <Select
+                                          value={field.state.value}
+                                          onValueChange={field.handleChange}
+                                          disabled={options.length === 0}
                                         >
-                                          {(subSubSubField) => (
-                                            <subSubSubField.InputField
-                                              label={
-                                                distribution.expense_participant_id
-                                              }
-                                            />
-                                          )}
-                                        </form.AppField>
-                                      </div>
-                                    ),
-                                  )}
-                                </section>
-                              )}
-                            </form.AppField>
-                          </div>
-                        )}
-                      </li>
-                    ))}
+                                          <SelectTrigger className="col-span-full w-full capitalize">
+                                            <SelectValue placeholder="Select a participant" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {options.map((option) => (
+                                              <SelectItem
+                                                key={option.value}
+                                                value={option.value}
+                                                className="capitalize"
+                                              >
+                                                {option.label}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      )}
+                                    </form.Subscribe>
+                                  </Fieldset>
+                                )}
+                              </form.AppField>
+                            </div>
+
+                            <form.Subscribe
+                              selector={(state) => state.values.participants}
+                            >
+                              {(participants) =>
+                                participants.length > 0 ? (
+                                  <div className="bg-accent/25 border-accent/75 flex flex-col gap-y-6 border-t p-6">
+                                    <form.AppField
+                                      name={`items[${itemIndex}].type`}
+                                      listeners={{
+                                        onChange: () =>
+                                          handleSyncDistributions(itemIndex),
+                                      }}
+                                    >
+                                      {(field) => (
+                                        <field.RadioGroupField
+                                          label="Type"
+                                          options={[
+                                            {
+                                              value: "equal",
+                                              label: "Equal",
+                                            },
+                                            {
+                                              value: "percentage",
+                                              label: "Percentage",
+                                            },
+                                            {
+                                              value: "absolute",
+                                              label: "Absolute",
+                                            },
+                                          ]}
+                                          orientation="horizontal"
+                                        />
+                                      )}
+                                    </form.AppField>
+                                    <form.Subscribe
+                                      selector={(state) =>
+                                        state.values.items[itemIndex].type
+                                      }
+                                    >
+                                      {(type) =>
+                                        type !== "equal" ? (
+                                          <form.AppField
+                                            name={`items[${itemIndex}].distributions`}
+                                            mode="array"
+                                          >
+                                            {() => (
+                                              <section className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
+                                                <form.Subscribe
+                                                  selector={(state) =>
+                                                    state.values.items[
+                                                      itemIndex
+                                                    ].distributions
+                                                  }
+                                                >
+                                                  {(distributions) =>
+                                                    distributions.map(
+                                                      (
+                                                        distribution,
+                                                        distributionIndex,
+                                                      ) => (
+                                                        <div
+                                                          key={
+                                                            distributionIndex
+                                                          }
+                                                        >
+                                                          <form.AppField
+                                                            name={`items[${itemIndex}].distributions[${distributionIndex}].amount`}
+                                                          >
+                                                            {(field) => (
+                                                              <field.InputField
+                                                                label={
+                                                                  distribution.expense_participant_id
+                                                                }
+                                                                type="number"
+                                                              />
+                                                            )}
+                                                          </form.AppField>
+                                                        </div>
+                                                      ),
+                                                    )
+                                                  }
+                                                </form.Subscribe>
+                                              </section>
+                                            )}
+                                          </form.AppField>
+                                        ) : null
+                                      }
+                                    </form.Subscribe>
+                                  </div>
+                                ) : null
+                              }
+                            </form.Subscribe>
+                          </li>
+                        ))
+                      }
+                    </form.Subscribe>
                   </ul>
                   <Button
                     type="button"
@@ -388,7 +465,25 @@ function RouteComponent() {
               )}
             </form.AppField>
           </TabsContent>
-          <TabsContent value="summary">summary</TabsContent>
+          <TabsContent value="summary">
+            <section className="bg-accent/25 border-accent/75 flex flex-col gap-y-6 rounded-md border p-6">
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  Total Summary: {formatToCurrency(totalSummary)}
+                </h2>
+              </div>
+              <Separator className="border-accent/75" />
+              <div>
+                <h3 className="font-medium">Breakdown</h3>
+                <DataTable columns={summaryBreakdownColumns} data={breakdown} />
+              </div>
+              <Separator className="border-accent/75" />
+              <div>
+                <h3 className="font-medium">Settlement Plan</h3>
+                <DataTable columns={settlementPlanColumns} data={settlements} />
+              </div>
+            </section>
+          </TabsContent>
 
           <form.AppForm>
             <form.SubmitButton className="self-end">
