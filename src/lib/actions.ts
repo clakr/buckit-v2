@@ -182,7 +182,7 @@ export async function archiveGoal(payload: z.output<typeof archiveGoalSchema>) {
 export async function fetchGoalTransactions(goalId: Goal["id"]) {
   const { error, data } = await supabase
     .from("goal_transactions")
-    .select()
+    .select(`*, goals!inner(*)`)
     .eq("goal_id", goalId)
     .order("created_at", {
       ascending: false,
@@ -221,12 +221,18 @@ export async function fetchTransactions() {
     fetchGoalsTransactions(),
   ]);
 
-  return promises
-    .filter((promise) => promise.status === "fulfilled")
-    .flatMap<
-      | Awaited<ReturnType<typeof fetchBucketsTransactions>>[number]
-      | Awaited<ReturnType<typeof fetchGoalsTransactions>>[number]
-    >((promise) => promise.value);
+  const transactions: (
+    | Awaited<ReturnType<typeof fetchBucketsTransactions>>[number]
+    | Awaited<ReturnType<typeof fetchGoalsTransactions>>[number]
+  )[] = [];
+
+  for (const promise of promises) {
+    if (promise.status === "fulfilled") {
+      transactions.push(...promise.value);
+    }
+  }
+
+  return transactions;
 }
 
 export async function fetchDistributions() {

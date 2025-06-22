@@ -35,7 +35,7 @@ export function ConvertToBucketDialog() {
       goal_id: goalId,
       name: bucket?.name,
       description: bucket?.description,
-      current_amount: bucket?.current_amount.toString(),
+      current_amount: bucket?.current_amount,
     } as z.input<typeof convertToBucketSchema>,
     validators: {
       onSubmit: convertToBucketSchema,

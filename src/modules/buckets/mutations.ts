@@ -10,6 +10,7 @@ import {
   updateBucketSchema,
   archiveBucketSchema,
   createBucketTransactionSchema,
+  convertToGoalSchema,
 } from "@/lib/schemas";
 import { Transaction } from "@/lib/types";
 import { Bucket, BucketTransaction, Goal, GoalInsert } from "@/supabase/types";
@@ -133,7 +134,7 @@ export function useConvertToGoalMutation() {
     mutationFn: async ({
       bucket_id,
       ...goalPayload
-    }: GoalInsert & { bucket_id: Bucket["id"] }) => {
+    }: z.output<typeof convertToGoalSchema>) => {
       try {
         const promises = await Promise.allSettled([
           archiveBucket({ id: bucket_id }),

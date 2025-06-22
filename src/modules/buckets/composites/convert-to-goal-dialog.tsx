@@ -35,8 +35,8 @@ export function ConvertToGoalDialog() {
       bucket_id: bucketId,
       name: bucket?.name,
       description: bucket?.description,
-      current_amount: bucket?.current_amount.toString(),
-      target_amount: "",
+      current_amount: bucket?.current_amount,
+      target_amount: 0,
     } as z.input<typeof convertToGoalSchema>,
     validators: {
       onSubmit: convertToGoalSchema,
