@@ -71,9 +71,14 @@ export function ViewBucketTransactionsDialog() {
     );
   }
 
+  const sortedTransactions = transactions.toSorted(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  );
+
   return (
     <DialogContainer>
-      <DataTable columns={columns} data={transactions} />
+      <DataTable columns={columns} data={sortedTransactions} />
     </DialogContainer>
   );
 }

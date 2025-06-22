@@ -22,7 +22,7 @@ export function CreateBucketTransactionDialog() {
   const form = useAppForm({
     defaultValues: {
       bucket_id: bucketId,
-      amount: "",
+      amount: 0,
       description: "",
       type: "inbound",
     } as z.input<typeof createBucketTransactionSchema>,
@@ -32,7 +32,7 @@ export function CreateBucketTransactionDialog() {
     onSubmit: async ({ value }) => {
       const payload = createBucketTransactionSchema.parse(value);
 
-      await mutation.mutateAsync([payload]);
+      await mutation.mutateAsync(payload);
 
       form.reset();
 

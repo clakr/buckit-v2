@@ -21,7 +21,7 @@ export function CreateBucketDialog() {
     defaultValues: {
       name: "",
       description: "",
-      current_amount: "",
+      current_amount: 0,
     } as z.input<typeof createBucketSchema>,
     validators: {
       onSubmit: createBucketSchema,

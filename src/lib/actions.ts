@@ -1,9 +1,13 @@
+import {
+  createBucketSchema,
+  updateBucketSchema,
+  archiveBucketSchema,
+  createBucketTransactionSchema,
+} from "@/lib/schemas";
 import { supabase } from "@/supabase";
 import {
   Bucket,
-  BucketInsert,
   BucketTransactionInsert,
-  BucketUpdate,
   Distribution,
   DistributionInsert,
   DistributionTargetInsert,
@@ -18,12 +22,27 @@ import {
   GoalTransactionInsert,
   GoalUpdate,
 } from "@/supabase/types";
+import { z } from "zod";
 
 export async function fetchBuckets() {
   const { error, data } = await supabase
     .from("buckets")
     .select()
     .eq("is_active", true);
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createBucket(
+  payload: z.output<typeof createBucketSchema>,
+) {
+  const { error, data } = await supabase
+    .from("buckets")
+    .insert(payload)
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
 
@@ -42,14 +61,57 @@ export async function fetchBucket(bucketId: Bucket["id"]) {
   return data;
 }
 
+export async function updateBucket(
+  payload: z.output<typeof updateBucketSchema>,
+) {
+  const { error, data } = await supabase
+    .from("buckets")
+    .update(payload)
+    .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function archiveBucket(
+  payload: z.output<typeof archiveBucketSchema>,
+) {
+  const { error, data } = await supabase
+    .from("buckets")
+    .update({ is_active: false })
+    .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
 export async function fetchBucketTransactions(bucketId: Bucket["id"]) {
   const { error, data } = await supabase
     .from("bucket_transactions")
-    .select()
+    .select(`*, buckets!inner(*)`)
     .eq("bucket_id", bucketId)
     .order("created_at", {
       ascending: false,
     });
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function createBucketTransactions(
+  payload: z.output<typeof createBucketTransactionSchema>,
+) {
+  const { error, data } = await supabase
+    .from("bucket_transactions")
+    .insert(payload)
+    .select(`*, buckets!inner(*)`);
 
   if (error) throw new Error(error.message);
 
@@ -165,46 +227,6 @@ export async function fetchDistributionTargets(
   return data;
 }
 
-export async function createBucket(payload: BucketInsert) {
-  const { error, data } = await supabase
-    .from("buckets")
-    .insert(payload)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-export async function updateBucket(
-  payload: BucketUpdate & { id: Bucket["id"] },
-) {
-  const { error, data } = await supabase
-    .from("buckets")
-    .update(payload)
-    .eq("id", payload.id)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-export async function archiveBucket(payload: { id: Bucket["id"] }) {
-  const { error, data } = await supabase
-    .from("buckets")
-    .update({ is_active: false })
-    .eq("id", payload.id)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
 export async function createGoal(payload: GoalInsert) {
   const { error, data } = await supabase
     .from("goals")
@@ -262,19 +284,6 @@ export async function createDistributionTargets(
     .from("distribution_targets")
     .insert(payload)
     .select();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-}
-
-export async function createBucketTransactions(
-  payload: BucketTransactionInsert[],
-) {
-  const { error, data } = await supabase
-    .from("bucket_transactions")
-    .insert(payload)
-    .select(`*, buckets!inner(*)`);
 
   if (error) throw new Error(error.message);
 

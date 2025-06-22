@@ -14,15 +14,9 @@ const baseBucketSchema = z.object({
     .max(1000, "Description must be less than 1000 characters")
     .nullable(),
   current_amount: z
-    .string()
-    .nonempty("Current amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z
-        .number()
-        .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
-        .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .min(-1_000_000_000, "Amount must be at least -1,000,000,000")
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
 });
 
 const baseGoalSchema = z.object({
@@ -63,15 +57,8 @@ export const transactionTypeSchema = z.union([
 
 const baseTransactionSchema = z.object({
   amount: z
-    .string()
-    .nonempty("Amount is required")
-    .transform((value) => Number(value))
-    .pipe(
-      z.number().max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    )
-    .or(
-      z.number().max(1_000_000_000, "Amount must be less than 1,000,000,000"),
-    ),
+    .number()
+    .max(1_000_000_000, "Amount must be less than 1,000,000,000"),
   description: z
     .string()
     .nonempty("Description is required")
@@ -218,15 +205,15 @@ export const updateBucketSchema = baseBucketSchema
     current_amount: true,
   })
   .extend({
-    id: z.string().nonempty("Bucket ID is required"),
+    id: z.string().uuid().nonempty("Bucket ID is required"),
   });
 
 export const archiveBucketSchema = z.object({
-  id: z.string().nonempty("Bucket ID is required"),
+  id: z.string().uuid().nonempty("Bucket ID is required"),
 });
 
 export const createBucketTransactionSchema = baseTransactionSchema.extend({
-  bucket_id: z.string().nonempty("Bucket ID is required"),
+  bucket_id: z.string().uuid().nonempty("Bucket ID is required"),
 });
 
 export const createGoalSchema = baseGoalSchema.refine(

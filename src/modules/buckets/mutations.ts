@@ -5,15 +5,23 @@ import {
   createGoal,
   updateBucket,
 } from "@/lib/actions";
+import {
+  createBucketSchema,
+  updateBucketSchema,
+  archiveBucketSchema,
+  createBucketTransactionSchema,
+} from "@/lib/schemas";
 import { Transaction } from "@/lib/types";
 import { Bucket, BucketTransaction, Goal, GoalInsert } from "@/supabase/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 
 export function useCreateBucketMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createBucket,
+    mutationFn: async (payload: z.output<typeof createBucketSchema>) =>
+      await createBucket(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -26,28 +34,12 @@ export function useCreateBucketMutation() {
   });
 }
 
-export function useArchiveBucketMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: archiveBucket,
-    onSettled: (payload, _, variable) => {
-      if (!payload) return undefined;
-
-      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
-        if (!prev) return undefined;
-
-        return prev.filter((bucket) => variable.id !== bucket.id);
-      });
-    },
-  });
-}
-
 export function useUpdateBucketMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateBucket,
+    mutationFn: async (payload: z.output<typeof updateBucketSchema>) =>
+      await updateBucket(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
@@ -70,11 +62,31 @@ export function useUpdateBucketMutation() {
   });
 }
 
+export function useArchiveBucketMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: z.output<typeof archiveBucketSchema>) =>
+      await archiveBucket(payload),
+    onSettled: (payload, _, variable) => {
+      if (!payload) return undefined;
+
+      queryClient.setQueryData<Bucket[]>(["buckets"], (prev) => {
+        if (!prev) return undefined;
+
+        return prev.filter((bucket) => variable.id !== bucket.id);
+      });
+    },
+  });
+}
+
 export function useCreateBucketTransactionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createBucketTransactions,
+    mutationFn: async (
+      payload: z.output<typeof createBucketTransactionSchema>,
+    ) => await createBucketTransactions(payload),
     onSettled: (payload) => {
       if (!payload) return undefined;
 
