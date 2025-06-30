@@ -170,11 +170,11 @@ function RouteComponent() {
             <form.AppField name="distribution_targets" mode="array">
               {(field) => (
                 <fieldset className="grid gap-y-4">
-                  <section className="grid gap-y-4">
+                  <section className="@container grid gap-y-4">
                     {field.state.value.map((_, i) => (
                       <div
                         key={i}
-                        className="grid grid-cols-[repeat(3,minmax(0,1fr))_max-content] items-end gap-x-3 rounded border border-dashed p-4 [&_button[data-slot='popover-trigger']]:col-span-full [&_button[data-slot='select-trigger']]:w-full"
+                        className="grid items-end gap-3 rounded border border-dashed p-4 @min-xl:grid-cols-[repeat(3,minmax(0,1fr))_max-content] [&_button[data-slot='popover-trigger']]:col-span-full [&_button[data-slot='select-trigger']]:w-full"
                       >
                         <form.AppField
                           name={`distribution_targets[${i}].target_id`}
@@ -300,6 +300,7 @@ function RouteComponent() {
                           size="icon"
                           onClick={() => field.removeValue(i)}
                           disabled={i === 0}
+                          className="justify-self-end"
                         >
                           <Icon icon="bx:trash" />
                           <span className="sr-only">Remove Distribution</span>

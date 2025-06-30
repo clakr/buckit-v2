@@ -241,7 +241,7 @@ function RouteComponent() {
                       />
                     )}
                   </form.Subscribe>
-                  <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 gap-y-1.5">
+                  <div className="@container mt-2 grid grid-cols-[minmax(200px,1fr)_auto] gap-x-2 gap-y-1.5">
                     <Input
                       ref={participantInputRef}
                       id="participant-input"
@@ -258,7 +258,7 @@ function RouteComponent() {
                       onClick={handleAddParticipant}
                     >
                       <Icon icon="bx:plus" />
-                      Add Participant
+                      <span className="@max-sm:hidden">Add Participant</span>
                     </Button>
                     <p className="text-muted-foreground col-span-full text-xs">
                       Type a name and press{" "}
@@ -285,9 +285,9 @@ function RouteComponent() {
                         items.map((_, itemIndex) => (
                           <li
                             key={itemIndex}
-                            className="border-accent/75 flex flex-col gap-y-3 rounded-md border"
+                            className="border-accent/75 @container flex flex-col gap-y-3 rounded-md border"
                           >
-                            <div className="grid grid-cols-[repeat(3,minmax(0px,200px))_minmax(0,1fr)] gap-x-3 p-6">
+                            <div className="grid gap-3 p-6 @min-3xl:grid-cols-[repeat(3,minmax(200px,1fr))_minmax(0,1fr)]">
                               <form.AppField
                                 name={`items[${itemIndex}].amount`}
                                 listeners={{
@@ -358,8 +358,8 @@ function RouteComponent() {
                               </form.AppField>
                               <Button
                                 type="button"
-                                variant="destructive"
-                                className="self-end justify-self-start"
+                                variant="secondary"
+                                className="self-end justify-self-end @min-3xl:justify-self-start"
                                 onClick={() => {
                                   if (items.length === 1) return;
                                   form.removeFieldValue("items", itemIndex);
@@ -430,24 +430,21 @@ function RouteComponent() {
                                                         distribution,
                                                         distributionIndex,
                                                       ) => (
-                                                        <div
+                                                        <form.AppField
                                                           key={
                                                             distributionIndex
                                                           }
+                                                          name={`items[${itemIndex}].distributions[${distributionIndex}].amount`}
                                                         >
-                                                          <form.AppField
-                                                            name={`items[${itemIndex}].distributions[${distributionIndex}].amount`}
-                                                          >
-                                                            {(field) => (
-                                                              <field.InputField
-                                                                label={
-                                                                  distribution.expense_participant_id
-                                                                }
-                                                                type="number"
-                                                              />
-                                                            )}
-                                                          </form.AppField>
-                                                        </div>
+                                                          {(field) => (
+                                                            <field.InputField
+                                                              label={
+                                                                distribution.expense_participant_id
+                                                              }
+                                                              type="number"
+                                                            />
+                                                          )}
+                                                        </form.AppField>
                                                       ),
                                                     )
                                                   }

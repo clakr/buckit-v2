@@ -76,16 +76,15 @@ function SidebarContent() {
               <SidebarMenuItem key={link.to}>
                 <SidebarMenuButton asChild>
                   <Link to={link.to} activeProps={{ "data-active": true }}>
-                    {({ isActive }) => (
-                      <>
-                        <Icon
-                          icon={
-                            isActive ? link.icon.active : link.icon.inactive
-                          }
-                        />
-                        <span>{link.label}</span>
-                      </>
-                    )}
+                    <Icon
+                      icon={link.icon.active}
+                      className="hidden [[data-active=true]_&]:block"
+                    />
+                    <Icon
+                      icon={link.icon.inactive}
+                      className="block [[data-active=true]_&]:hidden"
+                    />
+                    <span>{link.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
